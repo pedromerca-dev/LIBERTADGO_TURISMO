@@ -6,9 +6,19 @@
 import { Router, Request, Response } from 'express';
 import { RegisterUserSchema, LoginUserSchema } from './creatorsSchemas.ts';
 import { getAuthRepository, getCreatorsRepository } from './repositories/index.ts';
-import { hashPassword, verifyPassword, createToken, requireAuth } from './authService.ts';
+import { hashPassword, verifyPassword, createToken, requireAuth, revokeToken } from './authService.ts';
 
 export const authRouter = Router();
+
+const isProduction = process.env.NODE_ENV === 'production';
+const COOKIE_NAME = 'libertadgo_token';
+const COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: isProduction,
+  sameSite: 'strict' as const,
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  path: '/',
+};
 
 // POST /api/auth/register
 authRouter.post('/register', async (req: Request, res: Response) => {
@@ -46,6 +56,9 @@ authRouter.post('/register', async (req: Request, res: Response) => {
       name: newUser.name,
       role: newUser.role,
     });
+
+    // Set HttpOnly, SameSite strict session cookie
+    res.cookie(COOKIE_NAME, token, COOKIE_OPTIONS);
 
     res.status(201).json({
       success: true,
@@ -106,6 +119,9 @@ authRouter.post('/login', async (req: Request, res: Response) => {
       role: user.role,
     });
 
+    // Set HttpOnly, SameSite strict session cookie
+    res.cookie(COOKIE_NAME, token, COOKIE_OPTIONS);
+
     res.json({
       success: true,
       data: {
@@ -126,7 +142,35 @@ authRouter.post('/login', async (req: Request, res: Response) => {
 });
 
 // POST /api/auth/logout
-authRouter.post('/logout', (_req: Request, res: Response) => {
+authRouter.post('/logout', async (req: Request, res: Response) => {
+  // Extract token from Authorization header or cookie
+  const authHeader = req.headers.authorization;
+  let token: string | null = null;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.substring(7).trim();
+  } else if (req.headers.cookie) {
+    const match = req.headers.cookie.match(/libertadgo_token=([^;]+)/);
+    if (match) token = match[1];
+  } else if (req.body?.token) {
+    token = req.body.token;
+  }
+
+  if (token) {
+    try {
+      await revokeToken(token, req.user?.userId);
+    } catch (err) {
+      console.warn('[Auth Warning] Error invalidating token:', err);
+    }
+  }
+
+  // Clear session cookie
+  res.clearCookie(COOKIE_NAME, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: 'strict',
+    path: '/',
+  });
+
   res.json({ success: true, message: 'Sesión cerrada correctamente' });
 });
 

@@ -141,9 +141,77 @@ export function verifyToken(token: string): TokenPayload | null {
   }
 }
 
+// --- TOKEN REVOCATION & BLACKLIST ---
+
+const revokedTokenHashes = new Set<string>();
+
+export function hashToken(token: string): string {
+  return crypto.createHash('sha256').update(token.trim()).digest('hex');
+}
+
+export async function revokeToken(token: string, userId?: string): Promise<void> {
+  const tokenHash = hashToken(token);
+  revokedTokenHashes.add(tokenHash);
+
+  try {
+    if (process.env.DATABASE_URL) {
+      const { getDbPool } = await import('./repositories/dbPool.ts');
+      const pool = getDbPool();
+      const payload = verifyToken(token);
+      const expiresAt = payload ? new Date(payload.exp * 1000) : new Date(Date.now() + TOKEN_EXPIRY_DAYS * 86400000);
+      const targetUserId = userId || payload?.userId || null;
+
+      await pool.query(
+        `INSERT INTO revoked_tokens (token_hash, user_id, expires_at, revoked_at)
+         VALUES ($1, $2, $3, NOW())
+         ON CONFLICT (token_hash) DO NOTHING`,
+        [tokenHash, targetUserId, expiresAt]
+      );
+    }
+  } catch (err) {
+    // If database is not configured or in test mode, memory revocation is already effective
+    console.warn('[Security] Token revocation persisted to memory (database sync bypassed):', err instanceof Error ? err.message : String(err));
+  }
+}
+
+export async function isTokenRevoked(token: string): Promise<boolean> {
+  const tokenHash = hashToken(token);
+  if (revokedTokenHashes.has(tokenHash)) {
+    return true;
+  }
+
+  try {
+    if (process.env.DATABASE_URL) {
+      const { getDbPool } = await import('./repositories/dbPool.ts');
+      const pool = getDbPool();
+      const res = await pool.query(
+        'SELECT token_hash FROM revoked_tokens WHERE token_hash = $1',
+        [tokenHash]
+      );
+      if (res.rows.length > 0) {
+        revokedTokenHashes.add(tokenHash);
+        return true;
+      }
+    }
+  } catch {
+    // Rely on memory cache if DB is not reachable
+  }
+
+  return false;
+}
+
+export function isTokenRevokedSync(token: string): boolean {
+  const tokenHash = hashToken(token);
+  return revokedTokenHashes.has(tokenHash);
+}
+
+export function clearRevokedTokensForTesting(): void {
+  revokedTokenHashes.clear();
+}
+
 // --- MIDDLEWARES ---
 
-export function authMiddleware(req: Request, _res: Response, next: NextFunction): void {
+export async function authMiddleware(req: Request, _res: Response, next: NextFunction): Promise<void> {
   const authHeader = req.headers.authorization;
   let token: string | null = null;
 
@@ -158,7 +226,10 @@ export function authMiddleware(req: Request, _res: Response, next: NextFunction)
   if (token) {
     const payload = verifyToken(token);
     if (payload) {
-      req.user = payload;
+      const revoked = await isTokenRevoked(token);
+      if (!revoked) {
+        req.user = payload;
+      }
     }
   }
   next();

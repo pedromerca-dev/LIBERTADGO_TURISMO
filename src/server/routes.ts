@@ -104,6 +104,11 @@ apiRouter.get('/places/search', (req: Request, res: Response) => {
 // GET /api/places/:id/videos - Approved videos associated with a specific place
 apiRouter.get('/places/:id/videos', async (req: Request, res: Response) => {
   try {
+    const place = catalogRepository.getPlaceById(req.params.id);
+    if (!place) {
+      res.status(404).json({ success: false, error: 'Lugar no encontrado en el catálogo de La Libertad' });
+      return;
+    }
     const { getCreatorsRepository } = await import('./repositories/index.ts');
     const repo = getCreatorsRepository();
     const videos = await repo.getVideosForPlace(req.params.id);

@@ -13,6 +13,7 @@ import {
   PanelRightClose,
   PanelRightOpen,
   ChevronDown,
+  Shield,
 } from 'lucide-react';
 import { TripItinerary } from '../types/catalog.ts';
 import { formatDateRange } from '../utils/dateUtils.ts';
@@ -25,6 +26,7 @@ interface HeaderProps {
   onEditTrip?: () => void;
   onUpdateTripTitle?: (newTitle: string) => void;
   onOpenArchitectureModal: () => void;
+  onOpenAdmin?: () => void;
   mobileTab?: 'content' | 'map';
   setMobileTab?: (tab: 'content' | 'map') => void;
   isMapCollapsed?: boolean;
@@ -39,6 +41,7 @@ export const Header: React.FC<HeaderProps> = ({
   onEditTrip,
   onUpdateTripTitle,
   onOpenArchitectureModal,
+  onOpenAdmin,
   mobileTab = 'content',
   setMobileTab,
   isMapCollapsed = false,
@@ -452,10 +455,36 @@ export const Header: React.FC<HeaderProps> = ({
                       <Layers className="w-3.5 h-3.5 text-[#64748B]" />
                       <span>Arquitectura MVP</span>
                     </button>
+                    {onOpenAdmin && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onOpenAdmin();
+                          setIsMoreMenuOpen(false);
+                        }}
+                        className="w-full px-3 py-2 text-left text-xs text-[#17243A] hover:bg-[#F7F8FA] flex items-center gap-2 cursor-pointer border-t border-[#E9EEF4]"
+                      >
+                        <Shield className="w-3.5 h-3.5 text-[#E85B49]" />
+                        <span className="font-semibold text-slate-800">Panel Admin</span>
+                      </button>
+                    )}
                   </div>
                 </>
               )}
             </div>
+          )}
+
+          {/* Botón directo de Acceso al Panel Admin */}
+          {onOpenAdmin && (
+            <button
+              type="button"
+              onClick={onOpenAdmin}
+              className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg transition-colors cursor-pointer"
+              title="Acceder al Panel de Administración del Catálogo"
+            >
+              <Shield className="w-3.5 h-3.5 text-[#E85B49]" />
+              <span>Admin</span>
+            </button>
           )}
 
           {/* Botón Primario: Crear / Nuevo Viaje */}

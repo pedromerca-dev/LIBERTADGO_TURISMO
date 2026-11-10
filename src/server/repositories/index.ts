@@ -82,6 +82,26 @@ function initializeRepositories(): {
       const sanitized = getSanitizedHost(databaseUrl);
       console.log(`[Storage Architecture] Activating PostgreSQL RDBMS adapter (${sanitized}).`);
       const postgresAdapter = new PostgresCreatorsRepository(databaseUrl);
+
+      // Lazily initialize persistent Postgres place catalog adapter
+      try {
+        const { getDbPool } = require('./dbPool.ts');
+        const { PostgresPlaceRepository } = require('./postgresPlaceRepository.ts');
+        const { setPlaceRepositoryInstance } = require('./placeRepository.ts');
+        const pool = getDbPool(databaseUrl);
+        setPlaceRepositoryInstance(new PostgresPlaceRepository(pool));
+      } catch {
+        // Dynamic import fallback for ESM environments
+        import('./dbPool.ts').then(({ getDbPool }) => {
+          import('./postgresPlaceRepository.ts').then(({ PostgresPlaceRepository }) => {
+            import('./placeRepository.ts').then(({ setPlaceRepositoryInstance }) => {
+              const pool = getDbPool(databaseUrl);
+              setPlaceRepositoryInstance(new PostgresPlaceRepository(pool));
+            });
+          });
+        }).catch(() => {});
+      }
+
       return {
         auth: postgresAdapter,
         creators: postgresAdapter,
@@ -164,6 +184,12 @@ export async function verifyDatabaseConnectivity(): Promise<void> {
         authRepoInstance = memoryAdapter;
         creatorsRepoInstance = memoryAdapter;
         activeDatabaseAdapter = memoryAdapter;
+        try {
+          const { setPlaceRepositoryInstance } = await import('./placeRepository.ts');
+          setPlaceRepositoryInstance(null);
+        } catch {
+          // ignore
+        }
       }
     }
   } else if (isProduction) {
@@ -249,6 +275,13 @@ export function resetRepositoriesForTesting(): void {
 }
 
 export async function closeDatabaseConnections(): Promise<void> {
+  try {
+    const { closeDbPool } = await import('./dbPool.ts');
+    await closeDbPool();
+  } catch {
+    // ignore
+  }
+
   if (activeDatabaseAdapter && typeof activeDatabaseAdapter.close === 'function') {
     await activeDatabaseAdapter.close();
     console.log('[Storage Architecture] Database connections closed cleanly.');

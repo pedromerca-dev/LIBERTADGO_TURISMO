@@ -4,6 +4,7 @@ import { Place, TripItinerary, TripActivity, LocalCampaign, CampaignSubmission }
 import { LA_LIBERTAD_LOCALITIES, Locality } from '../types/geo.ts';
 import { isWithinLaLibertad, validateLocalityId, getLocality } from '../utils/geoBoundary.ts';
 import { calculateTripDuration, formatDateRange } from '../utils/dateUtils.ts';
+import { getPlaceRepository } from './repositories/placeRepository.ts';
 
 class CatalogRepository {
   private places: Map<string, Place> = new Map();
@@ -35,86 +36,19 @@ class CatalogRepository {
 
   // --- PLACES & CATALOG ---
   public getPlaces(filters?: { localityId?: string; category?: string; search?: string }): Place[] {
-    let result = Array.from(this.places.values());
-
-    if (filters?.localityId) {
-      const locId = filters.localityId.toLowerCase().trim();
-      result = result.filter((p) => p.localityId.toLowerCase() === locId);
-    }
-
-    if (filters?.category && filters.category !== 'todas') {
-      const cat = filters.category.toLowerCase().trim();
-      result = result.filter(
-        (p) =>
-          p.category.toLowerCase() === cat ||
-          (p.subcategory && p.subcategory.toLowerCase().includes(cat))
-      );
-    }
-
-    if (filters?.search) {
-      const q = filters.search.toLowerCase().trim();
-      result = result.filter(
-        (p) =>
-          p.name.toLowerCase().includes(q) ||
-          p.address.toLowerCase().includes(q) ||
-          p.shortDescription.toLowerCase().includes(q) ||
-          p.tags.some((t) => t.toLowerCase().includes(q))
-      );
-    }
-
-    // Strict deduplication by ID and slug
-    const seen = new Set<string>();
-    const deduped: Place[] = [];
-    for (const p of result) {
-      if (!seen.has(p.id) && !seen.has(p.slug)) {
-        seen.add(p.id);
-        seen.add(p.slug);
-        deduped.push(p);
-      }
-    }
-
-    // Double check strict boundary constraint
-    return deduped.filter((p) => isWithinLaLibertad(p.coordinates));
+    return getPlaceRepository().getPublicPlaces(filters);
   }
 
   public getPlaceById(id: string): Place | undefined {
-    const place = this.places.get(id);
+    const place = getPlaceRepository().getPlaceById(id);
     if (!place || !isWithinLaLibertad(place.coordinates)) return undefined;
+    // Strict public isolation: only PUBLISHED places can be retrieved via the public catalog
+    if (place.status && place.status !== 'PUBLISHED') return undefined;
     return place;
   }
 
   public searchPlaces(query: string, localityId?: string): Place[] {
-    const q = (query || '').toLowerCase().trim();
-    let result = Array.from(this.places.values());
-
-    if (localityId) {
-      result = result.filter((p) => p.localityId.toLowerCase() === localityId.toLowerCase().trim());
-    }
-
-    if (q) {
-      result = result.filter((p) => {
-        return (
-          p.name.toLowerCase().includes(q) ||
-          p.category.toLowerCase().includes(q) ||
-          p.address.toLowerCase().includes(q) ||
-          p.shortDescription.toLowerCase().includes(q) ||
-          p.tags.some((t) => t.toLowerCase().includes(q))
-        );
-      });
-    }
-
-    // Deduplicate
-    const seen = new Set<string>();
-    const deduped: Place[] = [];
-    for (const p of result) {
-      if (!seen.has(p.id) && !seen.has(p.slug)) {
-        seen.add(p.id);
-        seen.add(p.slug);
-        deduped.push(p);
-      }
-    }
-
-    return deduped.filter((p) => isWithinLaLibertad(p.coordinates));
+    return getPlaceRepository().getPublicPlaces({ search: query, localityId });
   }
 
   // --- ITINERARIES ---

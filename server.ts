@@ -132,7 +132,7 @@ async function startServer() {
       res.status(503).json({
         success: false,
         error: 'Servicio no disponible: configuración de producción incompleta en Cloud Run.',
-        detail: configError,
+        ...(process.env.NODE_ENV !== 'production' ? { detail: configError } : {}),
       });
     });
   }

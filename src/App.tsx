@@ -21,11 +21,42 @@ import {
   reorderDayActivities,
   moveActivityToDayAndIndex,
 } from './utils/itineraryUtils.ts';
+import { AuthProvider, useAuth } from './context/AuthContext.tsx';
+import { LoginPage } from './pages/LoginPage.tsx';
+import { AdminLayout } from './components/admin/AdminLayout.tsx';
 
 const STORAGE_TRIPS_KEY = 'libertadgo_trips_v2';
 const STORAGE_ACTIVE_ID_KEY = 'libertadgo_active_trip_id_v2';
 
-export default function App() {
+function MainAppContent() {
+  const { isAdmin, isAuthenticated, isLoading: isAuthLoading } = useAuth();
+  const [currentRoute, setCurrentRoute] = useState<'public' | 'admin' | 'login'>(() => {
+    if (typeof window !== 'undefined') {
+      const path = window.location.pathname;
+      if (path.startsWith('/admin')) return 'admin';
+      if (path.startsWith('/login')) return 'login';
+    }
+    return 'public';
+  });
+
+  const navigateTo = (route: 'public' | 'admin' | 'login') => {
+    setCurrentRoute(route);
+    if (typeof window !== 'undefined') {
+      const path = route === 'admin' ? '/admin' : route === 'login' ? '/login' : '/';
+      window.history.pushState(null, '', path);
+    }
+  };
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname;
+      if (path.startsWith('/admin')) setCurrentRoute('admin');
+      else if (path.startsWith('/login')) setCurrentRoute('login');
+      else setCurrentRoute('public');
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
   // Navigation & view states
   const [activeView, setActiveView] = useState<'workspace' | 'destinations'>('workspace');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
@@ -396,6 +427,27 @@ export default function App() {
     setSavedTrips((prev) => prev.map((t) => (t.id === updatedTrip.id ? updatedTrip : t)));
   };
 
+  if (currentRoute === 'admin') {
+    if (isAdmin) {
+      return <AdminLayout onGoToPublicApp={() => navigateTo('public')} />;
+    }
+    return (
+      <LoginPage
+        onBackToApp={() => navigateTo('public')}
+        onLoginSuccess={() => navigateTo('admin')}
+      />
+    );
+  }
+
+  if (currentRoute === 'login') {
+    return (
+      <LoginPage
+        onBackToApp={() => navigateTo('public')}
+        onLoginSuccess={() => navigateTo(isAdmin ? 'admin' : 'public')}
+      />
+    );
+  }
+
   return (
     <div className="h-dvh flex flex-col overflow-hidden bg-[#F8F9FA] text-[#17243A] antialiased">
       {/* 
@@ -424,6 +476,7 @@ export default function App() {
         }}
         onUpdateTripTitle={handleUpdateTripTitle}
         onOpenArchitectureModal={() => setIsArchitectureModalOpen(true)}
+        onOpenAdmin={() => navigateTo('admin')}
         mobileTab={mobileTab}
         setMobileTab={setMobileTab}
         isMapCollapsed={isMapCollapsed}
@@ -550,5 +603,13 @@ export default function App() {
         onClose={() => setIsArchitectureModalOpen(false)}
       />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <MainAppContent />
+    </AuthProvider>
   );
 }
