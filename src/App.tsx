@@ -14,7 +14,7 @@ import { WorkspaceContent } from './components/workspace/WorkspaceContent.tsx';
 import { MapPanel } from './components/workspace/MapPanel.tsx';
 import { INITIAL_PLACES } from './data/initialPlaces.ts';
 import { TripItinerary, Place, TripActivity } from './types/catalog.ts';
-import { matchesCategory, matchesSearchQuery } from './utils/filterUtils.ts';
+import { matchesCategory, matchesSearchQuery, matchesLocality } from './utils/filterUtils.ts';
 import {
   addPlaceToDay,
   removeActivityAndReindex,
@@ -41,9 +41,10 @@ export default function App() {
 
   // Synchronized catalog & map filter states
   const [selectedCategory, setSelectedCategory] = useState<string>('todas');
+  const [selectedLocality, setSelectedLocality] = useState<string>('todas');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  // Places catalog state
+  // Places catalog state (maintaining complete regional catalog of 297 places)
   const [places, setPlaces] = useState<Place[]>(INITIAL_PLACES);
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
 
@@ -51,6 +52,18 @@ export default function App() {
   const handleCategoryChange = (newCat: string) => {
     setSelectedCategory(newCat);
     if (selectedPlace && !matchesCategory(selectedPlace.category, newCat)) {
+      setSelectedPlace(null);
+    }
+  };
+
+  // Synchronized locality change handler with detail view cleanup (non-destructive)
+  const handleLocalityChange = (newLoc: string) => {
+    setSelectedLocality(newLoc);
+    if (
+      selectedPlace &&
+      newLoc !== 'todas' &&
+      !matchesLocality(selectedPlace.localityId, newLoc)
+    ) {
       setSelectedPlace(null);
     }
   };
@@ -127,32 +140,22 @@ export default function App() {
     }
   }, [savedTrips, currentTrip]);
 
-  // Fetch places when destination changes
+  // Load full regional catalog (297 verified places across La Libertad)
   useEffect(() => {
-    if (!currentTrip) {
-      setPlaces(INITIAL_PLACES);
-      return;
-    }
-
-    fetch(`/api/places?localityId=${currentTrip.destinationId}`)
+    fetch('/api/places')
       .then((res) => res.json())
       .then((data) => {
-        if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+        // Only update if backend successfully returns the full catalog (at least 297 places)
+        if (data.success && Array.isArray(data.data) && data.data.length >= INITIAL_PLACES.length) {
           setPlaces(data.data);
         } else {
-          const localMatching = INITIAL_PLACES.filter(
-            (p) => p.localityId === currentTrip.destinationId
-          );
-          setPlaces(localMatching.length > 0 ? localMatching : INITIAL_PLACES);
+          setPlaces(INITIAL_PLACES);
         }
       })
       .catch(() => {
-        const localMatching = INITIAL_PLACES.filter(
-          (p) => p.localityId === currentTrip.destinationId
-        );
-        setPlaces(localMatching.length > 0 ? localMatching : INITIAL_PLACES);
+        setPlaces(INITIAL_PLACES);
       });
-  }, [currentTrip?.destinationId]);
+  }, []);
 
   // ==========================================
   // TRIP CREATION & SWITCHING HANDLERS
@@ -169,6 +172,7 @@ export default function App() {
     setSelectedPlace(null);
     setSelectedDayNumber(null);
     setSelectedCategory('todas');
+    setSelectedLocality('todas');
     setSearchQuery('');
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   };
@@ -181,6 +185,7 @@ export default function App() {
     setSelectedPlace(null);
     setSelectedDayNumber(null);
     setSelectedCategory('todas');
+    setSelectedLocality('todas');
     setSearchQuery('');
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   };
@@ -490,6 +495,8 @@ export default function App() {
                 onReturnToPreviousSection={handleReturnToPreviousSection}
                 selectedCategory={selectedCategory}
                 onCategoryChange={handleCategoryChange}
+                selectedLocality={selectedLocality}
+                onLocalityChange={handleLocalityChange}
                 searchQuery={searchQuery}
                 onSearchChange={handleSearchChange}
               />
@@ -519,6 +526,8 @@ export default function App() {
                 onSwitchToContent={() => setMobileTab('content')}
                 selectedCategory={selectedCategory}
                 onCategoryChange={handleCategoryChange}
+                selectedLocality={selectedLocality}
+                onLocalityChange={handleLocalityChange}
                 searchQuery={searchQuery}
                 onSearchChange={handleSearchChange}
               />

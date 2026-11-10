@@ -16,6 +16,25 @@ export const FILTER_CATEGORIES: FilterCategoryItem[] = [
   { id: 'museos', label: 'Museos', icon: '🎨' },
 ];
 
+export interface LocalityFilterOption {
+  id: string;
+  name: string;
+}
+
+export const LOCALITY_FILTER_OPTIONS: LocalityFilterOption[] = [
+  { id: 'todas', name: 'Toda La Libertad' },
+  { id: 'trujillo', name: 'Trujillo' },
+  { id: 'huanchaco', name: 'Huanchaco' },
+  { id: 'la-esperanza', name: 'La Esperanza' },
+  { id: 'victor-larco', name: 'Víctor Larco' },
+  { id: 'huamachuco', name: 'Huamachuco' },
+  { id: 'moche', name: 'Moche' },
+  { id: 'puerto-malabrigo', name: 'Puerto Malabrigo' },
+  { id: 'pacasmayo', name: 'Pacasmayo' },
+  { id: 'magdalena-cao', name: 'Magdalena de Cao' },
+  { id: 'cascas', name: 'Cascas' },
+];
+
 /**
  * Checks if a place category matches the active filter category.
  * Handles mapping for 'restaurantes' which also includes 'gastronomia'.
@@ -30,6 +49,16 @@ export function matchesCategory(placeCategory: PlaceCategory | string, filterCat
   }
 
   return placeCategory === filterCategory;
+}
+
+/**
+ * Checks if a place locality matches the active locality filter.
+ */
+export function matchesLocality(placeLocalityId: string, filterLocalityId?: string): boolean {
+  if (!filterLocalityId || filterLocalityId === 'todas') {
+    return true;
+  }
+  return placeLocalityId.toLowerCase().trim() === filterLocalityId.toLowerCase().trim();
 }
 
 /**
@@ -71,14 +100,19 @@ export function matchesSearchQuery(place: Place, query: string): boolean {
 }
 
 /**
- * Filters places by category and search query.
+ * Filters places by category, search query, and optional locality.
  */
 export function filterCatalogPlaces(
   places: Place[],
   category: string,
-  searchQuery: string
+  searchQuery: string,
+  localityId?: string
 ): Place[] {
   return places.filter((place) => {
-    return matchesCategory(place.category, category) && matchesSearchQuery(place, searchQuery);
+    return (
+      matchesCategory(place.category, category) &&
+      matchesSearchQuery(place, searchQuery) &&
+      matchesLocality(place.localityId, localityId)
+    );
   });
 }

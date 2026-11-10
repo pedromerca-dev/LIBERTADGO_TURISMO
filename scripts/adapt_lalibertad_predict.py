@@ -66,21 +66,87 @@ def slugify(text: str) -> str:
     text = re.sub(r'[^\w\s-]', '', text.lower())
     return re.sub(r'[-\s]+', '-', text).strip('-')
 
-def determine_locality(name: str, address: str, lat: float, lng: float) -> tuple[str, str]:
-    text = f"{name} {address}".lower()
-    if 'huanchaco' in text: return 'huanchaco', 'Huanchaco'
-    if 'moche' in text or 'campiña de moche' in text: return 'moche', 'Moche'
-    if 'victor larco' in text or 'buenos aires' in text or 'vista alegre' in text: return 'victor-larco', 'Víctor Larco Herrera'
-    if 'la esperanza' in text or 'huaca arco iris' in text or 'huaca el dragon' in text: return 'la-esperanza', 'La Esperanza'
-    if 'magdalena de cao' in text or 'el brujo' in text or 'señora de cao' in text: return 'magdalena-cao', 'Magdalena de Cao'
-    if 'pacasmayo' in text: return 'pacasmayo', 'Pacasmayo'
-    if 'huamachuco' in text or 'marcahuamachuco' in text or 'sausacocha' in text: return 'huamachuco', 'Huamachuco'
-    if 'cascas' in text: return 'cascas', 'Cascas'
-    if 'chicama' in text or 'malabrigo' in text: return 'puerto-malabrigo', 'Puerto Malabrigo (Chicama)'
+def haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    R = 6371.0
+    p1, p2 = math.radians(lat1), math.radians(lat2)
+    dp = math.radians(lat2 - lat1)
+    dl = math.radians(lon2 - lon1)
+    a = math.sin(dp/2)**2 + math.cos(p1)*math.cos(p2)*math.sin(dl/2)**2
+    return 2 * R * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
-    def dist(loc): return math.hypot(lat - loc['lat'], lng - loc['lng'])
-    closest = min(LOCALITIES, key=dist)
-    return closest['id'], closest['name']
+def determine_locality(name: str, address: str, lat: float, lng: float) -> tuple[str, str]:
+    """
+    Determina la localidad con prioridad geoespacial estricta y límites territoriales,
+    asegurando que nombres comerciales no determinen por sí solos el distrito.
+    """
+    # 1. Validación territorial perimetral de La Libertad (-9.2 a -6.8 lat, -80.2 a -76.8 lng)
+    if not (-9.2 <= lat <= -6.8 and -80.2 <= lng <= -76.8):
+        return 'pendiente-revision', 'Pendiente de Revisión Territorial'
+
+    # 2. Cálculo de distancias haversine a cada centroide de localidad
+    distances = {loc['id']: (haversine_km(lat, lng, loc['lat'], loc['lng']), loc['name']) for loc in LOCALITIES}
+    closest_id, (min_dist, closest_name) = min(distances.items(), key=lambda x: x[1][0])
+
+    # 3. Análisis de dirección explícita (NO nombre comercial) para desempate distrital
+    addr_l = address.lower() if address else ''
+
+    # Cluster metropolitano de Trujillo (radio < 15 km)
+    if distances['trujillo'][0] < 15.0:
+        if ('victor larco' in addr_l or 'buenos aires' in addr_l or 'california' in addr_l):
+            if distances['victor-larco'][0] < 10.0:
+                return 'victor-larco', 'Víctor Larco Herrera'
+        if ('la esperanza' in addr_l or 'mansiche' in addr_l):
+            if distances['la-esperanza'][0] < 10.0:
+                return 'la-esperanza', 'La Esperanza'
+        if 'huanchaco' in addr_l and distances['huanchaco'][0] < 12.0:
+            return 'huanchaco', 'Huanchaco'
+        if ('moche' in addr_l or 'campiña de moche' in addr_l) and distances['moche'][0] < 12.0:
+            return 'moche', 'Moche'
+        if 'trujillo' in addr_l and distances['trujillo'][0] < 12.0:
+            return 'trujillo', 'Trujillo'
+
+    # Localidades distantes (> 20 km): Malabrigo, Pacasmayo, Cascas, Huamachuco, Magdalena de Cao
+    remote_localities = ['puerto-malabrigo', 'pacasmayo', 'cascas', 'huamachuco', 'magdalena-cao']
+    if closest_id in remote_localities:
+        if min_dist <= 25.0:
+            return closest_id, closest_name
+        else:
+            return 'pendiente-revision', 'Pendiente de Revisión Territorial'
+
+    # Asignar centro geodésico más cercano por proximidad
+    return closest_id, closest_name
+
+def run_locality_regression_tests():
+    """Pruebas para evitar regresiones en Trujillo, Huanchaco, Moche, Víctor Larco y Puerto Malabrigo."""
+    # Test 1: Hotel Chicama (Trujillo/Víctor Larco, no debe irse a Puerto Malabrigo por su nombre)
+    loc_id, _ = determine_locality("Hotel Chicama", "Calle Rosate 280, Trujillo", -8.12282, -79.04269)
+    assert loc_id in ['victor-larco', 'trujillo'], f"Test 1 falló: {loc_id}"
+
+    # Test 2: Moche - Cafés Especiales (Centro de Trujillo, no debe irse a Moche por su nombre)
+    loc_id, _ = determine_locality("Moche - Cafés Especiales", "Jr. Bolognesi 496, Centro Histórico", -8.11494, -79.03060)
+    assert loc_id == 'trujillo', f"Test 2 falló: {loc_id}"
+
+    # Test 3: El Escudero Lodge Huanchaco (Urb. San Andrés, Trujillo)
+    loc_id, _ = determine_locality("El Escudero Lodge Huanchaco", "Calle Las Palmeras 240, Urb. San Andrés", -8.12041, -79.02948)
+    assert loc_id == 'trujillo', f"Test 3 falló: {loc_id}"
+
+    # Test 4: Muelle de Huanchaco (debe ser Huanchaco)
+    loc_id, _ = determine_locality("Muelle de Huanchaco", "Av. Larco s/n", -8.0792, -79.1215)
+    assert loc_id == 'huanchaco', f"Test 4 falló: {loc_id}"
+
+    # Test 5: Huacas del Sol y de la Luna (debe ser Moche)
+    loc_id, _ = determine_locality("Huacas de Moche", "Campiña de Moche", -8.1345, -78.9912)
+    assert loc_id == 'moche', f"Test 5 falló: {loc_id}"
+
+    # Test 6: Puerto Malabrigo ola izquierda (debe ser Puerto Malabrigo)
+    loc_id, _ = determine_locality("Puerto Chicama", "Malecón de Malabrigo", -7.7011, -79.4358)
+    assert loc_id == 'puerto-malabrigo', f"Test 6 falló: {loc_id}"
+
+    # Test 7: Coordenada fuera de La Libertad
+    loc_id, _ = determine_locality("Lugar en Lima", "Miraflores", -12.12, -77.03)
+    assert loc_id == 'pendiente-revision', f"Test 7 falló: {loc_id}"
+
+    print("[Tests] Todas las pruebas de regresión de determine_locality pasaron exitosamente.")
 
 def determine_category_and_subcategory(name: str, orig_category: str, kind: str, cuisine: str | None) -> tuple[str, str]:
     name_l = name.lower()

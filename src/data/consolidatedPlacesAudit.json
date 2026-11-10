@@ -1,0 +1,1773 @@
+[
+  {
+    "retiredId": "place_predict_52",
+    "canonicalId": "place_rincon_vallejo",
+    "canonicalName": "El Rincón de Vallejo",
+    "retiredName": "El Rincón de Vallejo",
+    "retiredAt": "2026-11-10T16:45:00Z",
+    "rationale": "Consolidación de duplicado confirmado según auditoría técnica de catálogo.",
+    "sourcesIntegrated": [
+      {
+        "placeId": "place_predict_52",
+        "sourceId": "openstreetmap",
+        "externalId": "4934609621",
+        "lastSyncedAt": "2026-11-05"
+      }
+    ],
+    "retiredSnapshot": {
+      "id": "place_predict_52",
+      "slug": "el-rincon-de-vallejo-2",
+      "name": "El Rincón de Vallejo",
+      "category": "gastronomia",
+      "subcategory": "Comida Criolla Tradicional",
+      "localityId": "trujillo",
+      "localityName": "Trujillo",
+      "address": "Jirón Orbegoso 309, Centro Histórico de Trujillo",
+      "coordinates": {
+        "lat": -8.1100092,
+        "lng": -79.0294465
+      },
+      "geohash": "6nxcces",
+      "shortDescription": "El Rincón de Vallejo: experiencia gastronómica auténtica en Trujillo con lo mejor de la cocina liberteña.",
+      "fullDescription": "El Rincón de Vallejo es un referente turístico situado en Jirón Orbegoso 309, Centro Histórico de Trujillo. Representa una de las opciones destacadas para visitantes y viajeros que exploran el circuito turístico regional de La Libertad.",
+      "rating": 4.3,
+      "reviewsCount": 7026,
+      "images": [
+        {
+          "id": "img_place_predict_52_1",
+          "url": "/images/places/place_52.webp",
+          "caption": "El Rincón de Vallejo - Comida Criolla Tradicional",
+          "isCover": true
+        }
+      ],
+      "verification": {
+        "isVerified": true,
+        "verificationLevel": "partner_verified",
+        "verifiedAt": "2026-11-05",
+        "notes": "Integrado desde registro turístico verificado (OSM)"
+      },
+      "sources": [
+        {
+          "placeId": "place_predict_52",
+          "sourceId": "openstreetmap",
+          "externalId": "4934609621",
+          "lastSyncedAt": "2026-11-05"
+        }
+      ],
+      "tags": [
+        "Trujillo",
+        "Comida Criolla Tradicional",
+        "Interiores",
+        "Rincón",
+        "Vallejo",
+        "Gastronomía"
+      ],
+      "recommendedDurationMinutes": 80,
+      "phone": "+51 44 226232",
+      "website": "http://www.rincondevallejo.pe/",
+      "mapsUrl": "https://www.google.com/maps/search/?api=1&query=El+Ric%C3%B3n+de+Vallejo+-8.110009,-79.029447",
+      "priceLevel": 2,
+      "safetyScore": 41.3,
+      "safetyReport": {
+        "score": 41.3,
+        "riskLevel": "Riesgo Urbano / Desfavorable de Noche",
+        "incidentCount": 1933,
+        "radiusMeters": 1000,
+        "criticalShift": "tarde",
+        "source": "MININTER - Sistema de Denuncias Policiales (SIDPOL)",
+        "unsafeHours": "18:30 a 05:00 hrs (Horas de baja visibilidad y mayor registro en turno tarde).",
+        "safeHours": "09:00 a 17:00 hrs (Franja recomendada para recorridos y actividades).",
+        "unsafeDatesNotice": "Mayor incidencia estadística en fines de semana (viernes noche, sábado y domingo) y fechas festivas locales de alta afluencia comercial.",
+        "topCrimes": [
+          {
+            "name": "Hurto simple de pertenencias / carteristas",
+            "count": 779,
+            "percentage": 40.3
+          },
+          {
+            "name": "Conflictos domésticos / violencia psicológica",
+            "count": 227,
+            "percentage": 11.7
+          },
+          {
+            "name": "Arrebato de teléfono celular",
+            "count": 177,
+            "percentage": 9.2
+          },
+          {
+            "name": "Estafa o engaño comercial",
+            "count": 140,
+            "percentage": 7.2
+          },
+          {
+            "name": "Violencia interpersonal / física",
+            "count": 99,
+            "percentage": 5.1
+          }
+        ],
+        "recommendations": [
+          "Evite manipular o exponer teléfonos móviles de gama alta en aceras concurridas o cerca de la calzada.",
+          "Lleve mochilas y bolsos hacia adelante en zonas de aglomeración y esquinas comerciales.",
+          "Contrate servicios turísticos, transporte y tours únicamente en agencias formales registradas ante MINCETUR.",
+          "Planifique retornar a su hospedaje antes de las 19:00 hrs y priorice el uso de taxis de aplicativo o autorizados.",
+          "Porte solo una copia fotostática de su documento de identidad y mantenga las tarjetas bancarias protegidas."
+        ],
+        "evaluatedAt": "2026-11-05T17:46:35.060402Z"
+      },
+      "reviews": [
+        {
+          "authorName": "Marinka Burgos-Riano",
+          "rating": 1.0,
+          "text": "Una experiencia bastante decepcionante y demasiado cara para lo que ofrecen.\n\nPara empezar, la señorita que nos atendió por teléfono nos complicó innecesariamente la reserva, insistiendo en que teníamos que pagar 100 soles por Yape. Le expliqué que estábamos en el aeropuerto y que íbamos a ir directamente al restaurante, seis personas en total, pero no quiso entender razones.\n\nLo curioso es que finalmente llegamos sin reserva y nos dieron una mesa sin ningún problema.\n\nEl interior del restaurante es lindo, tiene su encanto, pero la calle es bastante ruidosa por el tráfico constante de vehículos. Además, hace bastante calor dentro. Tienen aire acondicionado, pero el local está completamente abierto hacia la calle, sin puertas que permitan mantener el ambiente fresco. Así que de poco sirve.\n\nLos baños estaban sucios y hasta había unas sandalias tiradas encima del lavamanos.\n\nEn cuanto a la comida, el arroz chaufa estaba demasiado grasoso y el cuy frito no tenía nada de especial. Práctica"
+        },
+        {
+          "authorName": "Fiorela Garcia Castillo",
+          "rating": 4.0,
+          "text": "Fui a 2 sedes, uno que esta en la av. Orbegoso cerca a la plaza de Trujillo y el otro que está cerca al estadio Mansiche en la Av. España. Estuvo bastante agradable, vayan a almorzar temprano, generalmente se acaban más rápido los platos que incluyen pescado, y algunos platos criollos...Es un lugar cálido y buena atención, los precios no son muy altos, pero tampoco tan bajos."
+        },
+        {
+          "authorName": "Luz De María",
+          "rating": 4.0,
+          "text": "\"Sí, vale la pena. La comida es rica, los precios son competitivos y el ambiente tiene un atractivo cultural. Solo recomendaría que, si piden 'cabrito deshuesado', pregunten antes cómo lo sirven para evitar confusiones, a mí me tocó un hueso muy grande.\""
+        }
+      ],
+      "predictionScore": {
+        "score": 82.8,
+        "confidence": 0.8,
+        "date": "2026-11-18",
+        "breakdown": [
+          {
+            "name": "weather_temperature",
+            "value": 1.0,
+            "weight": 2.0,
+            "contribution": 0.1667,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Temperatura promedio 25.4°C (rango ideal 16.0-30.0°C)"
+          },
+          {
+            "name": "weather_rain",
+            "value": 0.7525,
+            "weight": 3.0,
+            "contribution": 0.1881,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Precipitación 0.0 mm, prob. lluvia 55%"
+          },
+          {
+            "name": "weather_uv",
+            "value": 0.1,
+            "weight": 1.0,
+            "contribution": 0.0083,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Índice UV 9.0 (máx. aceptable 10.0)"
+          },
+          {
+            "name": "weather_wind",
+            "value": 0.576,
+            "weight": 1.0,
+            "contribution": 0.048,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Viento 21.2 km/h (máx. aceptable 50.0)"
+          },
+          {
+            "name": "calendar_weekend",
+            "value": 1.0,
+            "weight": 1.0,
+            "contribution": 0.0833,
+            "data_source": "calendar",
+            "data_date": "2026-11-18",
+            "explanation": "Día de semana"
+          },
+          {
+            "name": "calendar_crowd",
+            "value": 1.0,
+            "weight": 4.0,
+            "contribution": 0.3333,
+            "data_source": "calendar",
+            "data_date": "2026-11-18",
+            "explanation": "Nivel de aglomeración por eventos: 0/5"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "retiredId": "place_predict_455",
+    "canonicalId": "place_gran_recreo_hotel",
+    "canonicalName": "Gran Recreo Hotel",
+    "retiredName": "Gran Recreo Hotel",
+    "retiredAt": "2026-11-10T16:45:00Z",
+    "rationale": "Consolidación de duplicado confirmado según auditoría técnica de catálogo.",
+    "sourcesIntegrated": [
+      {
+        "placeId": "place_predict_455",
+        "sourceId": "openstreetmap",
+        "externalId": "9829847817",
+        "lastSyncedAt": "2026-11-05"
+      }
+    ],
+    "retiredSnapshot": {
+      "id": "place_predict_455",
+      "slug": "gran-recreo-hotel",
+      "name": "Gran Recreo Hotel",
+      "category": "hoteles",
+      "subcategory": "Hotel & Hospedaje Turístico",
+      "localityId": "trujillo",
+      "localityName": "Trujillo",
+      "address": "Jirón Estete 466, Trujillo",
+      "coordinates": {
+        "lat": -8.1072502,
+        "lng": -79.0245388
+      },
+      "geohash": "6nxccu0",
+      "shortDescription": "Gran Recreo Hotel: alojamiento confortable y acogedor con ubicación estratégica en Trujillo.",
+      "fullDescription": "Gran Recreo Hotel es un referente turístico situado en Jirón Estete 466, Trujillo. Representa una de las opciones destacadas para visitantes y viajeros que exploran el circuito turístico regional de La Libertad.",
+      "rating": 4.5,
+      "reviewsCount": 50,
+      "images": [
+        {
+          "id": "img_place_predict_455_fb",
+          "url": "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
+          "caption": "Gran Recreo Hotel en Trujillo",
+          "isCover": true
+        }
+      ],
+      "verification": {
+        "isVerified": true,
+        "verificationLevel": "community",
+        "verifiedAt": "2026-11-05",
+        "notes": "Integrado desde registro turístico verificado (OPENSTREETMAP)"
+      },
+      "sources": [
+        {
+          "placeId": "place_predict_455",
+          "sourceId": "openstreetmap",
+          "externalId": "9829847817",
+          "lastSyncedAt": "2026-11-05"
+        }
+      ],
+      "tags": [
+        "Trujillo",
+        "Hotel & Hospedaje Turístico",
+        "Interiores",
+        "Gran",
+        "Recreo",
+        "Hotel"
+      ],
+      "recommendedDurationMinutes": 60,
+      "priceLevel": 2
+    }
+  },
+  {
+    "retiredId": "place_predict_152",
+    "canonicalId": "place_big_ben_huanchaco",
+    "canonicalName": "Restaurante Big Ben Huanchaco",
+    "retiredName": "Restaurante Big Ben Huanchaco",
+    "retiredAt": "2026-11-10T16:45:00Z",
+    "rationale": "Consolidación de duplicado confirmado según auditoría técnica de catálogo.",
+    "sourcesIntegrated": [
+      {
+        "placeId": "place_predict_152",
+        "sourceId": "google_places_api",
+        "externalId": "ChIJM0a2xVc5rZER9kskrsjzU5I",
+        "lastSyncedAt": "2026-11-05"
+      }
+    ],
+    "retiredSnapshot": {
+      "id": "place_predict_152",
+      "slug": "restaurante-big-ben-huanchaco-2",
+      "name": "Restaurante Big Ben Huanchaco",
+      "category": "restaurantes",
+      "subcategory": "Cevichería & Cocina Marina",
+      "localityId": "huanchaco",
+      "localityName": "Huanchaco",
+      "address": "Av. Víctor Larco Herrera 1182, Huanchaco",
+      "coordinates": {
+        "lat": -8.0743528,
+        "lng": -79.1190873
+      },
+      "geohash": "6nxdpd5",
+      "shortDescription": "Restaurante Big Ben Huanchaco: experiencia gastronómica auténtica en Huanchaco con lo mejor de la cocina liberteña.",
+      "fullDescription": "Restaurante Big Ben Huanchaco es un referente turístico situado en Av. Víctor Larco Herrera 1182, Huanchaco. Representa una de las opciones destacadas para visitantes y viajeros que exploran el circuito turístico regional de La Libertad.",
+      "rating": 4.5,
+      "reviewsCount": 1681,
+      "images": [
+        {
+          "id": "img_place_predict_152_1",
+          "url": "/images/places/place_152.webp",
+          "caption": "Restaurante Big Ben Huanchaco - Cevichería & Cocina Marina",
+          "isCover": true
+        }
+      ],
+      "verification": {
+        "isVerified": true,
+        "verificationLevel": "partner_verified",
+        "verifiedAt": "2026-11-05",
+        "notes": "Integrado desde registro turístico verificado (OSM)"
+      },
+      "sources": [
+        {
+          "placeId": "place_predict_152",
+          "sourceId": "google_places_api",
+          "externalId": "ChIJM0a2xVc5rZER9kskrsjzU5I",
+          "lastSyncedAt": "2026-11-05"
+        }
+      ],
+      "tags": [
+        "Huanchaco",
+        "Cevichería & Cocina Marina",
+        "Costa",
+        "Restaurante",
+        "Gastronomía",
+        "Comida Típica"
+      ],
+      "recommendedDurationMinutes": 75,
+      "phone": "+51 991 916 650",
+      "website": "https://bigbenrestaurantes.com/sedes/huanchaco/",
+      "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Big+Ben+-8.074353,-79.119087",
+      "googlePlaceId": "ChIJM0a2xVc5rZER9kskrsjzU5I",
+      "priceLevel": 2,
+      "safetyScore": 77.3,
+      "safetyReport": {
+        "score": 77.3,
+        "riskLevel": "Moderado",
+        "incidentCount": 58,
+        "radiusMeters": 1000,
+        "criticalShift": "noche",
+        "source": "MININTER - Sistema de Denuncias Policiales (SIDPOL)",
+        "unsafeHours": "19:00 a 05:59 hrs (Turnos Noche y Madrugada concentran el 59% de las incidencias).",
+        "safeHours": "08:30 a 16:30 hrs (Turno con vigilancia policial diurna y plena iluminación).",
+        "unsafeDatesNotice": "Mayor incidencia estadística en fines de semana (viernes noche, sábado y domingo) y fechas festivas locales de alta afluencia comercial.",
+        "topCrimes": [
+          {
+            "name": "Conflictos domésticos / violencia psicológica",
+            "count": 18,
+            "percentage": 31.0
+          },
+          {
+            "name": "Hurto simple de pertenencias / carteristas",
+            "count": 12,
+            "percentage": 20.7
+          },
+          {
+            "name": "Violencia interpersonal / física",
+            "count": 11,
+            "percentage": 19.0
+          },
+          {
+            "name": "Incidencias de extorsión comercial",
+            "count": 4,
+            "percentage": 6.9
+          },
+          {
+            "name": "Arrebato de teléfono celular",
+            "count": 3,
+            "percentage": 5.2
+          }
+        ],
+        "recommendations": [
+          "Evite manipular o exponer teléfonos móviles de gama alta en aceras concurridas o cerca de la calzada.",
+          "Lleve mochilas y bolsos hacia adelante en zonas de aglomeración y esquinas comerciales.",
+          "Planifique retornar a su hospedaje antes de las 19:00 hrs y priorice el uso de taxis de aplicativo o autorizados.",
+          "Porte solo una copia fotostática de su documento de identidad y mantenga las tarjetas bancarias protegidas."
+        ],
+        "evaluatedAt": "2026-11-05T17:46:51.179730Z"
+      },
+      "reviews": [
+        {
+          "authorName": "ky",
+          "rating": 5.0,
+          "text": "el lugar es muy lindo y la comida fue realmente buena, no solo en sabor sino también en presentación. Aunque el precio de los platillos me parecieron algo elevados creo que valen la pena por la calidad de comida y servicio que brindan. La atención fue muy agradable ya que siempre estuvieron atentos y fueron muy amables."
+        },
+        {
+          "authorName": "Franshesca A'o",
+          "rating": 5.0,
+          "text": "El ambiente es muy agradable para una ocasión especial.\n\nLa atención desde que ingresas es muy personalizada.\n\nLos insumos de cada plato son frescos.\n\nLas bebidas de autor están muy bien balanceados para acompañar cada plato."
+        },
+        {
+          "authorName": "OMAR CUZCO CUEVA",
+          "rating": 2.0,
+          "text": "El sabor del ceviche mix. No estuvo tan bueno. He probado mejores. Así que no se los recomiendo, además pedí muy picante. Y no trajeron como lo pedí. No picaba. Conclusión, es puro nombre no más la cevichería."
+        }
+      ],
+      "predictionScore": {
+        "score": 75.8,
+        "confidence": 0.85,
+        "date": "2026-11-18",
+        "breakdown": [
+          {
+            "name": "weather_temperature",
+            "value": 1.0,
+            "weight": 2.0,
+            "contribution": 0.1176,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Temperatura promedio 25.9°C (rango ideal 16.0-30.0°C)"
+          },
+          {
+            "name": "weather_rain",
+            "value": 0.7525,
+            "weight": 3.0,
+            "contribution": 0.1328,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Precipitación 0.0 mm, prob. lluvia 55%"
+          },
+          {
+            "name": "weather_uv",
+            "value": 0.08,
+            "weight": 1.0,
+            "contribution": 0.0047,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Índice UV 9.2 (máx. aceptable 10.0)"
+          },
+          {
+            "name": "weather_wind",
+            "value": 0.554,
+            "weight": 1.0,
+            "contribution": 0.0326,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Viento 22.3 km/h (máx. aceptable 50.0)"
+          },
+          {
+            "name": "marine_wave_height",
+            "value": 1.0,
+            "weight": 3.0,
+            "contribution": 0.1765,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Altura de ola 0.0 m (máx. cómodo 2.5 m)"
+          },
+          {
+            "name": "marine_wave_period",
+            "value": 0.0,
+            "weight": 2.0,
+            "contribution": 0.0,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Período de ola 0.0 s (rango ideal 8.0-18.0 s)"
+          },
+          {
+            "name": "calendar_weekend",
+            "value": 1.0,
+            "weight": 1.0,
+            "contribution": 0.0588,
+            "data_source": "calendar",
+            "data_date": "2026-11-18",
+            "explanation": "Día de semana"
+          },
+          {
+            "name": "calendar_crowd",
+            "value": 1.0,
+            "weight": 4.0,
+            "contribution": 0.2353,
+            "data_source": "calendar",
+            "data_date": "2026-11-18",
+            "explanation": "Nivel de aglomeración por eventos: 0/5"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "retiredId": "place_predict_304",
+    "canonicalId": "place_huaca_esmeralda",
+    "canonicalName": "Huaca La Esmeralda",
+    "retiredName": "Huaca La Esmeralda",
+    "retiredAt": "2026-11-10T16:45:00Z",
+    "rationale": "Consolidación de duplicado confirmado según auditoría técnica de catálogo.",
+    "sourcesIntegrated": [
+      {
+        "placeId": "place_predict_304",
+        "sourceId": "openstreetmap",
+        "externalId": "157129502",
+        "lastSyncedAt": "2026-11-05"
+      }
+    ],
+    "retiredSnapshot": {
+      "id": "place_predict_304",
+      "slug": "huaca-la-esmeralda-2",
+      "name": "Huaca La Esmeralda",
+      "category": "arqueologia",
+      "subcategory": "Sitio Arqueológico",
+      "localityId": "trujillo",
+      "localityName": "Trujillo",
+      "address": "Huaca La Esmeralda, Trujillo, La Libertad",
+      "coordinates": {
+        "lat": -8.1047125,
+        "lng": -79.0449684
+      },
+      "geohash": "6nxcck9",
+      "shortDescription": "Huaca La Esmeralda: imponente legado arqueológico prehispánico conservado en el valle de Trujillo.",
+      "fullDescription": "Huaca La Esmeralda es un referente turístico situado en Huaca La Esmeralda, Trujillo, La Libertad. Representa una de las opciones destacadas para visitantes y viajeros que exploran el circuito turístico regional de La Libertad.",
+      "rating": 4.2,
+      "reviewsCount": 1017,
+      "images": [
+        {
+          "id": "img_place_predict_304_1",
+          "url": "/images/places/place_304.webp",
+          "caption": "Huaca La Esmeralda - Sitio Arqueológico",
+          "isCover": true
+        }
+      ],
+      "verification": {
+        "isVerified": true,
+        "verificationLevel": "partner_verified",
+        "verifiedAt": "2026-11-05",
+        "notes": "Integrado desde registro turístico verificado (OSM)"
+      },
+      "sources": [
+        {
+          "placeId": "place_predict_304",
+          "sourceId": "openstreetmap",
+          "externalId": "157129502",
+          "lastSyncedAt": "2026-11-05"
+        }
+      ],
+      "tags": [
+        "Trujillo",
+        "Sitio Arqueológico",
+        "Interiores",
+        "Huaca",
+        "Esmeralda",
+        "Historia Prehispánica"
+      ],
+      "recommendedDurationMinutes": 120,
+      "website": "https://www.google.com/maps/search/?api=1&query=Huaca+La+Esmeralda+-8.104712,-79.044968",
+      "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Huaca+La+Esmeralda+-8.104712,-79.044968",
+      "safetyScore": 48.2,
+      "safetyReport": {
+        "score": 48.2,
+        "riskLevel": "Riesgo Urbano / Desfavorable de Noche",
+        "incidentCount": 1081,
+        "radiusMeters": 1000,
+        "criticalShift": "noche",
+        "source": "MININTER - Sistema de Denuncias Policiales (SIDPOL)",
+        "unsafeHours": "18:30 a 05:00 hrs (Horas de baja visibilidad y mayor registro en turno noche).",
+        "safeHours": "09:00 a 17:00 hrs (Franja recomendada para recorridos y actividades).",
+        "unsafeDatesNotice": "Mayor incidencia estadística en fines de semana (viernes noche, sábado y domingo) y fechas festivas locales de alta afluencia comercial.",
+        "topCrimes": [
+          {
+            "name": "Hurto simple de pertenencias / carteristas",
+            "count": 208,
+            "percentage": 19.2
+          },
+          {
+            "name": "Conflictos domésticos / violencia psicológica",
+            "count": 190,
+            "percentage": 17.6
+          },
+          {
+            "name": "Hurto De Vehiculo",
+            "count": 142,
+            "percentage": 13.1
+          },
+          {
+            "name": "Violencia interpersonal / física",
+            "count": 129,
+            "percentage": 11.9
+          },
+          {
+            "name": "Arrebato de teléfono celular",
+            "count": 77,
+            "percentage": 7.1
+          }
+        ],
+        "recommendations": [
+          "Evite manipular o exponer teléfonos móviles de gama alta en aceras concurridas o cerca de la calzada.",
+          "Lleve mochilas y bolsos hacia adelante en zonas de aglomeración y esquinas comerciales.",
+          "Planifique retornar a su hospedaje antes de las 19:00 hrs y priorice el uso de taxis de aplicativo o autorizados.",
+          "Porte solo una copia fotostática de su documento de identidad y mantenga las tarjetas bancarias protegidas."
+        ],
+        "evaluatedAt": "2026-11-05T17:47:01.656037Z"
+      },
+      "reviews": [
+        {
+          "authorName": "jonathan caleb claros chuquipa",
+          "rating": 5.0,
+          "text": "Recomiendo primero ir a Chan Chan ya que pagando ahí ese mismo boleto sirve para entrar a la huaca Esmeralda y a la huaca arcoíris, cuando fui no había nada de gente en la huaca Esmeralda, el guía costó 15 soles, es un lugar bien pequeño rodeado de mucha urbanización, solo demoré 10 minutos en recorrer la huaca y 10 minutos con la explicación del guía"
+        },
+        {
+          "authorName": "Ernesto Alonso Díaz Pardavé",
+          "rating": 5.0,
+          "text": "Excelente lugar.. estás pequeño pero estás muy cerca y caminas por dentro de la Huaca. POR FAVOR.. SIEMPRE CON RESPETO A LA CULTURA. Si llevan botellas de agua, no las boten por ahí. 🤦🏽‍♂️"
+        },
+        {
+          "authorName": "Gerardo Cailloma Navarrete",
+          "rating": 5.0,
+          "text": "La historia del viejo Perú en esta huaca Chimú. Lastimosamente no tiene una visita como se debe. Tiene unos frisos en alto relieve notables. Generalmente, se visitan tres espacios chimú con un solo boleto: Chan Chan, Huaca del Dragón y esta huaca, la menos visitada de los tres sitios arqueológicos."
+        }
+      ],
+      "predictionScore": {
+        "score": 85.5,
+        "confidence": 0.83,
+        "date": "2026-11-18",
+        "breakdown": [
+          {
+            "name": "weather_temperature",
+            "value": 1.0,
+            "weight": 3.0,
+            "contribution": 0.15,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Temperatura promedio 25.4°C (rango ideal 17.0-29.0°C)"
+          },
+          {
+            "name": "weather_rain",
+            "value": 0.7525,
+            "weight": 5.0,
+            "contribution": 0.1881,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Precipitación 0.0 mm, prob. lluvia 55%"
+          },
+          {
+            "name": "weather_uv",
+            "value": 0.3571,
+            "weight": 1.0,
+            "contribution": 0.0179,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Índice UV 9.0 (máx. aceptable 14.0)"
+          },
+          {
+            "name": "weather_wind",
+            "value": 0.47,
+            "weight": 1.0,
+            "contribution": 0.0235,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Viento 21.2 km/h (máx. aceptable 40.0)"
+          },
+          {
+            "name": "calendar_weekend",
+            "value": 1.0,
+            "weight": 2.0,
+            "contribution": 0.1,
+            "data_source": "calendar",
+            "data_date": "2026-11-18",
+            "explanation": "Día de semana"
+          },
+          {
+            "name": "calendar_crowd",
+            "value": 1.0,
+            "weight": 5.0,
+            "contribution": 0.25,
+            "data_source": "calendar",
+            "data_date": "2026-11-18",
+            "explanation": "Nivel de aglomeración por eventos: 0/5"
+          },
+          {
+            "name": "external_rating",
+            "value": 0.84,
+            "weight": 3.0,
+            "contribution": 0.126,
+            "data_source": "google_places",
+            "data_date": "2026-11-18",
+            "explanation": "Calificación verificada 4.2/5.0"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "retiredId": "place_predict_100",
+    "canonicalId": "place_predict_99",
+    "canonicalName": "Restaurant y Cevicheria Las Gemelas",
+    "retiredName": "Restaurant y Cevicheria Las Gemelas",
+    "retiredAt": "2026-11-10T16:45:00Z",
+    "rationale": "Consolidación de duplicado confirmado según auditoría técnica de catálogo.",
+    "sourcesIntegrated": [
+      {
+        "placeId": "place_predict_100",
+        "sourceId": "openstreetmap",
+        "externalId": "5816747572",
+        "lastSyncedAt": "2026-11-05"
+      }
+    ],
+    "retiredSnapshot": {
+      "id": "place_predict_100",
+      "slug": "restaurant-y-cevicheria-las-gemelas-2",
+      "name": "Restaurant y Cevicheria Las Gemelas",
+      "category": "restaurantes",
+      "subcategory": "Cevichería & Cocina Marina",
+      "localityId": "la-esperanza",
+      "localityName": "La Esperanza",
+      "address": "Restaurant y Cevicheria Las Gemelas, La Esperanza, La Libertad",
+      "coordinates": {
+        "lat": -8.0856879,
+        "lng": -79.03587
+      },
+      "geohash": "6nxf12p",
+      "shortDescription": "Restaurant y Cevicheria Las Gemelas: experiencia gastronómica auténtica en La Esperanza con lo mejor de la cocina liberteña.",
+      "fullDescription": "Restaurant y Cevicheria Las Gemelas es un referente turístico situado en Restaurant y Cevicheria Las Gemelas, La Esperanza, La Libertad. Representa una de las opciones destacadas para visitantes y viajeros que exploran el circuito turístico regional de La Libertad.",
+      "rating": 3.6,
+      "reviewsCount": 51,
+      "images": [
+        {
+          "id": "img_place_predict_100_1",
+          "url": "/images/places/place_100.webp",
+          "caption": "Restaurant y Cevicheria Las Gemelas - Cevichería & Cocina Marina",
+          "isCover": true
+        }
+      ],
+      "verification": {
+        "isVerified": true,
+        "verificationLevel": "partner_verified",
+        "verifiedAt": "2026-11-05",
+        "notes": "Integrado desde registro turístico verificado (OSM)"
+      },
+      "sources": [
+        {
+          "placeId": "place_predict_100",
+          "sourceId": "openstreetmap",
+          "externalId": "5816747572",
+          "lastSyncedAt": "2026-11-05"
+        }
+      ],
+      "tags": [
+        "La Esperanza",
+        "Cevichería & Cocina Marina",
+        "Interiores",
+        "Restaurant",
+        "Cevicheria",
+        "Gemelas"
+      ],
+      "recommendedDurationMinutes": 75,
+      "phone": "+51 986 672 040",
+      "website": "https://www.google.com/maps/search/?api=1&query=Restaurant+y+Cevicheria+Las+Gemelas+-8.085688,-79.035870",
+      "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Restaurant+y+Cevicheria+Las+Gemelas+-8.085688,-79.035870",
+      "priceLevel": 2,
+      "safetyScore": 51.8,
+      "safetyReport": {
+        "score": 51.8,
+        "riskLevel": "Riesgo Urbano / Desfavorable de Noche",
+        "incidentCount": 627,
+        "radiusMeters": 1000,
+        "criticalShift": "noche",
+        "source": "MININTER - Sistema de Denuncias Policiales (SIDPOL)",
+        "unsafeHours": "18:30 a 05:00 hrs (Horas de baja visibilidad y mayor registro en turno noche).",
+        "safeHours": "09:00 a 17:00 hrs (Franja recomendada para recorridos y actividades).",
+        "unsafeDatesNotice": "Mayor incidencia estadística en fines de semana (viernes noche, sábado y domingo) y fechas festivas locales de alta afluencia comercial.",
+        "topCrimes": [
+          {
+            "name": "Conflictos domésticos / violencia psicológica",
+            "count": 164,
+            "percentage": 26.2
+          },
+          {
+            "name": "Hurto simple de pertenencias / carteristas",
+            "count": 101,
+            "percentage": 16.1
+          },
+          {
+            "name": "Violencia interpersonal / física",
+            "count": 91,
+            "percentage": 14.5
+          },
+          {
+            "name": "Incidencias de extorsión comercial",
+            "count": 70,
+            "percentage": 11.2
+          },
+          {
+            "name": "Hurto De Vehiculo",
+            "count": 40,
+            "percentage": 6.4
+          }
+        ],
+        "recommendations": [
+          "Lleve mochilas y bolsos hacia adelante en zonas de aglomeración y esquinas comerciales.",
+          "Planifique retornar a su hospedaje antes de las 19:00 hrs y priorice el uso de taxis de aplicativo o autorizados.",
+          "Porte solo una copia fotostática de su documento de identidad y mantenga las tarjetas bancarias protegidas."
+        ],
+        "evaluatedAt": "2026-11-05T17:46:44.099904Z"
+      },
+      "reviews": [
+        {
+          "authorName": "Ismael Johdan Rojas Valencia",
+          "rating": 1.0,
+          "text": "Pésimo servicio. Luego de mantenerme más de media hora haciendo un pedido, me dicen que solamente es con pago a través de yape. Deberían de actualizar su sistema de trabajo, salimos perjudicados los clientes. La atención al público es pésima tanto presencial como de manera online, deberían de mejorar eso. Si te quejas te contestan con risas."
+        },
+        {
+          "authorName": "Michael González",
+          "rating": 1.0,
+          "text": "La comida 4 de 10. Mi chilcano salió con piedras y arena, nadie solucionó nada. La atención es terrible y el ambiente es sucio y cubiertos mal lavados. No volvería definitivamente..."
+        },
+        {
+          "authorName": "ky",
+          "rating": 1.0,
+          "text": "pedí un combinado y el tallarín fue lo peor que probé, simplemente con verlo supe que no iba a estar bueno y realmente fue una decepción. No volvería, además que los los precios me parecieron algo elevados para la calidad que tiene el restaurante."
+        }
+      ],
+      "predictionScore": {
+        "score": 82.8,
+        "confidence": 0.8,
+        "date": "2026-11-18",
+        "breakdown": [
+          {
+            "name": "weather_temperature",
+            "value": 1.0,
+            "weight": 2.0,
+            "contribution": 0.1667,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Temperatura promedio 25.4°C (rango ideal 16.0-30.0°C)"
+          },
+          {
+            "name": "weather_rain",
+            "value": 0.7525,
+            "weight": 3.0,
+            "contribution": 0.1881,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Precipitación 0.0 mm, prob. lluvia 55%"
+          },
+          {
+            "name": "weather_uv",
+            "value": 0.1,
+            "weight": 1.0,
+            "contribution": 0.0083,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Índice UV 9.0 (máx. aceptable 10.0)"
+          },
+          {
+            "name": "weather_wind",
+            "value": 0.576,
+            "weight": 1.0,
+            "contribution": 0.048,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Viento 21.2 km/h (máx. aceptable 50.0)"
+          },
+          {
+            "name": "calendar_weekend",
+            "value": 1.0,
+            "weight": 1.0,
+            "contribution": 0.0833,
+            "data_source": "calendar",
+            "data_date": "2026-11-18",
+            "explanation": "Día de semana"
+          },
+          {
+            "name": "calendar_crowd",
+            "value": 1.0,
+            "weight": 4.0,
+            "contribution": 0.3333,
+            "data_source": "calendar",
+            "data_date": "2026-11-18",
+            "explanation": "Nivel de aglomeración por eventos: 0/5"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "retiredId": "place_predict_137",
+    "canonicalId": "place_predict_130",
+    "canonicalName": "Cevicheria Amparito",
+    "retiredName": "Cevicheria Amparito",
+    "retiredAt": "2026-11-10T16:45:00Z",
+    "rationale": "Consolidación de duplicado confirmado según auditoría técnica de catálogo.",
+    "sourcesIntegrated": [
+      {
+        "placeId": "place_predict_137",
+        "sourceId": "openstreetmap",
+        "externalId": "5816747562",
+        "lastSyncedAt": "2026-11-05"
+      }
+    ],
+    "retiredSnapshot": {
+      "id": "place_predict_137",
+      "slug": "cevicheria-amparito-2",
+      "name": "Cevicheria Amparito",
+      "category": "restaurantes",
+      "subcategory": "Cevichería & Cocina Marina",
+      "localityId": "la-esperanza",
+      "localityName": "La Esperanza",
+      "address": "Cevicheria Amparito, La Esperanza, La Libertad",
+      "coordinates": {
+        "lat": -8.0857511,
+        "lng": -79.0355414
+      },
+      "geohash": "6nxf180",
+      "shortDescription": "Cevicheria Amparito: experiencia gastronómica auténtica en La Esperanza con lo mejor de la cocina liberteña.",
+      "fullDescription": "Cevicheria Amparito es un referente turístico situado en Cevicheria Amparito, La Esperanza, La Libertad. Representa una de las opciones destacadas para visitantes y viajeros que exploran el circuito turístico regional de La Libertad.",
+      "rating": 3.5,
+      "reviewsCount": 112,
+      "images": [
+        {
+          "id": "img_place_predict_137_1",
+          "url": "/images/places/place_137.webp",
+          "caption": "Cevicheria Amparito - Cevichería & Cocina Marina",
+          "isCover": true
+        }
+      ],
+      "verification": {
+        "isVerified": true,
+        "verificationLevel": "partner_verified",
+        "verifiedAt": "2026-11-05",
+        "notes": "Integrado desde registro turístico verificado (OSM)"
+      },
+      "sources": [
+        {
+          "placeId": "place_predict_137",
+          "sourceId": "openstreetmap",
+          "externalId": "5816747562",
+          "lastSyncedAt": "2026-11-05"
+        }
+      ],
+      "tags": [
+        "La Esperanza",
+        "Cevichería & Cocina Marina",
+        "Interiores",
+        "Cevicheria",
+        "Amparito",
+        "Gastronomía"
+      ],
+      "recommendedDurationMinutes": 75,
+      "phone": "+51 956 320 637",
+      "website": "https://www.google.com/maps/search/?api=1&query=Cevicheria+Amparito+-8.085751,-79.035541",
+      "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Cevicheria+Amparito+-8.085751,-79.035541",
+      "priceLevel": 2,
+      "safetyScore": 51.8,
+      "safetyReport": {
+        "score": 51.8,
+        "riskLevel": "Riesgo Urbano / Desfavorable de Noche",
+        "incidentCount": 627,
+        "radiusMeters": 1000,
+        "criticalShift": "noche",
+        "source": "MININTER - Sistema de Denuncias Policiales (SIDPOL)",
+        "unsafeHours": "18:30 a 05:00 hrs (Horas de baja visibilidad y mayor registro en turno noche).",
+        "safeHours": "09:00 a 17:00 hrs (Franja recomendada para recorridos y actividades).",
+        "unsafeDatesNotice": "Mayor incidencia estadística en fines de semana (viernes noche, sábado y domingo) y fechas festivas locales de alta afluencia comercial.",
+        "topCrimes": [
+          {
+            "name": "Conflictos domésticos / violencia psicológica",
+            "count": 164,
+            "percentage": 26.2
+          },
+          {
+            "name": "Hurto simple de pertenencias / carteristas",
+            "count": 101,
+            "percentage": 16.1
+          },
+          {
+            "name": "Violencia interpersonal / física",
+            "count": 91,
+            "percentage": 14.5
+          },
+          {
+            "name": "Incidencias de extorsión comercial",
+            "count": 70,
+            "percentage": 11.2
+          },
+          {
+            "name": "Hurto De Vehiculo",
+            "count": 40,
+            "percentage": 6.4
+          }
+        ],
+        "recommendations": [
+          "Lleve mochilas y bolsos hacia adelante en zonas de aglomeración y esquinas comerciales.",
+          "Planifique retornar a su hospedaje antes de las 19:00 hrs y priorice el uso de taxis de aplicativo o autorizados.",
+          "Porte solo una copia fotostática de su documento de identidad y mantenga las tarjetas bancarias protegidas."
+        ],
+        "evaluatedAt": "2026-11-05T17:46:48.690419Z"
+      },
+      "reviews": [
+        {
+          "authorName": "Pilar rocio Sanchez morillo",
+          "rating": 5.0,
+          "text": "Fresco y. Rico Ellos. Se. Dedican a venta pescado y todo del. Momento.   Saludos."
+        },
+        {
+          "authorName": "david cabosmalon",
+          "rating": 1.0,
+          "text": "El servicio pesimo. La cajera es una mujer sin ningin criterio para atender bien a los clientes.\nSiendo una cevicheria , no la recomendaria a nadie su ceviche pesimo. Verdaderamente una muy mala experiencia."
+        },
+        {
+          "authorName": "Alexander Avila",
+          "rating": 3.0,
+          "text": "El menú es variado, la sazón es un 6 de 10, la atención es un poco mala, el tiempo de espera es considerable, el local es apto para días calurosos, los días fríos preferible comer dentro del local pero no hay muchas mesas dentro y puedes dejar tu carro frente al local."
+        }
+      ],
+      "predictionScore": {
+        "score": 82.8,
+        "confidence": 0.8,
+        "date": "2026-11-18",
+        "breakdown": [
+          {
+            "name": "weather_temperature",
+            "value": 1.0,
+            "weight": 2.0,
+            "contribution": 0.1667,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Temperatura promedio 25.4°C (rango ideal 16.0-30.0°C)"
+          },
+          {
+            "name": "weather_rain",
+            "value": 0.7525,
+            "weight": 3.0,
+            "contribution": 0.1881,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Precipitación 0.0 mm, prob. lluvia 55%"
+          },
+          {
+            "name": "weather_uv",
+            "value": 0.1,
+            "weight": 1.0,
+            "contribution": 0.0083,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Índice UV 9.0 (máx. aceptable 10.0)"
+          },
+          {
+            "name": "weather_wind",
+            "value": 0.576,
+            "weight": 1.0,
+            "contribution": 0.048,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Viento 21.2 km/h (máx. aceptable 50.0)"
+          },
+          {
+            "name": "calendar_weekend",
+            "value": 1.0,
+            "weight": 1.0,
+            "contribution": 0.0833,
+            "data_source": "calendar",
+            "data_date": "2026-11-18",
+            "explanation": "Día de semana"
+          },
+          {
+            "name": "calendar_crowd",
+            "value": 1.0,
+            "weight": 4.0,
+            "contribution": 0.3333,
+            "data_source": "calendar",
+            "data_date": "2026-11-18",
+            "explanation": "Nivel de aglomeración por eventos: 0/5"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "retiredId": "place_predict_310",
+    "canonicalId": "place_casa_urquiaga",
+    "canonicalName": "Casa Urquiaga (Calonge)",
+    "retiredName": "Casa Urquiaga",
+    "retiredAt": "2026-11-10T16:45:00Z",
+    "rationale": "Consolidación de duplicado confirmado según auditoría técnica de catálogo.",
+    "sourcesIntegrated": [
+      {
+        "placeId": "place_predict_310",
+        "sourceId": "openstreetmap",
+        "externalId": "19973993",
+        "lastSyncedAt": "2026-11-05"
+      }
+    ],
+    "retiredSnapshot": {
+      "id": "place_predict_310",
+      "slug": "casa-urquiaga",
+      "name": "Casa Urquiaga",
+      "category": "atractivos",
+      "subcategory": "Atractivo Turístico",
+      "localityId": "trujillo",
+      "localityName": "Trujillo",
+      "address": "Casa Urquiaga, Trujillo, La Libertad",
+      "coordinates": {
+        "lat": -8.1125362,
+        "lng": -79.0279039
+      },
+      "geohash": "6nxccej",
+      "shortDescription": "Casa Urquiaga en Trujillo, destacado punto de atractivo turístico en La Libertad.",
+      "fullDescription": "Casa Urquiaga es un referente turístico situado en Casa Urquiaga, Trujillo, La Libertad. Representa una de las opciones destacadas para visitantes y viajeros que exploran el circuito turístico regional de La Libertad.",
+      "rating": 4.4,
+      "reviewsCount": 136,
+      "images": [
+        {
+          "id": "img_place_predict_310_1",
+          "url": "/images/places/place_310.webp",
+          "caption": "Casa Urquiaga - Atractivo Turístico",
+          "isCover": true
+        }
+      ],
+      "verification": {
+        "isVerified": true,
+        "verificationLevel": "partner_verified",
+        "verifiedAt": "2026-11-05",
+        "notes": "Integrado desde registro turístico verificado (OSM)"
+      },
+      "sources": [
+        {
+          "placeId": "place_predict_310",
+          "sourceId": "openstreetmap",
+          "externalId": "19973993",
+          "lastSyncedAt": "2026-11-05"
+        }
+      ],
+      "tags": [
+        "Trujillo",
+        "Atractivo Turístico",
+        "Interiores",
+        "Casa",
+        "Urquiaga"
+      ],
+      "recommendedDurationMinutes": 60,
+      "phone": "+51 981 064 315",
+      "website": "https://www.google.com/maps/search/?api=1&query=Casa+Urquiaga+-8.112536,-79.027904",
+      "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Casa+Urquiaga+-8.112536,-79.027904",
+      "safetyScore": 41.3,
+      "safetyReport": {
+        "score": 41.3,
+        "riskLevel": "Riesgo Urbano / Desfavorable de Noche",
+        "incidentCount": 1933,
+        "radiusMeters": 1000,
+        "criticalShift": "tarde",
+        "source": "MININTER - Sistema de Denuncias Policiales (SIDPOL)",
+        "unsafeHours": "18:30 a 05:00 hrs (Horas de baja visibilidad y mayor registro en turno tarde).",
+        "safeHours": "09:00 a 17:00 hrs (Franja recomendada para recorridos y actividades).",
+        "unsafeDatesNotice": "Mayor incidencia estadística en fines de semana (viernes noche, sábado y domingo) y fechas festivas locales de alta afluencia comercial.",
+        "topCrimes": [
+          {
+            "name": "Hurto simple de pertenencias / carteristas",
+            "count": 779,
+            "percentage": 40.3
+          },
+          {
+            "name": "Conflictos domésticos / violencia psicológica",
+            "count": 227,
+            "percentage": 11.7
+          },
+          {
+            "name": "Arrebato de teléfono celular",
+            "count": 177,
+            "percentage": 9.2
+          },
+          {
+            "name": "Estafa o engaño comercial",
+            "count": 140,
+            "percentage": 7.2
+          },
+          {
+            "name": "Violencia interpersonal / física",
+            "count": 99,
+            "percentage": 5.1
+          }
+        ],
+        "recommendations": [
+          "Evite manipular o exponer teléfonos móviles de gama alta en aceras concurridas o cerca de la calzada.",
+          "Lleve mochilas y bolsos hacia adelante en zonas de aglomeración y esquinas comerciales.",
+          "Contrate servicios turísticos, transporte y tours únicamente en agencias formales registradas ante MINCETUR.",
+          "Planifique retornar a su hospedaje antes de las 19:00 hrs y priorice el uso de taxis de aplicativo o autorizados.",
+          "Porte solo una copia fotostática de su documento de identidad y mantenga las tarjetas bancarias protegidas."
+        ],
+        "evaluatedAt": "2026-11-05T17:47:01.674400Z"
+      },
+      "reviews": [
+        {
+          "authorName": "Jenny Portal Villanueva",
+          "rating": 5.0,
+          "text": "Excelente lugar, con explicación detallada de los dueños de la casa, me encanta el lugar"
+        },
+        {
+          "authorName": "sumac urpi rojas rondan",
+          "rating": 4.0,
+          "text": "Esta en buen estado de conservación, hay un mi pequeña colección numismática. A falta de guía, tienen QR para escuchar de manera clara y muy precisa la historia que conlleva está casona."
+        },
+        {
+          "authorName": "C. Reyes",
+          "rating": 5.0,
+          "text": "Llegamos por casualidad a esta casa museo y la verdad que nos sorprendió mucho lo bonita que es, con muebles originales y piezas muy interesantes de la historia no solo del Peru sino que también de Latinoamérica. El guía también ayudó mucho a que la experiencia fuera mejor. Un 10 para el museo y el guía."
+        }
+      ],
+      "predictionScore": {
+        "score": 86.2,
+        "confidence": 0.83,
+        "date": "2026-11-18",
+        "breakdown": [
+          {
+            "name": "weather_temperature",
+            "value": 1.0,
+            "weight": 3.0,
+            "contribution": 0.15,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Temperatura promedio 25.4°C (rango ideal 17.0-29.0°C)"
+          },
+          {
+            "name": "weather_rain",
+            "value": 0.7525,
+            "weight": 5.0,
+            "contribution": 0.1881,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Precipitación 0.0 mm, prob. lluvia 55%"
+          },
+          {
+            "name": "weather_uv",
+            "value": 0.3571,
+            "weight": 1.0,
+            "contribution": 0.0179,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Índice UV 9.0 (máx. aceptable 14.0)"
+          },
+          {
+            "name": "weather_wind",
+            "value": 0.47,
+            "weight": 1.0,
+            "contribution": 0.0235,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Viento 21.2 km/h (máx. aceptable 40.0)"
+          },
+          {
+            "name": "calendar_weekend",
+            "value": 1.0,
+            "weight": 2.0,
+            "contribution": 0.1,
+            "data_source": "calendar",
+            "data_date": "2026-11-18",
+            "explanation": "Día de semana"
+          },
+          {
+            "name": "calendar_crowd",
+            "value": 1.0,
+            "weight": 5.0,
+            "contribution": 0.25,
+            "data_source": "calendar",
+            "data_date": "2026-11-18",
+            "explanation": "Nivel de aglomeración por eventos: 0/5"
+          },
+          {
+            "name": "external_rating",
+            "value": 0.88,
+            "weight": 3.0,
+            "contribution": 0.132,
+            "data_source": "google_places",
+            "data_date": "2026-11-18",
+            "explanation": "Calificación verificada 4.4/5.0"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "retiredId": "place_predict_309",
+    "canonicalId": "place_casa_emancipacion",
+    "canonicalName": "Casa de la Emancipación (BBVA)",
+    "retiredName": "Casa de la Emancipación",
+    "retiredAt": "2026-11-10T16:45:00Z",
+    "rationale": "Consolidación de duplicado confirmado según auditoría técnica de catálogo.",
+    "sourcesIntegrated": [
+      {
+        "placeId": "place_predict_309",
+        "sourceId": "openstreetmap",
+        "externalId": "7551382",
+        "lastSyncedAt": "2026-11-05"
+      }
+    ],
+    "retiredSnapshot": {
+      "id": "place_predict_309",
+      "slug": "casa-de-la-emancipacion",
+      "name": "Casa de la Emancipación",
+      "category": "atractivos",
+      "subcategory": "Atractivo Turístico",
+      "localityId": "trujillo",
+      "localityName": "Trujillo",
+      "address": "Casa de la Emancipación, Trujillo, La Libertad",
+      "coordinates": {
+        "lat": -8.1106238,
+        "lng": -79.0263301
+      },
+      "geohash": "6nxccew",
+      "shortDescription": "Casa de la Emancipación en Trujillo, destacado punto de atractivo turístico en La Libertad.",
+      "fullDescription": "Casa de la Emancipación es un referente turístico situado en Casa de la Emancipación, Trujillo, La Libertad. Representa una de las opciones destacadas para visitantes y viajeros que exploran el circuito turístico regional de La Libertad.",
+      "rating": 4.5,
+      "reviewsCount": 50,
+      "images": [
+        {
+          "id": "img_place_predict_309_1",
+          "url": "/images/places/place_309.webp",
+          "caption": "Casa de la Emancipación - Atractivo Turístico",
+          "isCover": true
+        }
+      ],
+      "verification": {
+        "isVerified": true,
+        "verificationLevel": "community",
+        "verifiedAt": "2026-11-05",
+        "notes": "Integrado desde registro turístico verificado (OSM)"
+      },
+      "sources": [
+        {
+          "placeId": "place_predict_309",
+          "sourceId": "openstreetmap",
+          "externalId": "7551382",
+          "lastSyncedAt": "2026-11-05"
+        }
+      ],
+      "tags": [
+        "Trujillo",
+        "Atractivo Turístico",
+        "Interiores",
+        "Casa",
+        "Emancipación"
+      ],
+      "recommendedDurationMinutes": 60,
+      "website": "https://www.google.com/maps/search/?api=1&query=Casa+de+la+Emancipaci%C3%B3n+-8.110624,-79.026330",
+      "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Casa+de+la+Emancipaci%C3%B3n+-8.110624,-79.026330",
+      "safetyScore": 40.8,
+      "safetyReport": {
+        "score": 40.8,
+        "riskLevel": "Riesgo Urbano / Desfavorable de Noche",
+        "incidentCount": 2000,
+        "radiusMeters": 1000,
+        "criticalShift": "tarde",
+        "source": "MININTER - Sistema de Denuncias Policiales (SIDPOL)",
+        "unsafeHours": "18:30 a 05:00 hrs (Horas de baja visibilidad y mayor registro en turno tarde).",
+        "safeHours": "09:00 a 17:00 hrs (Franja recomendada para recorridos y actividades).",
+        "unsafeDatesNotice": "Mayor incidencia estadística en fines de semana (viernes noche, sábado y domingo) y fechas festivas locales de alta afluencia comercial.",
+        "topCrimes": [
+          {
+            "name": "Hurto simple de pertenencias / carteristas",
+            "count": 825,
+            "percentage": 41.2
+          },
+          {
+            "name": "Conflictos domésticos / violencia psicológica",
+            "count": 239,
+            "percentage": 11.9
+          },
+          {
+            "name": "Arrebato de teléfono celular",
+            "count": 171,
+            "percentage": 8.6
+          },
+          {
+            "name": "Estafa o engaño comercial",
+            "count": 135,
+            "percentage": 6.8
+          },
+          {
+            "name": "Violencia interpersonal / física",
+            "count": 121,
+            "percentage": 6.0
+          }
+        ],
+        "recommendations": [
+          "Evite manipular o exponer teléfonos móviles de gama alta en aceras concurridas o cerca de la calzada.",
+          "Lleve mochilas y bolsos hacia adelante en zonas de aglomeración y esquinas comerciales.",
+          "Contrate servicios turísticos, transporte y tours únicamente en agencias formales registradas ante MINCETUR.",
+          "Planifique retornar a su hospedaje antes de las 19:00 hrs y priorice el uso de taxis de aplicativo o autorizados.",
+          "Porte solo una copia fotostática de su documento de identidad y mantenga las tarjetas bancarias protegidas."
+        ],
+        "evaluatedAt": "2026-11-05T17:47:01.671522Z"
+      },
+      "predictionScore": {
+        "score": 85.8,
+        "confidence": 0.81,
+        "date": "2026-11-18",
+        "breakdown": [
+          {
+            "name": "weather_temperature",
+            "value": 1.0,
+            "weight": 3.0,
+            "contribution": 0.1765,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Temperatura promedio 25.4°C (rango ideal 17.0-29.0°C)"
+          },
+          {
+            "name": "weather_rain",
+            "value": 0.7525,
+            "weight": 5.0,
+            "contribution": 0.2213,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Precipitación 0.0 mm, prob. lluvia 55%"
+          },
+          {
+            "name": "weather_uv",
+            "value": 0.3571,
+            "weight": 1.0,
+            "contribution": 0.021,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Índice UV 9.0 (máx. aceptable 14.0)"
+          },
+          {
+            "name": "weather_wind",
+            "value": 0.47,
+            "weight": 1.0,
+            "contribution": 0.0276,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Viento 21.2 km/h (máx. aceptable 40.0)"
+          },
+          {
+            "name": "calendar_weekend",
+            "value": 1.0,
+            "weight": 2.0,
+            "contribution": 0.1176,
+            "data_source": "calendar",
+            "data_date": "2026-11-18",
+            "explanation": "Día de semana"
+          },
+          {
+            "name": "calendar_crowd",
+            "value": 1.0,
+            "weight": 5.0,
+            "contribution": 0.2941,
+            "data_source": "calendar",
+            "data_date": "2026-11-18",
+            "explanation": "Nivel de aglomeración por eventos: 0/5"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "retiredId": "place_predict_433",
+    "canonicalId": "place_plazuela_recreo",
+    "canonicalName": "Plazuela El Recreo y Antigua Caja de Agua",
+    "retiredName": "Plazuela El Recreo",
+    "retiredAt": "2026-11-10T16:45:00Z",
+    "rationale": "Consolidación de duplicado confirmado según auditoría técnica de catálogo.",
+    "sourcesIntegrated": [
+      {
+        "placeId": "place_predict_433",
+        "sourceId": "openstreetmap",
+        "externalId": "111216576",
+        "lastSyncedAt": "2026-11-05"
+      }
+    ],
+    "retiredSnapshot": {
+      "id": "place_predict_433",
+      "slug": "plazuela-el-recreo",
+      "name": "Plazuela El Recreo",
+      "category": "atractivos",
+      "subcategory": "Atractivo Turístico",
+      "localityId": "trujillo",
+      "localityName": "Trujillo",
+      "address": "Trujillo, La Libertad",
+      "coordinates": {
+        "lat": -8.1070931,
+        "lng": -79.0237271
+      },
+      "geohash": "6nxccu0",
+      "shortDescription": "Plazuela El Recreo en Trujillo, destacado punto de atractivo turístico en La Libertad.",
+      "fullDescription": "Plazuela El Recreo es un referente turístico situado en Trujillo, La Libertad. Representa una de las opciones destacadas para visitantes y viajeros que exploran el circuito turístico regional de La Libertad.",
+      "rating": 4.5,
+      "reviewsCount": 50,
+      "images": [
+        {
+          "id": "img_place_predict_433_fb",
+          "url": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
+          "caption": "Plazuela El Recreo en Trujillo",
+          "isCover": true
+        }
+      ],
+      "verification": {
+        "isVerified": true,
+        "verificationLevel": "community",
+        "verifiedAt": "2026-11-05",
+        "notes": "Integrado desde registro turístico verificado (OPENSTREETMAP)"
+      },
+      "sources": [
+        {
+          "placeId": "place_predict_433",
+          "sourceId": "openstreetmap",
+          "externalId": "111216576",
+          "lastSyncedAt": "2026-11-05"
+        }
+      ],
+      "tags": [
+        "Trujillo",
+        "Atractivo Turístico",
+        "Interiores",
+        "Plazuela",
+        "Recreo"
+      ],
+      "recommendedDurationMinutes": 60
+    }
+  },
+  {
+    "retiredId": "place_predict_343",
+    "canonicalId": "place_huaca_arco_iris",
+    "canonicalName": "Huaca Arco Iris (El Dragón)",
+    "retiredName": "Huaca arcoiris",
+    "retiredAt": "2026-11-10T16:45:00Z",
+    "rationale": "Consolidación de duplicado confirmado según auditoría técnica de catálogo.",
+    "sourcesIntegrated": [
+      {
+        "placeId": "place_predict_343",
+        "sourceId": "openstreetmap",
+        "externalId": "4876324221",
+        "lastSyncedAt": "2026-11-05"
+      }
+    ],
+    "retiredSnapshot": {
+      "id": "place_predict_343",
+      "slug": "huaca-arcoiris",
+      "name": "Huaca arcoiris",
+      "category": "arqueologia",
+      "subcategory": "Sitio Arqueológico",
+      "localityId": "la-esperanza",
+      "localityName": "La Esperanza",
+      "address": "Huaca arcoiris, La Esperanza, La Libertad",
+      "coordinates": {
+        "lat": -8.0764323,
+        "lng": -79.0488434
+      },
+      "geohash": "6nxf11w",
+      "shortDescription": "Huaca arcoiris: imponente legado arqueológico prehispánico conservado en el valle de La Esperanza.",
+      "fullDescription": "Huaca arcoiris es un referente turístico situado en Huaca arcoiris, La Esperanza, La Libertad. Representa una de las opciones destacadas para visitantes y viajeros que exploran el circuito turístico regional de La Libertad.",
+      "rating": 4.4,
+      "reviewsCount": 1208,
+      "images": [
+        {
+          "id": "img_place_predict_343_1",
+          "url": "/images/places/place_343.webp",
+          "caption": "Huaca arcoiris - Sitio Arqueológico",
+          "isCover": true
+        }
+      ],
+      "verification": {
+        "isVerified": true,
+        "verificationLevel": "partner_verified",
+        "verifiedAt": "2026-11-05",
+        "notes": "Integrado desde registro turístico verificado (OSM)"
+      },
+      "sources": [
+        {
+          "placeId": "place_predict_343",
+          "sourceId": "openstreetmap",
+          "externalId": "4876324221",
+          "lastSyncedAt": "2026-11-05"
+        }
+      ],
+      "tags": [
+        "La Esperanza",
+        "Sitio Arqueológico",
+        "Interiores",
+        "Huaca",
+        "Arcoiris",
+        "Historia Prehispánica"
+      ],
+      "recommendedDurationMinutes": 120,
+      "website": "https://www.google.com/maps/search/?api=1&query=Huaca+arcoiris+-8.076432,-79.048843",
+      "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Huaca+arcoiris+-8.076432,-79.048843",
+      "safetyScore": 51.5,
+      "safetyReport": {
+        "score": 51.5,
+        "riskLevel": "Riesgo Urbano / Desfavorable de Noche",
+        "incidentCount": 660,
+        "radiusMeters": 1000,
+        "criticalShift": "noche",
+        "source": "MININTER - Sistema de Denuncias Policiales (SIDPOL)",
+        "unsafeHours": "18:30 a 05:00 hrs (Horas de baja visibilidad y mayor registro en turno noche).",
+        "safeHours": "09:00 a 17:00 hrs (Franja recomendada para recorridos y actividades).",
+        "unsafeDatesNotice": "Mayor incidencia estadística en fines de semana (viernes noche, sábado y domingo) y fechas festivas locales de alta afluencia comercial.",
+        "topCrimes": [
+          {
+            "name": "Conflictos domésticos / violencia psicológica",
+            "count": 177,
+            "percentage": 26.8
+          },
+          {
+            "name": "Violencia interpersonal / física",
+            "count": 102,
+            "percentage": 15.5
+          },
+          {
+            "name": "Incidencias de extorsión comercial",
+            "count": 89,
+            "percentage": 13.5
+          },
+          {
+            "name": "Hurto simple de pertenencias / carteristas",
+            "count": 82,
+            "percentage": 12.4
+          },
+          {
+            "name": "Hurto De Vehiculo",
+            "count": 60,
+            "percentage": 9.1
+          }
+        ],
+        "recommendations": [
+          "Lleve mochilas y bolsos hacia adelante en zonas de aglomeración y esquinas comerciales.",
+          "Planifique retornar a su hospedaje antes de las 19:00 hrs y priorice el uso de taxis de aplicativo o autorizados.",
+          "Porte solo una copia fotostática de su documento de identidad y mantenga las tarjetas bancarias protegidas."
+        ],
+        "evaluatedAt": "2026-11-05T17:47:03.922351Z"
+      },
+      "reviews": [
+        {
+          "authorName": "KOZHAN",
+          "rating": 5.0,
+          "text": "Es un complejo pequeño, pero no tienes que pagar extra si compraste una entrada para el complejo arqueológico; Chan-Chan está incluido en el precio."
+        },
+        {
+          "authorName": "Gerardo Cailloma Navarrete",
+          "rating": 4.0,
+          "text": "Un espacio arqueológico que es poco visitado en nuestra ciudad,  a diferencia de espacios como Chan Chan o las Huacas del Sol y la Luna. Este resto arqueológico sufrió daños leves por parte de unos estudiantes que incluso grabaron su acción delictiva. Hay ahora una escenografía nueva que representan escenas de la vida moche de entonces."
+        },
+        {
+          "authorName": "Carlosfrancisco Martín Leiva Martínez",
+          "rating": 5.0,
+          "text": "En este hermoso lugar aprendes mucho de la cultura chimú,  sus tradiciones,  dioses y lo más importante te permiten entrar al templo de sacrificios. Los guías turísticos te explican detalladamente sobre el lugar y desde fuera se puede notar el constante mantenimiento que recibe.  Cuenta con una tienda de recuerdos."
+        }
+      ],
+      "predictionScore": {
+        "score": 85.9,
+        "confidence": 0.83,
+        "date": "2026-11-18",
+        "breakdown": [
+          {
+            "name": "weather_temperature",
+            "value": 1.0,
+            "weight": 3.0,
+            "contribution": 0.15,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Temperatura promedio 25.8°C (rango ideal 17.0-29.0°C)"
+          },
+          {
+            "name": "weather_rain",
+            "value": 0.7525,
+            "weight": 5.0,
+            "contribution": 0.1881,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Precipitación 0.0 mm, prob. lluvia 55%"
+          },
+          {
+            "name": "weather_uv",
+            "value": 0.3429,
+            "weight": 1.0,
+            "contribution": 0.0171,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Índice UV 9.2 (máx. aceptable 14.0)"
+          },
+          {
+            "name": "weather_wind",
+            "value": 0.4425,
+            "weight": 1.0,
+            "contribution": 0.0221,
+            "data_source": "open-meteo",
+            "data_date": "2026-11-18",
+            "explanation": "Viento 22.3 km/h (máx. aceptable 40.0)"
+          },
+          {
+            "name": "calendar_weekend",
+            "value": 1.0,
+            "weight": 2.0,
+            "contribution": 0.1,
+            "data_source": "calendar",
+            "data_date": "2026-11-18",
+            "explanation": "Día de semana"
+          },
+          {
+            "name": "calendar_crowd",
+            "value": 1.0,
+            "weight": 5.0,
+            "contribution": 0.25,
+            "data_source": "calendar",
+            "data_date": "2026-11-18",
+            "explanation": "Nivel de aglomeración por eventos: 0/5"
+          },
+          {
+            "name": "external_rating",
+            "value": 0.88,
+            "weight": 3.0,
+            "contribution": 0.132,
+            "data_source": "google_places",
+            "data_date": "2026-11-18",
+            "explanation": "Calificación verificada 4.4/5.0"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "retiredId": "place_predict_434",
+    "canonicalId": "place_hotel_costa_sol_trujillo",
+    "canonicalName": "Hotel Costa del Sol Wyndham Trujillo Centro",
+    "retiredName": "Hotel Costa del Sol",
+    "retiredAt": "2026-11-10T16:45:00Z",
+    "rationale": "Consolidación de duplicado confirmado según auditoría técnica de catálogo.",
+    "sourcesIntegrated": [
+      {
+        "placeId": "place_predict_434",
+        "sourceId": "openstreetmap",
+        "externalId": "7552019",
+        "lastSyncedAt": "2026-11-05"
+      }
+    ],
+    "retiredSnapshot": {
+      "id": "place_predict_434",
+      "slug": "hotel-costa-del-sol",
+      "name": "Hotel Costa del Sol",
+      "category": "hoteles",
+      "subcategory": "Hotel & Hospedaje Turístico",
+      "localityId": "trujillo",
+      "localityName": "Trujillo",
+      "address": "Jirón Independencia, Trujillo",
+      "coordinates": {
+        "lat": -8.1107931,
+        "lng": -79.0289303
+      },
+      "geohash": "6nxccek",
+      "shortDescription": "Hotel Costa del Sol: alojamiento confortable y acogedor con ubicación estratégica en Trujillo.",
+      "fullDescription": "Hotel Costa del Sol es un referente turístico situado en Jirón Independencia, Trujillo. Representa una de las opciones destacadas para visitantes y viajeros que exploran el circuito turístico regional de La Libertad.",
+      "rating": 4.5,
+      "reviewsCount": 50,
+      "images": [
+        {
+          "id": "img_place_predict_434_fb",
+          "url": "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
+          "caption": "Hotel Costa del Sol en Trujillo",
+          "isCover": true
+        }
+      ],
+      "verification": {
+        "isVerified": true,
+        "verificationLevel": "community",
+        "verifiedAt": "2026-11-05",
+        "notes": "Integrado desde registro turístico verificado (OPENSTREETMAP)"
+      },
+      "sources": [
+        {
+          "placeId": "place_predict_434",
+          "sourceId": "openstreetmap",
+          "externalId": "7552019",
+          "lastSyncedAt": "2026-11-05"
+        }
+      ],
+      "tags": [
+        "Trujillo",
+        "Hotel & Hospedaje Turístico",
+        "Interiores",
+        "Hotel",
+        "Costa",
+        "Alojamiento"
+      ],
+      "recommendedDurationMinutes": 60,
+      "priceLevel": 2
+    }
+  }
+]

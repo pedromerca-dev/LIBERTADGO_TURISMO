@@ -24,8 +24,10 @@ import { WorkspaceSection } from './WorkspaceSidebar.tsx';
 import { PlaceImage } from '../common/PlaceImage.tsx';
 import {
   FILTER_CATEGORIES,
+  LOCALITY_FILTER_OPTIONS,
   matchesCategory,
   matchesSearchQuery,
+  matchesLocality,
 } from '../../utils/filterUtils.ts';
 import { ItineraryView } from './ItineraryView.tsx';
 import { HorizontalScrollContainer } from '../common/HorizontalScrollContainer.tsx';
@@ -53,6 +55,8 @@ interface WorkspaceContentProps {
   onReturnToPreviousSection?: () => void;
   selectedCategory?: string;
   onCategoryChange?: (category: string) => void;
+  selectedLocality?: string;
+  onLocalityChange?: (locality: string) => void;
   searchQuery?: string;
   onSearchChange?: (query: string) => void;
 }
@@ -80,6 +84,8 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
   onReturnToPreviousSection,
   selectedCategory = 'todas',
   onCategoryChange,
+  selectedLocality = 'todas',
+  onLocalityChange,
   searchQuery = '',
   onSearchChange,
 }) => {
@@ -96,6 +102,8 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const categoryContainerRef = useRef<HTMLDivElement>(null);
   const categoryButtonsRef = useRef<Map<string, HTMLButtonElement>>(new Map());
+  const localityContainerRef = useRef<HTMLDivElement>(null);
+  const localityButtonsRef = useRef<Map<string, HTMLButtonElement>>(new Map());
 
   useEffect(() => {
     if (scrollContainerRef.current) {
@@ -115,9 +123,42 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
     }
   }, [selectedCategory]);
 
+  // Mantener visible la localidad seleccionada al desplazarse
+  useEffect(() => {
+    if (selectedLocality === 'todas') {
+      localityContainerRef.current?.scrollTo({ left: 0, behavior: 'smooth' });
+    } else {
+      const activeChip = localityButtonsRef.current.get(selectedLocality);
+      if (activeChip && localityContainerRef.current) {
+        activeChip.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+      }
+    }
+  }, [selectedLocality]);
+
   const dayItems: TripDayItem[] = useMemo(() => {
     return generateDayList(trip.startDate, trip.totalDays);
   }, [trip.startDate, trip.totalDays]);
+
+  // Opciones de localidad con conteos dinámicos en tiempo real
+  const localityOptionsWithCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const p of places) {
+      const locId = p.localityId.toLowerCase();
+      counts[locId] = (counts[locId] || 0) + 1;
+    }
+    return LOCALITY_FILTER_OPTIONS.map((loc) => ({
+      ...loc,
+      count: loc.id === 'todas' ? places.length : (counts[loc.id] || 0),
+    }));
+  }, [places]);
+
+  const activeLocalityLabel = useMemo(() => {
+    if (!selectedLocality || selectedLocality === 'todas') {
+      return 'La Libertad';
+    }
+    const found = LOCALITY_FILTER_OPTIONS.find((l) => l.id === selectedLocality);
+    return found ? found.name : trip.destinationName;
+  }, [selectedLocality, trip.destinationName]);
 
   // Alternar (toggle) asignación de un lugar a un día específico
   const handleToggleDay = (place: Place, dayNumber: number) => {
@@ -134,12 +175,16 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
     }
   };
 
-  // Filtrado de lugares sincronizado con catálogo y mapa
+  // Filtrado de lugares sincronizado con catálogo y mapa (categoría + búsqueda + localidad)
   const filteredPlaces = useMemo(() => {
     return places.filter((p) => {
-      return matchesCategory(p.category, selectedCategory) && matchesSearchQuery(p, searchQuery);
+      return (
+        matchesCategory(p.category, selectedCategory) &&
+        matchesSearchQuery(p, searchQuery) &&
+        matchesLocality(p.localityId, selectedLocality)
+      );
     });
-  }, [places, selectedCategory, searchQuery]);
+  }, [places, selectedCategory, searchQuery, selectedLocality]);
 
   // Lugares guardados en la wishlist
   const savedPlaces = useMemo(() => {
@@ -273,7 +318,7 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
           <div className="flex items-start justify-between gap-2">
             <div>
               <h2 className="text-base sm:text-lg font-bold font-display text-[#17243A] tracking-tight leading-snug">
-                Explorar {trip.destinationName}
+                Explorar {activeLocalityLabel}
               </h2>
               {/* Contador real de resultados */}
               <p className="text-xs text-[#64748B] mt-0.5">
@@ -301,7 +346,7 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
               type="text"
               value={searchQuery}
               onChange={(e) => onSearchChange?.(e.target.value)}
-              placeholder={`Buscar en ${trip.destinationName} (ceviche, huacas, surf, museos)...`}
+              placeholder={`Buscar en ${activeLocalityLabel} (ceviche, huacas, surf, museos)...`}
               className="w-full h-11 sm:h-10 pl-10 pr-9 text-xs sm:text-sm bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-[#17243A] placeholder:text-[#94A3B8] focus:bg-white focus:outline-none focus:border-[#E85B49] focus:ring-2 focus:ring-[#E85B49]/15 transition-all shadow-2xs"
             />
             {searchQuery && (
@@ -315,6 +360,48 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
               </button>
             )}
           </div>
+
+          {/* Selector de Localidades de La Libertad (filtro no destructivo) */}
+          <HorizontalScrollContainer
+            innerRef={localityContainerRef}
+            containerClassName="w-full"
+            className="gap-1.5 pt-0.5 pb-0.5"
+            gradientTheme="white"
+            ariaLabel="Filtros de localidad"
+          >
+            {localityOptionsWithCounts.map((loc) => {
+              const isLocActive = (selectedLocality || 'todas') === loc.id;
+              return (
+                <button
+                  ref={(el) => {
+                    if (el) localityButtonsRef.current.set(loc.id, el);
+                    else localityButtonsRef.current.delete(loc.id);
+                  }}
+                  key={loc.id}
+                  type="button"
+                  onClick={() => onLocalityChange?.(loc.id)}
+                  className={`px-2.5 py-1 text-xs rounded-lg transition-all whitespace-nowrap cursor-pointer shrink-0 flex-shrink-0 font-medium flex items-center gap-1.5 ${
+                    isLocActive
+                      ? 'bg-[#E85B49] text-white shadow-xs font-semibold'
+                      : 'bg-[#F8FAFC] text-[#475569] hover:bg-[#F1F5F9] hover:text-[#0F172A] border border-[#E2E8F0]/80'
+                  }`}
+                  title={`Filtrar por ${loc.name} (${loc.count} lugares)`}
+                >
+                  <MapPin className={`w-3 h-3 ${isLocActive ? 'text-white' : 'text-[#E85B49]'}`} />
+                  <span>{loc.name}</span>
+                  <span
+                    className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full leading-tight font-semibold ${
+                      isLocActive
+                        ? 'bg-white/25 text-white'
+                        : 'bg-[#E2E8F0] text-[#64748B]'
+                    }`}
+                  >
+                    {loc.count}
+                  </span>
+                </button>
+              );
+            })}
+          </HorizontalScrollContainer>
 
           {/* Separación visual y Chips de Categorías deslizables con soporte táctil fluido, degradados y flechas en desktop */}
           <HorizontalScrollContainer
@@ -635,13 +722,14 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
                 <div>
                   <p className="font-semibold text-slate-700 text-sm">No se encontraron lugares</p>
                   <p className="text-[#64748B] mt-0.5">
-                    No hay resultados en {trip.destinationName} para los filtros seleccionados.
+                    No hay resultados en {activeLocalityLabel} para los filtros seleccionados.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => {
                     onCategoryChange?.('todas');
+                    onLocalityChange?.('todas');
                     onSearchChange?.('');
                   }}
                   className="mt-1 px-3.5 py-1.5 bg-[#17243A] text-white text-xs font-semibold rounded-lg hover:bg-[#E85B49] transition-colors cursor-pointer"

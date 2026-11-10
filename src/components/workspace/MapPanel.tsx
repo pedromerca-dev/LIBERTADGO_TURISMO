@@ -38,8 +38,10 @@ import {
 import { PlaceImage } from '../common/PlaceImage.tsx';
 import {
   FILTER_CATEGORIES,
+  LOCALITY_FILTER_OPTIONS,
   matchesCategory,
   matchesSearchQuery,
+  matchesLocality,
 } from '../../utils/filterUtils.ts';
 import { getDayColor } from '../../utils/itineraryUtils.ts';
 import { calculateRealRoute, RouteData } from '../../utils/routingService.ts';
@@ -64,6 +66,8 @@ interface MapPanelProps {
   onSwitchToContent?: () => void;
   selectedCategory?: string;
   onCategoryChange?: (category: string) => void;
+  selectedLocality?: string;
+  onLocalityChange?: (locality: string) => void;
   searchQuery?: string;
   onSearchChange?: (query: string) => void;
 }
@@ -97,6 +101,8 @@ export const MapPanel: React.FC<MapPanelProps> = ({
   onSwitchToContent,
   selectedCategory = 'todas',
   onCategoryChange,
+  selectedLocality = 'todas',
+  onLocalityChange,
   searchQuery = '',
   onSearchChange,
 }) => {
@@ -216,9 +222,14 @@ export const MapPanel: React.FC<MapPanelProps> = ({
     }
   }, [quickDayPickerOpen, selectedPlace, selectedDayNumber, trip.totalDays, dayItems, trip.activities]);
 
-  // Lugares filtrados reactivamente
+  // Lugares filtrados reactivamente (categoría, búsqueda, localidad y filtros avanzados)
   const filteredPlaces = useMemo(() => {
     return places.filter((p) => {
+      // 0. Filtro no destructivo por localidad
+      if (!matchesLocality(p.localityId, selectedLocality)) {
+        return false;
+      }
+
       // 1. Filtro por categoría principal unificado
       if (!matchesCategory(p.category, selectedCategory)) {
         return false;
@@ -255,6 +266,7 @@ export const MapPanel: React.FC<MapPanelProps> = ({
   }, [
     places,
     selectedCategory,
+    selectedLocality,
     searchQuery,
     onlySavedFilter,
     savedIds,
@@ -262,6 +274,37 @@ export const MapPanel: React.FC<MapPanelProps> = ({
     onlyMinceturFilter,
     isAreaFilterActive,
   ]);
+
+  // Recentrado suave del mapa cuando el usuario cambia de localidad
+  const previousLocalityRef = useRef<string>(selectedLocality);
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map || !mapLoaded) return;
+
+    if (previousLocalityRef.current !== selectedLocality) {
+      previousLocalityRef.current = selectedLocality;
+
+      if (selectedLocality && selectedLocality !== 'todas') {
+        const targetLoc = getLocality(selectedLocality);
+        if (targetLoc) {
+          map.flyTo({
+            center: [targetLoc.coordinates.lng, targetLoc.coordinates.lat],
+            zoom: targetLoc.defaultZoom || 14.5,
+            duration: 1200,
+            essential: true,
+          });
+        }
+      } else if (selectedLocality === 'todas') {
+        // Enfoque regional La Libertad para abarcar costa y sierra
+        map.flyTo({
+          center: [-78.85, -7.95],
+          zoom: 8.8,
+          duration: 1200,
+          essential: true,
+        });
+      }
+    }
+  }, [selectedLocality, mapLoaded]);
 
   // Sugerencias de búsqueda en tiempo real (Top 5)
   const searchSuggestions = useMemo(() => {
@@ -1341,6 +1384,37 @@ export const MapPanel: React.FC<MapPanelProps> = ({
                   </div>
                 )}
               </div>
+
+              {/* Carrusel Desplazable de Filtros por Localidad en el mapa */}
+              {onLocalityChange && (
+                <HorizontalScrollContainer
+                  containerClassName="w-full pointer-events-auto"
+                  className="gap-1.5 py-0.5"
+                  gradientTheme="white"
+                  scrollStep={200}
+                  ariaLabel="Filtros de localidad en mapa"
+                >
+                  {LOCALITY_FILTER_OPTIONS.map((loc) => {
+                    const isLocActive = (selectedLocality || 'todas') === loc.id;
+                    return (
+                      <button
+                        key={loc.id}
+                        type="button"
+                        onClick={() => onLocalityChange?.(loc.id)}
+                        className={`px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 flex-shrink-0 shadow-xs transition-all cursor-pointer flex items-center gap-1.5 ${
+                          isLocActive
+                            ? 'bg-[#E85B49] text-white ring-2 ring-[#E85B49]/30'
+                            : 'bg-white/95 text-[#475569] hover:bg-white hover:text-[#0F172A] border border-[#E2E8F0]/80'
+                        }`}
+                        title={`Filtrar mapa por ${loc.name}`}
+                      >
+                        <MapPin className={`w-3 h-3 ${isLocActive ? 'text-white' : 'text-[#E85B49]'}`} />
+                        <span>{loc.name}</span>
+                      </button>
+                    );
+                  })}
+                </HorizontalScrollContainer>
+              )}
 
               {/* Carrusel Desplazable de Filtros por Categoría con soporte táctil fluido, degradados y flechas en desktop */}
               <HorizontalScrollContainer
