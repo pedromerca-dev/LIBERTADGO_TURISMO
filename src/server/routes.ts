@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { catalogRepository } from './repository.ts';
+import { INITIAL_EVENTS } from '../data/initialEvents.ts';
 import { CreateTripSchema } from './schemas.ts';
 import { authRouter } from './authRoutes.ts';
 import { creatorsRouter } from './creatorsRoutes.ts';
@@ -49,6 +50,16 @@ apiRouter.get('/destinations/:id', (req: Request, res: Response) => {
     return;
   }
   res.json({ success: true, data: dest });
+});
+
+// GET /api/events - Cultural & tourist events in La Libertad
+apiRouter.get('/events', (_req: Request, res: Response) => {
+  res.json({
+    success: true,
+    data: INITIAL_EVENTS,
+    total: INITIAL_EVENTS.length,
+    region: 'La Libertad, Perú',
+  });
 });
 
 // GET /api/places

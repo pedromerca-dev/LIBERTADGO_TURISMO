@@ -68,6 +68,42 @@ export type PlaceCategory =
   | 'hoteles'
   | 'actividades';
 
+export interface PlaceSafetyReport {
+  score: number;
+  riskLevel: string;
+  incidentCount: number;
+  radiusMeters: number;
+  criticalShift: string;
+  unsafeHours?: string;
+  safeHours?: string;
+  unsafeDatesNotice?: string;
+  topCrimes?: Array<{ name: string; count: number; percentage: number }>;
+  recommendations?: string[];
+  source?: string;
+  evaluatedAt?: string;
+}
+
+export interface PlaceReviewItem {
+  authorName: string;
+  rating: number;
+  text: string;
+}
+
+export interface PlacePredictionScore {
+  score: number;
+  confidence: number;
+  date?: string;
+  breakdown?: Array<{
+    name: string;
+    value: number;
+    weight: number;
+    contribution: number;
+    explanation: string;
+    data_source?: string;
+    data_date?: string;
+  }>;
+}
+
 export interface Place {
   id: string;
   slug: string;
@@ -84,6 +120,8 @@ export interface Place {
   phone?: string;
   email?: string;
   website?: string;
+  mapsUrl?: string;
+  googlePlaceId?: string;
   priceLevel?: 1 | 2 | 3 | 4;
   rating?: number; // Verified rating only, e.g., 4.7
   reviewsCount?: number;
@@ -93,6 +131,10 @@ export interface Place {
   sources: PlaceSource[];
   tags: string[];
   recommendedDurationMinutes?: number;
+  safetyScore?: number;
+  safetyReport?: PlaceSafetyReport;
+  reviews?: PlaceReviewItem[];
+  predictionScore?: PlacePredictionScore;
 }
 
 export interface TripActivity {
