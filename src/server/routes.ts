@@ -63,48 +63,58 @@ apiRouter.get('/events', (_req: Request, res: Response) => {
 });
 
 // GET /api/places
-apiRouter.get('/places', (req: Request, res: Response) => {
-  const { localityId, category, q, page, limit } = req.query;
-  const places = catalogRepository.getPlaces({
-    localityId: typeof localityId === 'string' ? localityId : undefined,
-    category: typeof category === 'string' ? category : undefined,
-    search: typeof q === 'string' ? q : undefined,
-  });
+apiRouter.get('/places', async (req: Request, res: Response) => {
+  try {
+    const { localityId, category, q, page, limit } = req.query;
+    const places = await catalogRepository.getPlaces({
+      localityId: typeof localityId === 'string' ? localityId : undefined,
+      category: typeof category === 'string' ? category : undefined,
+      search: typeof q === 'string' ? q : undefined,
+    });
 
-  const pageNum = Math.max(1, Number(page) || 1);
-  const pageSize = Math.min(100, Math.max(1, Number(limit) || 50));
-  const total = places.length;
-  const startIndex = (pageNum - 1) * pageSize;
-  const paginated = limit ? places.slice(startIndex, startIndex + pageSize) : places;
+    const pageNum = Math.max(1, Number(page) || 1);
+    const pageSize = Math.min(100, Math.max(1, Number(limit) || 50));
+    const total = places.length;
+    const startIndex = (pageNum - 1) * pageSize;
+    const paginated = limit ? places.slice(startIndex, startIndex + pageSize) : places;
 
-  res.json({
-    success: true,
-    data: paginated,
-    total,
-    page: pageNum,
-    totalPages: Math.ceil(total / pageSize),
-    regionConstraint: 'La Libertad',
-    sources: ['MINCETUR', 'OpenStreetMap', 'Directorio_Oficial_La_Libertad'],
-  });
+    res.json({
+      success: true,
+      data: paginated,
+      total,
+      page: pageNum,
+      totalPages: Math.ceil(total / pageSize),
+      regionConstraint: 'La Libertad',
+      sources: ['MINCETUR', 'OpenStreetMap', 'Directorio_Oficial_La_Libertad'],
+    });
+  } catch (err) {
+    console.error('[Places Error] Error getting places:', err);
+    res.status(500).json({ success: false, error: 'Error al consultar catálogo de lugares' });
+  }
 });
 
 // GET /api/places/search
-apiRouter.get('/places/search', (req: Request, res: Response) => {
-  const q = typeof req.query.q === 'string' ? req.query.q : '';
-  const localityId = typeof req.query.localityId === 'string' ? req.query.localityId : undefined;
+apiRouter.get('/places/search', async (req: Request, res: Response) => {
+  try {
+    const q = typeof req.query.q === 'string' ? req.query.q : '';
+    const localityId = typeof req.query.localityId === 'string' ? req.query.localityId : undefined;
 
-  const places = catalogRepository.searchPlaces(q, localityId);
-  res.json({
-    success: true,
-    data: places,
-    total: places.length,
-  });
+    const places = await catalogRepository.searchPlaces(q, localityId);
+    res.json({
+      success: true,
+      data: places,
+      total: places.length,
+    });
+  } catch (err) {
+    console.error('[Places Error] Error searching places:', err);
+    res.status(500).json({ success: false, error: 'Error al buscar lugares' });
+  }
 });
 
 // GET /api/places/:id/videos - Approved videos associated with a specific place
 apiRouter.get('/places/:id/videos', async (req: Request, res: Response) => {
   try {
-    const place = catalogRepository.getPlaceById(req.params.id);
+    const place = await catalogRepository.getPlaceById(req.params.id);
     if (!place) {
       res.status(404).json({ success: false, error: 'Lugar no encontrado en el catálogo de La Libertad' });
       return;
@@ -125,13 +135,18 @@ apiRouter.get('/places/:id/videos', async (req: Request, res: Response) => {
 });
 
 // GET /api/places/:id
-apiRouter.get('/places/:id', (req: Request, res: Response) => {
-  const place = catalogRepository.getPlaceById(req.params.id);
-  if (!place) {
-    res.status(404).json({ success: false, error: 'Lugar no encontrado en el catálogo de La Libertad' });
-    return;
+apiRouter.get('/places/:id', async (req: Request, res: Response) => {
+  try {
+    const place = await catalogRepository.getPlaceById(req.params.id);
+    if (!place) {
+      res.status(404).json({ success: false, error: 'Lugar no encontrado en el catálogo de La Libertad' });
+      return;
+    }
+    res.json({ success: true, data: place });
+  } catch (err) {
+    console.error('[Places Error] Error getting place by id:', err);
+    res.status(500).json({ success: false, error: 'Error al consultar lugar' });
   }
-  res.json({ success: true, data: place });
 });
 
 // GET /api/route - Real-world street routing via OpenStreetMap / OSRM
@@ -262,14 +277,14 @@ apiRouter.get('/itineraries/:id', (req: Request, res: Response) => {
 });
 
 // POST /api/itineraries/:id/activities
-apiRouter.post('/itineraries/:id/activities', (req: Request, res: Response) => {
+apiRouter.post('/itineraries/:id/activities', async (req: Request, res: Response) => {
   const { placeId, dayNumber, timeSlot, notes } = req.body;
   if (!placeId || typeof dayNumber !== 'number') {
     res.status(400).json({ success: false, error: 'placeId y dayNumber son obligatorios' });
     return;
   }
 
-  const result = catalogRepository.addActivity(req.params.id, {
+  const result = await catalogRepository.addActivity(req.params.id, {
     placeId,
     dayNumber,
     timeSlot,

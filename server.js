@@ -35,12 +35,6 @@ var init_initialPlaces = __esm({
         "reviewsCount": 7024,
         "images": [
           {
-            "id": "img_place_rincon_vallejo_local",
-            "url": "/images/places/place_1.webp",
-            "caption": "El Rinc\xF3n de Vallejo",
-            "isCover": true
-          },
-          {
             "id": "img_rv_1",
             "url": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80",
             "caption": "Cabrito a la norte\xF1a tradicional con frijoles y zarza criolla",
@@ -103,6 +97,12 @@ var init_initialPlaces = __esm({
             "sourceId": "mincetur_directory",
             "externalId": "MINCETUR-DIR-TRU-001",
             "lastSyncedAt": "2026-10-15"
+          },
+          {
+            "placeId": "place_rincon_vallejo",
+            "sourceId": "openstreetmap",
+            "externalId": "4934609621",
+            "lastSyncedAt": "2026-11-05"
           }
         ],
         "tags": [
@@ -220,8 +220,7 @@ var init_initialPlaces = __esm({
             }
           ]
         },
-        "googlePlaceId": "ChIJCR2ph4M9rZERljGRKTNw678",
-        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Centro+Hist%C3%B3rico+de+Trujillo+-8.111786,-79.028667"
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=-8.11285,-79.02985"
       },
       {
         "id": "place_celler_cler",
@@ -244,12 +243,6 @@ var init_initialPlaces = __esm({
         "rating": 4.6,
         "reviewsCount": 693,
         "images": [
-          {
-            "id": "img_place_celler_cler_local",
-            "url": "/images/places/place_1.webp",
-            "caption": "El Celler de Cler",
-            "isCover": true
-          },
           {
             "id": "img_cc_1",
             "url": "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=800&q=80",
@@ -384,8 +377,7 @@ var init_initialPlaces = __esm({
             }
           ]
         },
-        "googlePlaceId": "ChIJCR2ph4M9rZERljGRKTNw678",
-        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Centro+Hist%C3%B3rico+de+Trujillo+-8.111786,-79.028667"
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=-8.11022,-79.03055"
       },
       {
         "id": "place_demarco",
@@ -408,12 +400,6 @@ var init_initialPlaces = __esm({
         "rating": 4.4,
         "reviewsCount": 3120,
         "images": [
-          {
-            "id": "img_place_demarco_local",
-            "url": "/images/places/place_1.webp",
-            "caption": "Demarco Restaurant & Caf\xE9",
-            "isCover": true
-          },
           {
             "id": "img_demarco_1",
             "url": "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=800&q=80",
@@ -549,8 +535,7 @@ var init_initialPlaces = __esm({
             }
           ]
         },
-        "googlePlaceId": "ChIJCR2ph4M9rZERljGRKTNw678",
-        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Centro+Hist%C3%B3rico+de+Trujillo+-8.111786,-79.028667"
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=-8.11080,-79.03120"
       },
       {
         "id": "place_fiesta_trujillo",
@@ -1253,7 +1238,7 @@ var init_initialPlaces = __esm({
           ]
         },
         "googlePlaceId": "ChIJCR2ph4M9rZERljGRKTNw678",
-        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Centro+Hist%C3%B3rico+de+Trujillo+-8.111786,-79.028667"
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Plaza+Mayor+Trujillo+-8.11182,-79.02871"
       },
       {
         "id": "place_catedral_trujillo",
@@ -1275,12 +1260,6 @@ var init_initialPlaces = __esm({
         "rating": 4.7,
         "reviewsCount": 8430,
         "images": [
-          {
-            "id": "img_place_catedral_trujillo_local",
-            "url": "/images/places/place_1.webp",
-            "caption": "Bas\xEDlica Menor y Catedral de Trujillo",
-            "isCover": true
-          },
           {
             "id": "img_cat_1",
             "url": "https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=800&q=80",
@@ -1416,8 +1395,7 @@ var init_initialPlaces = __esm({
             }
           ]
         },
-        "googlePlaceId": "ChIJCR2ph4M9rZERljGRKTNw678",
-        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Centro+Hist%C3%B3rico+de+Trujillo+-8.111786,-79.028667"
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=-8.11140,-79.02920"
       },
       {
         "id": "place_casa_urquiaga",
@@ -1439,12 +1417,6 @@ var init_initialPlaces = __esm({
         "reviewsCount": 1840,
         "images": [
           {
-            "id": "img_place_casa_urquiaga_local",
-            "url": "/images/places/place_1.webp",
-            "caption": "Casa Urquiaga (Calonge)",
-            "isCover": true
-          },
-          {
             "id": "img_cu_1",
             "url": "https://images.unsplash.com/photo-1541123437800-1bb1317badc2?auto=format&fit=crop&w=800&q=80",
             "caption": "Patio principal con pisos de laja y carpinter\xEDa hist\xF3rica",
@@ -1462,6 +1434,12 @@ var init_initialPlaces = __esm({
             "sourceId": "mincetur_inventory",
             "externalId": "MINCETUR-INV-LL-0045",
             "lastSyncedAt": "2026-10-01"
+          },
+          {
+            "placeId": "place_casa_urquiaga",
+            "sourceId": "openstreetmap",
+            "externalId": "19973993",
+            "lastSyncedAt": "2026-11-05"
           }
         ],
         "tags": [
@@ -1578,8 +1556,7 @@ var init_initialPlaces = __esm({
             }
           ]
         },
-        "googlePlaceId": "ChIJCR2ph4M9rZERljGRKTNw678",
-        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Centro+Hist%C3%B3rico+de+Trujillo+-8.111786,-79.028667"
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=-8.11145,-79.02805"
       },
       {
         "id": "place_casa_emancipacion",
@@ -1602,12 +1579,6 @@ var init_initialPlaces = __esm({
         "reviewsCount": 4210,
         "images": [
           {
-            "id": "img_place_casa_emancipacion_local",
-            "url": "/images/places/place_1.webp",
-            "caption": "Casa de la Emancipaci\xF3n (BBVA)",
-            "isCover": true
-          },
-          {
             "id": "img_emancip_1",
             "url": "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80",
             "caption": "Patio principal neocl\xE1sico con arquer\xEDa restaurada",
@@ -1625,6 +1596,12 @@ var init_initialPlaces = __esm({
             "sourceId": "mincetur_inventory",
             "externalId": "MINCETUR-INV-LL-0046",
             "lastSyncedAt": "2026-10-01"
+          },
+          {
+            "placeId": "place_casa_emancipacion",
+            "sourceId": "openstreetmap",
+            "externalId": "7551382",
+            "lastSyncedAt": "2026-11-05"
           }
         ],
         "tags": [
@@ -1742,8 +1719,7 @@ var init_initialPlaces = __esm({
             }
           ]
         },
-        "googlePlaceId": "ChIJCR2ph4M9rZERljGRKTNw678",
-        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Centro+Hist%C3%B3rico+de+Trujillo+-8.111786,-79.028667"
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=-8.11050,-79.03020"
       },
       {
         "id": "place_museo_arqueologia_unt",
@@ -1969,6 +1945,12 @@ var init_initialPlaces = __esm({
             "sourceId": "openstreetmap",
             "externalId": "OSM-WAY-4819032",
             "lastSyncedAt": "2026-10-01"
+          },
+          {
+            "placeId": "place_plazuela_recreo",
+            "sourceId": "openstreetmap",
+            "externalId": "111216576",
+            "lastSyncedAt": "2026-11-05"
           }
         ],
         "tags": [
@@ -2127,12 +2109,6 @@ var init_initialPlaces = __esm({
         "reviewsCount": 1731,
         "images": [
           {
-            "id": "img_place_hotel_costa_sol_trujillo_local",
-            "url": "/images/places/place_1.webp",
-            "caption": "Hotel Costa del Sol Wyndham Trujillo Centro",
-            "isCover": true
-          },
-          {
             "id": "img_hotel_tru_1",
             "url": "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
             "caption": "Fachada y patio colonial del Hotel Costa del Sol Trujillo",
@@ -2150,6 +2126,12 @@ var init_initialPlaces = __esm({
             "sourceId": "mincetur_directory",
             "externalId": "MINCETUR-HOSP-TRU-008",
             "lastSyncedAt": "2026-10-01"
+          },
+          {
+            "placeId": "place_hotel_costa_sol_trujillo",
+            "sourceId": "openstreetmap",
+            "externalId": "7552019",
+            "lastSyncedAt": "2026-11-05"
           }
         ],
         "tags": [
@@ -2267,8 +2249,7 @@ var init_initialPlaces = __esm({
             }
           ]
         },
-        "googlePlaceId": "ChIJCR2ph4M9rZERljGRKTNw678",
-        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Centro+Hist%C3%B3rico+de+Trujillo+-8.111786,-79.028667"
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=-8.11195,-79.02755"
       },
       {
         "id": "place_gran_recreo_hotel",
@@ -2291,12 +2272,6 @@ var init_initialPlaces = __esm({
         "reviewsCount": 1220,
         "images": [
           {
-            "id": "img_place_gran_recreo_hotel_local",
-            "url": "/images/places/place_1.webp",
-            "caption": "Gran Recreo Hotel",
-            "isCover": true
-          },
-          {
             "id": "img_gr_1",
             "url": "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80",
             "caption": "Piscina y \xE1rea de descanso de Gran Recreo Hotel",
@@ -2314,6 +2289,12 @@ var init_initialPlaces = __esm({
             "sourceId": "mincetur_directory",
             "externalId": "MINCETUR-HOSP-TRU-015",
             "lastSyncedAt": "2026-10-01"
+          },
+          {
+            "placeId": "place_gran_recreo_hotel",
+            "sourceId": "openstreetmap",
+            "externalId": "9829847817",
+            "lastSyncedAt": "2026-11-05"
           }
         ],
         "tags": [
@@ -2430,8 +2411,7 @@ var init_initialPlaces = __esm({
             }
           ]
         },
-        "googlePlaceId": "ChIJCR2ph4M9rZERljGRKTNw678",
-        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Centro+Hist%C3%B3rico+de+Trujillo+-8.111786,-79.028667"
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=-8.11010,-79.02680"
       },
       {
         "id": "place_chan_chan",
@@ -3022,12 +3002,6 @@ var init_initialPlaces = __esm({
         "reviewsCount": 3410,
         "images": [
           {
-            "id": "img_place_big_ben_huanchaco_local",
-            "url": "/images/places/place_2.webp",
-            "caption": "Restaurante Big Ben Huanchaco",
-            "isCover": true
-          },
-          {
             "id": "img_bb_1",
             "url": "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=800&q=80",
             "caption": "Ceviche fresco de pescado con camote y canchita",
@@ -3045,6 +3019,12 @@ var init_initialPlaces = __esm({
             "sourceId": "mincetur_directory",
             "externalId": "MINCETUR-DIR-HUA-002",
             "lastSyncedAt": "2026-10-01"
+          },
+          {
+            "placeId": "place_big_ben_huanchaco",
+            "sourceId": "google_places_api",
+            "externalId": "ChIJM0a2xVc5rZER9kskrsjzU5I",
+            "lastSyncedAt": "2026-11-05"
           }
         ],
         "tags": [
@@ -3205,7 +3185,8 @@ var init_initialPlaces = __esm({
             }
           ]
         },
-        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Balneario+de+Huanchaco+-8.078560,-79.121384"
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=-8.07680,-79.12320",
+        "googlePlaceId": "ChIJM0a2xVc5rZER9kskrsjzU5I"
       },
       {
         "id": "place_club_colonial_huanchaco",
@@ -3227,12 +3208,6 @@ var init_initialPlaces = __esm({
         "rating": 4.5,
         "reviewsCount": 1180,
         "images": [
-          {
-            "id": "img_place_club_colonial_huanchaco_local",
-            "url": "/images/places/place_2.webp",
-            "caption": "Restaurant Club Colonial Huanchaco",
-            "isCover": true
-          },
           {
             "id": "img_colonial_1",
             "url": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80",
@@ -3433,12 +3408,6 @@ var init_initialPlaces = __esm({
         "rating": 4.4,
         "reviewsCount": 1950,
         "images": [
-          {
-            "id": "img_place_pisagua_huanchaco_local",
-            "url": "/images/places/place_2.webp",
-            "caption": "Marisquer\xEDa Pisagua",
-            "isCover": true
-          },
           {
             "id": "img_pisagua_1",
             "url": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80",
@@ -3835,12 +3804,6 @@ var init_initialPlaces = __esm({
         "rating": 4.5,
         "reviewsCount": 920,
         "images": [
-          {
-            "id": "img_place_hotel_bracamonte_huanchaco_local",
-            "url": "/images/places/place_2.webp",
-            "caption": "Hotel Bracamonte Huanchaco",
-            "isCover": true
-          },
           {
             "id": "img_brac_1",
             "url": "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=800&q=80",
@@ -4731,6 +4694,12 @@ var init_initialPlaces = __esm({
             "sourceId": "mincetur_inventory",
             "externalId": "MINCETUR-INV-LL-0009",
             "lastSyncedAt": "2026-10-01"
+          },
+          {
+            "placeId": "place_huaca_arco_iris",
+            "sourceId": "openstreetmap",
+            "externalId": "4876324221",
+            "lastSyncedAt": "2026-11-05"
           }
         ],
         "tags": [
@@ -4909,6 +4878,12 @@ var init_initialPlaces = __esm({
             "sourceId": "mincetur_inventory",
             "externalId": "MINCETUR-INV-LL-0010",
             "lastSyncedAt": "2026-10-01"
+          },
+          {
+            "placeId": "place_huaca_esmeralda",
+            "sourceId": "openstreetmap",
+            "externalId": "157129502",
+            "lastSyncedAt": "2026-11-05"
           }
         ],
         "tags": [
@@ -12302,185 +12277,6 @@ var init_initialPlaces = __esm({
         }
       },
       {
-        "id": "place_predict_52",
-        "slug": "el-rincon-de-vallejo-2",
-        "name": "El Rinc\xF3n de Vallejo",
-        "category": "gastronomia",
-        "subcategory": "Comida Criolla Tradicional",
-        "localityId": "trujillo",
-        "localityName": "Trujillo",
-        "address": "Jir\xF3n Orbegoso 309, Centro Hist\xF3rico de Trujillo",
-        "coordinates": {
-          "lat": -8.1100092,
-          "lng": -79.0294465
-        },
-        "geohash": "6nxcces",
-        "shortDescription": "El Rinc\xF3n de Vallejo: experiencia gastron\xF3mica aut\xE9ntica en Trujillo con lo mejor de la cocina liberte\xF1a.",
-        "fullDescription": "El Rinc\xF3n de Vallejo es un referente tur\xEDstico situado en Jir\xF3n Orbegoso 309, Centro Hist\xF3rico de Trujillo. Representa una de las opciones destacadas para visitantes y viajeros que exploran el circuito tur\xEDstico regional de La Libertad.",
-        "rating": 4.3,
-        "reviewsCount": 7026,
-        "images": [
-          {
-            "id": "img_place_predict_52_1",
-            "url": "/images/places/place_52.webp",
-            "caption": "El Rinc\xF3n de Vallejo - Comida Criolla Tradicional",
-            "isCover": true
-          }
-        ],
-        "verification": {
-          "isVerified": true,
-          "verificationLevel": "partner_verified",
-          "verifiedAt": "2026-11-05",
-          "notes": "Integrado desde registro tur\xEDstico verificado (OSM)"
-        },
-        "sources": [
-          {
-            "placeId": "place_predict_52",
-            "sourceId": "openstreetmap",
-            "externalId": "4934609621",
-            "lastSyncedAt": "2026-11-05"
-          }
-        ],
-        "tags": [
-          "Trujillo",
-          "Comida Criolla Tradicional",
-          "Interiores",
-          "Rinc\xF3n",
-          "Vallejo",
-          "Gastronom\xEDa"
-        ],
-        "recommendedDurationMinutes": 80,
-        "phone": "+51 44 226232",
-        "website": "http://www.rincondevallejo.pe/",
-        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=El+Ric%C3%B3n+de+Vallejo+-8.110009,-79.029447",
-        "priceLevel": 2,
-        "safetyScore": 41.3,
-        "safetyReport": {
-          "score": 41.3,
-          "riskLevel": "Riesgo Urbano / Desfavorable de Noche",
-          "incidentCount": 1933,
-          "radiusMeters": 1e3,
-          "criticalShift": "tarde",
-          "source": "MININTER - Sistema de Denuncias Policiales (SIDPOL)",
-          "unsafeHours": "18:30 a 05:00 hrs (Horas de baja visibilidad y mayor registro en turno tarde).",
-          "safeHours": "09:00 a 17:00 hrs (Franja recomendada para recorridos y actividades).",
-          "unsafeDatesNotice": "Mayor incidencia estad\xEDstica en fines de semana (viernes noche, s\xE1bado y domingo) y fechas festivas locales de alta afluencia comercial.",
-          "topCrimes": [
-            {
-              "name": "Hurto simple de pertenencias / carteristas",
-              "count": 779,
-              "percentage": 40.3
-            },
-            {
-              "name": "Conflictos dom\xE9sticos / violencia psicol\xF3gica",
-              "count": 227,
-              "percentage": 11.7
-            },
-            {
-              "name": "Arrebato de tel\xE9fono celular",
-              "count": 177,
-              "percentage": 9.2
-            },
-            {
-              "name": "Estafa o enga\xF1o comercial",
-              "count": 140,
-              "percentage": 7.2
-            },
-            {
-              "name": "Violencia interpersonal / f\xEDsica",
-              "count": 99,
-              "percentage": 5.1
-            }
-          ],
-          "recommendations": [
-            "Evite manipular o exponer tel\xE9fonos m\xF3viles de gama alta en aceras concurridas o cerca de la calzada.",
-            "Lleve mochilas y bolsos hacia adelante en zonas de aglomeraci\xF3n y esquinas comerciales.",
-            "Contrate servicios tur\xEDsticos, transporte y tours \xFAnicamente en agencias formales registradas ante MINCETUR.",
-            "Planifique retornar a su hospedaje antes de las 19:00 hrs y priorice el uso de taxis de aplicativo o autorizados.",
-            "Porte solo una copia fotost\xE1tica de su documento de identidad y mantenga las tarjetas bancarias protegidas."
-          ],
-          "evaluatedAt": "2026-11-05T17:46:35.060402Z"
-        },
-        "reviews": [
-          {
-            "authorName": "Marinka Burgos-Riano",
-            "rating": 1,
-            "text": "Una experiencia bastante decepcionante y demasiado cara para lo que ofrecen.\n\nPara empezar, la se\xF1orita que nos atendi\xF3 por tel\xE9fono nos complic\xF3 innecesariamente la reserva, insistiendo en que ten\xEDamos que pagar 100 soles por Yape. Le expliqu\xE9 que est\xE1bamos en el aeropuerto y que \xEDbamos a ir directamente al restaurante, seis personas en total, pero no quiso entender razones.\n\nLo curioso es que finalmente llegamos sin reserva y nos dieron una mesa sin ning\xFAn problema.\n\nEl interior del restaurante es lindo, tiene su encanto, pero la calle es bastante ruidosa por el tr\xE1fico constante de veh\xEDculos. Adem\xE1s, hace bastante calor dentro. Tienen aire acondicionado, pero el local est\xE1 completamente abierto hacia la calle, sin puertas que permitan mantener el ambiente fresco. As\xED que de poco sirve.\n\nLos ba\xF1os estaban sucios y hasta hab\xEDa unas sandalias tiradas encima del lavamanos.\n\nEn cuanto a la comida, el arroz chaufa estaba demasiado grasoso y el cuy frito no ten\xEDa nada de especial. Pr\xE1ctica"
-          },
-          {
-            "authorName": "Fiorela Garcia Castillo",
-            "rating": 4,
-            "text": "Fui a 2 sedes, uno que esta en la av. Orbegoso cerca a la plaza de Trujillo y el otro que est\xE1 cerca al estadio Mansiche en la Av. Espa\xF1a. Estuvo bastante agradable, vayan a almorzar temprano, generalmente se acaban m\xE1s r\xE1pido los platos que incluyen pescado, y algunos platos criollos...Es un lugar c\xE1lido y buena atenci\xF3n, los precios no son muy altos, pero tampoco tan bajos."
-          },
-          {
-            "authorName": "Luz De Mar\xEDa",
-            "rating": 4,
-            "text": `"S\xED, vale la pena. La comida es rica, los precios son competitivos y el ambiente tiene un atractivo cultural. Solo recomendar\xEDa que, si piden 'cabrito deshuesado', pregunten antes c\xF3mo lo sirven para evitar confusiones, a m\xED me toc\xF3 un hueso muy grande."`
-          }
-        ],
-        "predictionScore": {
-          "score": 82.8,
-          "confidence": 0.8,
-          "date": "2026-11-18",
-          "breakdown": [
-            {
-              "name": "weather_temperature",
-              "value": 1,
-              "weight": 2,
-              "contribution": 0.1667,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "Temperatura promedio 25.4\xB0C (rango ideal 16.0-30.0\xB0C)"
-            },
-            {
-              "name": "weather_rain",
-              "value": 0.7525,
-              "weight": 3,
-              "contribution": 0.1881,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "Precipitaci\xF3n 0.0 mm, prob. lluvia 55%"
-            },
-            {
-              "name": "weather_uv",
-              "value": 0.1,
-              "weight": 1,
-              "contribution": 83e-4,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "\xCDndice UV 9.0 (m\xE1x. aceptable 10.0)"
-            },
-            {
-              "name": "weather_wind",
-              "value": 0.576,
-              "weight": 1,
-              "contribution": 0.048,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "Viento 21.2 km/h (m\xE1x. aceptable 50.0)"
-            },
-            {
-              "name": "calendar_weekend",
-              "value": 1,
-              "weight": 1,
-              "contribution": 0.0833,
-              "data_source": "calendar",
-              "data_date": "2026-11-18",
-              "explanation": "D\xEDa de semana"
-            },
-            {
-              "name": "calendar_crowd",
-              "value": 1,
-              "weight": 4,
-              "contribution": 0.3333,
-              "data_source": "calendar",
-              "data_date": "2026-11-18",
-              "explanation": "Nivel de aglomeraci\xF3n por eventos: 0/5"
-            }
-          ]
-        }
-      },
-      {
         "id": "place_predict_53",
         "slug": "pizza-oscar",
         "name": "Pizza Oscar",
@@ -16925,9 +16721,9 @@ var init_initialPlaces = __esm({
         "name": "Moche - Caf\xE9s Especiales",
         "category": "restaurantes",
         "subcategory": "Cafeter\xEDa & Pasteler\xEDa",
-        "localityId": "moche",
-        "localityName": "Moche",
-        "address": "Moche - Caf\xE9s Especiales, Moche, La Libertad",
+        "localityId": "trujillo",
+        "localityName": "Trujillo",
+        "address": "Jr. Bolognesi 496, Centro Hist\xF3rico de Trujillo",
         "coordinates": {
           "lat": -8.1149438,
           "lng": -79.0306033
@@ -16960,7 +16756,7 @@ var init_initialPlaces = __esm({
           }
         ],
         "tags": [
-          "Moche",
+          "Trujillo",
           "Cafeter\xEDa & Pasteler\xEDa",
           "Interiores",
           "Caf\xE9s",
@@ -19261,6 +19057,12 @@ var init_initialPlaces = __esm({
             "sourceId": "google_places_api",
             "externalId": "ChIJ27E3Me89rZERrIphPlOoobs",
             "lastSyncedAt": "2026-11-05"
+          },
+          {
+            "placeId": "place_predict_99",
+            "sourceId": "openstreetmap",
+            "externalId": "5816747572",
+            "lastSyncedAt": "2026-11-05"
           }
         ],
         "tags": [
@@ -19321,183 +19123,6 @@ var init_initialPlaces = __esm({
             "Porte solo una copia fotost\xE1tica de su documento de identidad y mantenga las tarjetas bancarias protegidas."
           ],
           "evaluatedAt": "2026-11-05T17:46:44.097802Z"
-        },
-        "reviews": [
-          {
-            "authorName": "Ismael Johdan Rojas Valencia",
-            "rating": 1,
-            "text": "P\xE9simo servicio. Luego de mantenerme m\xE1s de media hora haciendo un pedido, me dicen que solamente es con pago a trav\xE9s de yape. Deber\xEDan de actualizar su sistema de trabajo, salimos perjudicados los clientes. La atenci\xF3n al p\xFAblico es p\xE9sima tanto presencial como de manera online, deber\xEDan de mejorar eso. Si te quejas te contestan con risas."
-          },
-          {
-            "authorName": "Michael Gonz\xE1lez",
-            "rating": 1,
-            "text": "La comida 4 de 10. Mi chilcano sali\xF3 con piedras y arena, nadie solucion\xF3 nada. La atenci\xF3n es terrible y el ambiente es sucio y cubiertos mal lavados. No volver\xEDa definitivamente..."
-          },
-          {
-            "authorName": "ky",
-            "rating": 1,
-            "text": "ped\xED un combinado y el tallar\xEDn fue lo peor que prob\xE9, simplemente con verlo supe que no iba a estar bueno y realmente fue una decepci\xF3n. No volver\xEDa, adem\xE1s que los los precios me parecieron algo elevados para la calidad que tiene el restaurante."
-          }
-        ],
-        "predictionScore": {
-          "score": 82.8,
-          "confidence": 0.8,
-          "date": "2026-11-18",
-          "breakdown": [
-            {
-              "name": "weather_temperature",
-              "value": 1,
-              "weight": 2,
-              "contribution": 0.1667,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "Temperatura promedio 25.4\xB0C (rango ideal 16.0-30.0\xB0C)"
-            },
-            {
-              "name": "weather_rain",
-              "value": 0.7525,
-              "weight": 3,
-              "contribution": 0.1881,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "Precipitaci\xF3n 0.0 mm, prob. lluvia 55%"
-            },
-            {
-              "name": "weather_uv",
-              "value": 0.1,
-              "weight": 1,
-              "contribution": 83e-4,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "\xCDndice UV 9.0 (m\xE1x. aceptable 10.0)"
-            },
-            {
-              "name": "weather_wind",
-              "value": 0.576,
-              "weight": 1,
-              "contribution": 0.048,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "Viento 21.2 km/h (m\xE1x. aceptable 50.0)"
-            },
-            {
-              "name": "calendar_weekend",
-              "value": 1,
-              "weight": 1,
-              "contribution": 0.0833,
-              "data_source": "calendar",
-              "data_date": "2026-11-18",
-              "explanation": "D\xEDa de semana"
-            },
-            {
-              "name": "calendar_crowd",
-              "value": 1,
-              "weight": 4,
-              "contribution": 0.3333,
-              "data_source": "calendar",
-              "data_date": "2026-11-18",
-              "explanation": "Nivel de aglomeraci\xF3n por eventos: 0/5"
-            }
-          ]
-        }
-      },
-      {
-        "id": "place_predict_100",
-        "slug": "restaurant-y-cevicheria-las-gemelas-2",
-        "name": "Restaurant y Cevicheria Las Gemelas",
-        "category": "restaurantes",
-        "subcategory": "Cevicher\xEDa & Cocina Marina",
-        "localityId": "la-esperanza",
-        "localityName": "La Esperanza",
-        "address": "Restaurant y Cevicheria Las Gemelas, La Esperanza, La Libertad",
-        "coordinates": {
-          "lat": -8.0856879,
-          "lng": -79.03587
-        },
-        "geohash": "6nxf12p",
-        "shortDescription": "Restaurant y Cevicheria Las Gemelas: experiencia gastron\xF3mica aut\xE9ntica en La Esperanza con lo mejor de la cocina liberte\xF1a.",
-        "fullDescription": "Restaurant y Cevicheria Las Gemelas es un referente tur\xEDstico situado en Restaurant y Cevicheria Las Gemelas, La Esperanza, La Libertad. Representa una de las opciones destacadas para visitantes y viajeros que exploran el circuito tur\xEDstico regional de La Libertad.",
-        "rating": 3.6,
-        "reviewsCount": 51,
-        "images": [
-          {
-            "id": "img_place_predict_100_1",
-            "url": "/images/places/place_100.webp",
-            "caption": "Restaurant y Cevicheria Las Gemelas - Cevicher\xEDa & Cocina Marina",
-            "isCover": true
-          }
-        ],
-        "verification": {
-          "isVerified": true,
-          "verificationLevel": "partner_verified",
-          "verifiedAt": "2026-11-05",
-          "notes": "Integrado desde registro tur\xEDstico verificado (OSM)"
-        },
-        "sources": [
-          {
-            "placeId": "place_predict_100",
-            "sourceId": "openstreetmap",
-            "externalId": "5816747572",
-            "lastSyncedAt": "2026-11-05"
-          }
-        ],
-        "tags": [
-          "La Esperanza",
-          "Cevicher\xEDa & Cocina Marina",
-          "Interiores",
-          "Restaurant",
-          "Cevicheria",
-          "Gemelas"
-        ],
-        "recommendedDurationMinutes": 75,
-        "phone": "+51 986 672 040",
-        "website": "https://www.google.com/maps/search/?api=1&query=Restaurant+y+Cevicheria+Las+Gemelas+-8.085688,-79.035870",
-        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Restaurant+y+Cevicheria+Las+Gemelas+-8.085688,-79.035870",
-        "priceLevel": 2,
-        "safetyScore": 51.8,
-        "safetyReport": {
-          "score": 51.8,
-          "riskLevel": "Riesgo Urbano / Desfavorable de Noche",
-          "incidentCount": 627,
-          "radiusMeters": 1e3,
-          "criticalShift": "noche",
-          "source": "MININTER - Sistema de Denuncias Policiales (SIDPOL)",
-          "unsafeHours": "18:30 a 05:00 hrs (Horas de baja visibilidad y mayor registro en turno noche).",
-          "safeHours": "09:00 a 17:00 hrs (Franja recomendada para recorridos y actividades).",
-          "unsafeDatesNotice": "Mayor incidencia estad\xEDstica en fines de semana (viernes noche, s\xE1bado y domingo) y fechas festivas locales de alta afluencia comercial.",
-          "topCrimes": [
-            {
-              "name": "Conflictos dom\xE9sticos / violencia psicol\xF3gica",
-              "count": 164,
-              "percentage": 26.2
-            },
-            {
-              "name": "Hurto simple de pertenencias / carteristas",
-              "count": 101,
-              "percentage": 16.1
-            },
-            {
-              "name": "Violencia interpersonal / f\xEDsica",
-              "count": 91,
-              "percentage": 14.5
-            },
-            {
-              "name": "Incidencias de extorsi\xF3n comercial",
-              "count": 70,
-              "percentage": 11.2
-            },
-            {
-              "name": "Hurto De Vehiculo",
-              "count": 40,
-              "percentage": 6.4
-            }
-          ],
-          "recommendations": [
-            "Lleve mochilas y bolsos hacia adelante en zonas de aglomeraci\xF3n y esquinas comerciales.",
-            "Planifique retornar a su hospedaje antes de las 19:00 hrs y priorice el uso de taxis de aplicativo o autorizados.",
-            "Porte solo una copia fotost\xE1tica de su documento de identidad y mantenga las tarjetas bancarias protegidas."
-          ],
-          "evaluatedAt": "2026-11-05T17:46:44.099904Z"
         },
         "reviews": [
           {
@@ -23178,6 +22803,12 @@ var init_initialPlaces = __esm({
             "sourceId": "google_places_api",
             "externalId": "ChIJCTaOMO89rZER8wlHfhovgIA",
             "lastSyncedAt": "2026-11-05"
+          },
+          {
+            "placeId": "place_predict_130",
+            "sourceId": "openstreetmap",
+            "externalId": "5816747562",
+            "lastSyncedAt": "2026-11-05"
           }
         ],
         "tags": [
@@ -23790,183 +23421,6 @@ var init_initialPlaces = __esm({
             "authorName": "C. Castillo R.",
             "rating": 3,
             "text": "Un lugar en donde se puede disfrutar un rico pollo a la brasa,  lo malo es la atenci\xF3n, se debe de trabajar en ello."
-          }
-        ],
-        "predictionScore": {
-          "score": 82.8,
-          "confidence": 0.8,
-          "date": "2026-11-18",
-          "breakdown": [
-            {
-              "name": "weather_temperature",
-              "value": 1,
-              "weight": 2,
-              "contribution": 0.1667,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "Temperatura promedio 25.4\xB0C (rango ideal 16.0-30.0\xB0C)"
-            },
-            {
-              "name": "weather_rain",
-              "value": 0.7525,
-              "weight": 3,
-              "contribution": 0.1881,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "Precipitaci\xF3n 0.0 mm, prob. lluvia 55%"
-            },
-            {
-              "name": "weather_uv",
-              "value": 0.1,
-              "weight": 1,
-              "contribution": 83e-4,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "\xCDndice UV 9.0 (m\xE1x. aceptable 10.0)"
-            },
-            {
-              "name": "weather_wind",
-              "value": 0.576,
-              "weight": 1,
-              "contribution": 0.048,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "Viento 21.2 km/h (m\xE1x. aceptable 50.0)"
-            },
-            {
-              "name": "calendar_weekend",
-              "value": 1,
-              "weight": 1,
-              "contribution": 0.0833,
-              "data_source": "calendar",
-              "data_date": "2026-11-18",
-              "explanation": "D\xEDa de semana"
-            },
-            {
-              "name": "calendar_crowd",
-              "value": 1,
-              "weight": 4,
-              "contribution": 0.3333,
-              "data_source": "calendar",
-              "data_date": "2026-11-18",
-              "explanation": "Nivel de aglomeraci\xF3n por eventos: 0/5"
-            }
-          ]
-        }
-      },
-      {
-        "id": "place_predict_137",
-        "slug": "cevicheria-amparito-2",
-        "name": "Cevicheria Amparito",
-        "category": "restaurantes",
-        "subcategory": "Cevicher\xEDa & Cocina Marina",
-        "localityId": "la-esperanza",
-        "localityName": "La Esperanza",
-        "address": "Cevicheria Amparito, La Esperanza, La Libertad",
-        "coordinates": {
-          "lat": -8.0857511,
-          "lng": -79.0355414
-        },
-        "geohash": "6nxf180",
-        "shortDescription": "Cevicheria Amparito: experiencia gastron\xF3mica aut\xE9ntica en La Esperanza con lo mejor de la cocina liberte\xF1a.",
-        "fullDescription": "Cevicheria Amparito es un referente tur\xEDstico situado en Cevicheria Amparito, La Esperanza, La Libertad. Representa una de las opciones destacadas para visitantes y viajeros que exploran el circuito tur\xEDstico regional de La Libertad.",
-        "rating": 3.5,
-        "reviewsCount": 112,
-        "images": [
-          {
-            "id": "img_place_predict_137_1",
-            "url": "/images/places/place_137.webp",
-            "caption": "Cevicheria Amparito - Cevicher\xEDa & Cocina Marina",
-            "isCover": true
-          }
-        ],
-        "verification": {
-          "isVerified": true,
-          "verificationLevel": "partner_verified",
-          "verifiedAt": "2026-11-05",
-          "notes": "Integrado desde registro tur\xEDstico verificado (OSM)"
-        },
-        "sources": [
-          {
-            "placeId": "place_predict_137",
-            "sourceId": "openstreetmap",
-            "externalId": "5816747562",
-            "lastSyncedAt": "2026-11-05"
-          }
-        ],
-        "tags": [
-          "La Esperanza",
-          "Cevicher\xEDa & Cocina Marina",
-          "Interiores",
-          "Cevicheria",
-          "Amparito",
-          "Gastronom\xEDa"
-        ],
-        "recommendedDurationMinutes": 75,
-        "phone": "+51 956 320 637",
-        "website": "https://www.google.com/maps/search/?api=1&query=Cevicheria+Amparito+-8.085751,-79.035541",
-        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Cevicheria+Amparito+-8.085751,-79.035541",
-        "priceLevel": 2,
-        "safetyScore": 51.8,
-        "safetyReport": {
-          "score": 51.8,
-          "riskLevel": "Riesgo Urbano / Desfavorable de Noche",
-          "incidentCount": 627,
-          "radiusMeters": 1e3,
-          "criticalShift": "noche",
-          "source": "MININTER - Sistema de Denuncias Policiales (SIDPOL)",
-          "unsafeHours": "18:30 a 05:00 hrs (Horas de baja visibilidad y mayor registro en turno noche).",
-          "safeHours": "09:00 a 17:00 hrs (Franja recomendada para recorridos y actividades).",
-          "unsafeDatesNotice": "Mayor incidencia estad\xEDstica en fines de semana (viernes noche, s\xE1bado y domingo) y fechas festivas locales de alta afluencia comercial.",
-          "topCrimes": [
-            {
-              "name": "Conflictos dom\xE9sticos / violencia psicol\xF3gica",
-              "count": 164,
-              "percentage": 26.2
-            },
-            {
-              "name": "Hurto simple de pertenencias / carteristas",
-              "count": 101,
-              "percentage": 16.1
-            },
-            {
-              "name": "Violencia interpersonal / f\xEDsica",
-              "count": 91,
-              "percentage": 14.5
-            },
-            {
-              "name": "Incidencias de extorsi\xF3n comercial",
-              "count": 70,
-              "percentage": 11.2
-            },
-            {
-              "name": "Hurto De Vehiculo",
-              "count": 40,
-              "percentage": 6.4
-            }
-          ],
-          "recommendations": [
-            "Lleve mochilas y bolsos hacia adelante en zonas de aglomeraci\xF3n y esquinas comerciales.",
-            "Planifique retornar a su hospedaje antes de las 19:00 hrs y priorice el uso de taxis de aplicativo o autorizados.",
-            "Porte solo una copia fotost\xE1tica de su documento de identidad y mantenga las tarjetas bancarias protegidas."
-          ],
-          "evaluatedAt": "2026-11-05T17:46:48.690419Z"
-        },
-        "reviews": [
-          {
-            "authorName": "Pilar rocio Sanchez morillo",
-            "rating": 5,
-            "text": "Fresco y. Rico Ellos. Se. Dedican a venta pescado y todo del. Momento.   Saludos."
-          },
-          {
-            "authorName": "david cabosmalon",
-            "rating": 1,
-            "text": "El servicio pesimo. La cajera es una mujer sin ningin criterio para atender bien a los clientes.\nSiendo una cevicheria , no la recomendaria a nadie su ceviche pesimo. Verdaderamente una muy mala experiencia."
-          },
-          {
-            "authorName": "Alexander Avila",
-            "rating": 3,
-            "text": "El men\xFA es variado, la saz\xF3n es un 6 de 10, la atenci\xF3n es un poco mala, el tiempo de espera es considerable, el local es apto para d\xEDas calurosos, los d\xEDas fr\xEDos preferible comer dentro del local pero no hay muchas mesas dentro y puedes dejar tu carro frente al local."
           }
         ],
         "predictionScore": {
@@ -25250,203 +24704,6 @@ var init_initialPlaces = __esm({
             "authorName": "sheila menacho valenzuela",
             "rating": 5,
             "text": "Muy buena atenci\xF3n excelente comida"
-          }
-        ],
-        "predictionScore": {
-          "score": 75.8,
-          "confidence": 0.85,
-          "date": "2026-11-18",
-          "breakdown": [
-            {
-              "name": "weather_temperature",
-              "value": 1,
-              "weight": 2,
-              "contribution": 0.1176,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "Temperatura promedio 25.9\xB0C (rango ideal 16.0-30.0\xB0C)"
-            },
-            {
-              "name": "weather_rain",
-              "value": 0.7525,
-              "weight": 3,
-              "contribution": 0.1328,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "Precipitaci\xF3n 0.0 mm, prob. lluvia 55%"
-            },
-            {
-              "name": "weather_uv",
-              "value": 0.08,
-              "weight": 1,
-              "contribution": 47e-4,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "\xCDndice UV 9.2 (m\xE1x. aceptable 10.0)"
-            },
-            {
-              "name": "weather_wind",
-              "value": 0.554,
-              "weight": 1,
-              "contribution": 0.0326,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "Viento 22.3 km/h (m\xE1x. aceptable 50.0)"
-            },
-            {
-              "name": "marine_wave_height",
-              "value": 1,
-              "weight": 3,
-              "contribution": 0.1765,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "Altura de ola 0.0 m (m\xE1x. c\xF3modo 2.5 m)"
-            },
-            {
-              "name": "marine_wave_period",
-              "value": 0,
-              "weight": 2,
-              "contribution": 0,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "Per\xEDodo de ola 0.0 s (rango ideal 8.0-18.0 s)"
-            },
-            {
-              "name": "calendar_weekend",
-              "value": 1,
-              "weight": 1,
-              "contribution": 0.0588,
-              "data_source": "calendar",
-              "data_date": "2026-11-18",
-              "explanation": "D\xEDa de semana"
-            },
-            {
-              "name": "calendar_crowd",
-              "value": 1,
-              "weight": 4,
-              "contribution": 0.2353,
-              "data_source": "calendar",
-              "data_date": "2026-11-18",
-              "explanation": "Nivel de aglomeraci\xF3n por eventos: 0/5"
-            }
-          ]
-        }
-      },
-      {
-        "id": "place_predict_152",
-        "slug": "restaurante-big-ben-huanchaco-2",
-        "name": "Restaurante Big Ben Huanchaco",
-        "category": "restaurantes",
-        "subcategory": "Cevicher\xEDa & Cocina Marina",
-        "localityId": "huanchaco",
-        "localityName": "Huanchaco",
-        "address": "Av. V\xEDctor Larco Herrera 1182, Huanchaco",
-        "coordinates": {
-          "lat": -8.0743528,
-          "lng": -79.1190873
-        },
-        "geohash": "6nxdpd5",
-        "shortDescription": "Restaurante Big Ben Huanchaco: experiencia gastron\xF3mica aut\xE9ntica en Huanchaco con lo mejor de la cocina liberte\xF1a.",
-        "fullDescription": "Restaurante Big Ben Huanchaco es un referente tur\xEDstico situado en Av. V\xEDctor Larco Herrera 1182, Huanchaco. Representa una de las opciones destacadas para visitantes y viajeros que exploran el circuito tur\xEDstico regional de La Libertad.",
-        "rating": 4.5,
-        "reviewsCount": 1681,
-        "images": [
-          {
-            "id": "img_place_predict_152_1",
-            "url": "/images/places/place_152.webp",
-            "caption": "Restaurante Big Ben Huanchaco - Cevicher\xEDa & Cocina Marina",
-            "isCover": true
-          }
-        ],
-        "verification": {
-          "isVerified": true,
-          "verificationLevel": "partner_verified",
-          "verifiedAt": "2026-11-05",
-          "notes": "Integrado desde registro tur\xEDstico verificado (OSM)"
-        },
-        "sources": [
-          {
-            "placeId": "place_predict_152",
-            "sourceId": "google_places_api",
-            "externalId": "ChIJM0a2xVc5rZER9kskrsjzU5I",
-            "lastSyncedAt": "2026-11-05"
-          }
-        ],
-        "tags": [
-          "Huanchaco",
-          "Cevicher\xEDa & Cocina Marina",
-          "Costa",
-          "Restaurante",
-          "Gastronom\xEDa",
-          "Comida T\xEDpica"
-        ],
-        "recommendedDurationMinutes": 75,
-        "phone": "+51 991 916 650",
-        "website": "https://bigbenrestaurantes.com/sedes/huanchaco/",
-        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Big+Ben+-8.074353,-79.119087",
-        "googlePlaceId": "ChIJM0a2xVc5rZER9kskrsjzU5I",
-        "priceLevel": 2,
-        "safetyScore": 77.3,
-        "safetyReport": {
-          "score": 77.3,
-          "riskLevel": "Moderado",
-          "incidentCount": 58,
-          "radiusMeters": 1e3,
-          "criticalShift": "noche",
-          "source": "MININTER - Sistema de Denuncias Policiales (SIDPOL)",
-          "unsafeHours": "19:00 a 05:59 hrs (Turnos Noche y Madrugada concentran el 59% de las incidencias).",
-          "safeHours": "08:30 a 16:30 hrs (Turno con vigilancia policial diurna y plena iluminaci\xF3n).",
-          "unsafeDatesNotice": "Mayor incidencia estad\xEDstica en fines de semana (viernes noche, s\xE1bado y domingo) y fechas festivas locales de alta afluencia comercial.",
-          "topCrimes": [
-            {
-              "name": "Conflictos dom\xE9sticos / violencia psicol\xF3gica",
-              "count": 18,
-              "percentage": 31
-            },
-            {
-              "name": "Hurto simple de pertenencias / carteristas",
-              "count": 12,
-              "percentage": 20.7
-            },
-            {
-              "name": "Violencia interpersonal / f\xEDsica",
-              "count": 11,
-              "percentage": 19
-            },
-            {
-              "name": "Incidencias de extorsi\xF3n comercial",
-              "count": 4,
-              "percentage": 6.9
-            },
-            {
-              "name": "Arrebato de tel\xE9fono celular",
-              "count": 3,
-              "percentage": 5.2
-            }
-          ],
-          "recommendations": [
-            "Evite manipular o exponer tel\xE9fonos m\xF3viles de gama alta en aceras concurridas o cerca de la calzada.",
-            "Lleve mochilas y bolsos hacia adelante en zonas de aglomeraci\xF3n y esquinas comerciales.",
-            "Planifique retornar a su hospedaje antes de las 19:00 hrs y priorice el uso de taxis de aplicativo o autorizados.",
-            "Porte solo una copia fotost\xE1tica de su documento de identidad y mantenga las tarjetas bancarias protegidas."
-          ],
-          "evaluatedAt": "2026-11-05T17:46:51.179730Z"
-        },
-        "reviews": [
-          {
-            "authorName": "ky",
-            "rating": 5,
-            "text": "el lugar es muy lindo y la comida fue realmente buena, no solo en sabor sino tambi\xE9n en presentaci\xF3n. Aunque el precio de los platillos me parecieron algo elevados creo que valen la pena por la calidad de comida y servicio que brindan. La atenci\xF3n fue muy agradable ya que siempre estuvieron atentos y fueron muy amables."
-          },
-          {
-            "authorName": "Franshesca A'o",
-            "rating": 5,
-            "text": "El ambiente es muy agradable para una ocasi\xF3n especial.\n\nLa atenci\xF3n desde que ingresas es muy personalizada.\n\nLos insumos de cada plato son frescos.\n\nLas bebidas de autor est\xE1n muy bien balanceados para acompa\xF1ar cada plato."
-          },
-          {
-            "authorName": "OMAR CUZCO CUEVA",
-            "rating": 2,
-            "text": "El sabor del ceviche mix. No estuvo tan bueno. He probado mejores. As\xED que no se los recomiendo, adem\xE1s ped\xED muy picante. Y no trajeron como lo ped\xED. No picaba. Conclusi\xF3n, es puro nombre no m\xE1s la cevicher\xEDa."
           }
         ],
         "predictionScore": {
@@ -35482,10 +34739,10 @@ var init_initialPlaces = __esm({
           }
         ],
         "verification": {
-          "isVerified": true,
-          "verificationLevel": "partner_verified",
+          "isVerified": false,
+          "verificationLevel": "unverified",
           "verifiedAt": "2026-11-05",
-          "notes": "Integrado desde registro tur\xEDstico verificado (OSM)"
+          "notes": "Coordenadas registradas (-8.09915, -79.04343) pendientes de verificaci\xF3n geod\xE9sica en Malec\xF3n Grau, Puerto Malabrigo"
         },
         "sources": [
           {
@@ -35636,12 +34893,12 @@ var init_initialPlaces = __esm({
       {
         "id": "place_predict_223",
         "slug": "el-escudero-lodge-huanchaco",
-        "name": "El Escudero Lodge Huanchaco",
+        "name": "El Escudero Lodge",
         "category": "hoteles",
         "subcategory": "Hotel & Hospedaje Tur\xEDstico",
-        "localityId": "huanchaco",
-        "localityName": "Huanchaco",
-        "address": "Calle Las Palmeras 240, Huanchaco",
+        "localityId": "trujillo",
+        "localityName": "Trujillo",
+        "address": "Calle Las Palmeras 240, Urb. San Andr\xE9s, Trujillo",
         "coordinates": {
           "lat": -8.1204111,
           "lng": -79.0294891
@@ -35674,7 +34931,7 @@ var init_initialPlaces = __esm({
           }
         ],
         "tags": [
-          "Huanchaco",
+          "Trujillo",
           "Hotel & Hospedaje Tur\xEDstico",
           "Interiores",
           "Escudero",
@@ -42903,191 +42160,6 @@ var init_initialPlaces = __esm({
         }
       },
       {
-        "id": "place_predict_304",
-        "slug": "huaca-la-esmeralda-2",
-        "name": "Huaca La Esmeralda",
-        "category": "arqueologia",
-        "subcategory": "Sitio Arqueol\xF3gico",
-        "localityId": "trujillo",
-        "localityName": "Trujillo",
-        "address": "Huaca La Esmeralda, Trujillo, La Libertad",
-        "coordinates": {
-          "lat": -8.1047125,
-          "lng": -79.0449684
-        },
-        "geohash": "6nxcck9",
-        "shortDescription": "Huaca La Esmeralda: imponente legado arqueol\xF3gico prehisp\xE1nico conservado en el valle de Trujillo.",
-        "fullDescription": "Huaca La Esmeralda es un referente tur\xEDstico situado en Huaca La Esmeralda, Trujillo, La Libertad. Representa una de las opciones destacadas para visitantes y viajeros que exploran el circuito tur\xEDstico regional de La Libertad.",
-        "rating": 4.2,
-        "reviewsCount": 1017,
-        "images": [
-          {
-            "id": "img_place_predict_304_1",
-            "url": "/images/places/place_304.webp",
-            "caption": "Huaca La Esmeralda - Sitio Arqueol\xF3gico",
-            "isCover": true
-          }
-        ],
-        "verification": {
-          "isVerified": true,
-          "verificationLevel": "partner_verified",
-          "verifiedAt": "2026-11-05",
-          "notes": "Integrado desde registro tur\xEDstico verificado (OSM)"
-        },
-        "sources": [
-          {
-            "placeId": "place_predict_304",
-            "sourceId": "openstreetmap",
-            "externalId": "157129502",
-            "lastSyncedAt": "2026-11-05"
-          }
-        ],
-        "tags": [
-          "Trujillo",
-          "Sitio Arqueol\xF3gico",
-          "Interiores",
-          "Huaca",
-          "Esmeralda",
-          "Historia Prehisp\xE1nica"
-        ],
-        "recommendedDurationMinutes": 120,
-        "website": "https://www.google.com/maps/search/?api=1&query=Huaca+La+Esmeralda+-8.104712,-79.044968",
-        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Huaca+La+Esmeralda+-8.104712,-79.044968",
-        "safetyScore": 48.2,
-        "safetyReport": {
-          "score": 48.2,
-          "riskLevel": "Riesgo Urbano / Desfavorable de Noche",
-          "incidentCount": 1081,
-          "radiusMeters": 1e3,
-          "criticalShift": "noche",
-          "source": "MININTER - Sistema de Denuncias Policiales (SIDPOL)",
-          "unsafeHours": "18:30 a 05:00 hrs (Horas de baja visibilidad y mayor registro en turno noche).",
-          "safeHours": "09:00 a 17:00 hrs (Franja recomendada para recorridos y actividades).",
-          "unsafeDatesNotice": "Mayor incidencia estad\xEDstica en fines de semana (viernes noche, s\xE1bado y domingo) y fechas festivas locales de alta afluencia comercial.",
-          "topCrimes": [
-            {
-              "name": "Hurto simple de pertenencias / carteristas",
-              "count": 208,
-              "percentage": 19.2
-            },
-            {
-              "name": "Conflictos dom\xE9sticos / violencia psicol\xF3gica",
-              "count": 190,
-              "percentage": 17.6
-            },
-            {
-              "name": "Hurto De Vehiculo",
-              "count": 142,
-              "percentage": 13.1
-            },
-            {
-              "name": "Violencia interpersonal / f\xEDsica",
-              "count": 129,
-              "percentage": 11.9
-            },
-            {
-              "name": "Arrebato de tel\xE9fono celular",
-              "count": 77,
-              "percentage": 7.1
-            }
-          ],
-          "recommendations": [
-            "Evite manipular o exponer tel\xE9fonos m\xF3viles de gama alta en aceras concurridas o cerca de la calzada.",
-            "Lleve mochilas y bolsos hacia adelante en zonas de aglomeraci\xF3n y esquinas comerciales.",
-            "Planifique retornar a su hospedaje antes de las 19:00 hrs y priorice el uso de taxis de aplicativo o autorizados.",
-            "Porte solo una copia fotost\xE1tica de su documento de identidad y mantenga las tarjetas bancarias protegidas."
-          ],
-          "evaluatedAt": "2026-11-05T17:47:01.656037Z"
-        },
-        "reviews": [
-          {
-            "authorName": "jonathan caleb claros chuquipa",
-            "rating": 5,
-            "text": "Recomiendo primero ir a Chan Chan ya que pagando ah\xED ese mismo boleto sirve para entrar a la huaca Esmeralda y a la huaca arco\xEDris, cuando fui no hab\xEDa nada de gente en la huaca Esmeralda, el gu\xEDa cost\xF3 15 soles, es un lugar bien peque\xF1o rodeado de mucha urbanizaci\xF3n, solo demor\xE9 10 minutos en recorrer la huaca y 10 minutos con la explicaci\xF3n del gu\xEDa"
-          },
-          {
-            "authorName": "Ernesto Alonso D\xEDaz Pardav\xE9",
-            "rating": 5,
-            "text": "Excelente lugar.. est\xE1s peque\xF1o pero est\xE1s muy cerca y caminas por dentro de la Huaca. POR FAVOR.. SIEMPRE CON RESPETO A LA CULTURA. Si llevan botellas de agua, no las boten por ah\xED. \u{1F926}\u{1F3FD}\u200D\u2642\uFE0F"
-          },
-          {
-            "authorName": "Gerardo Cailloma Navarrete",
-            "rating": 5,
-            "text": "La historia del viejo Per\xFA en esta huaca Chim\xFA. Lastimosamente no tiene una visita como se debe. Tiene unos frisos en alto relieve notables. Generalmente, se visitan tres espacios chim\xFA con un solo boleto: Chan Chan, Huaca del Drag\xF3n y esta huaca, la menos visitada de los tres sitios arqueol\xF3gicos."
-          }
-        ],
-        "predictionScore": {
-          "score": 85.5,
-          "confidence": 0.83,
-          "date": "2026-11-18",
-          "breakdown": [
-            {
-              "name": "weather_temperature",
-              "value": 1,
-              "weight": 3,
-              "contribution": 0.15,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "Temperatura promedio 25.4\xB0C (rango ideal 17.0-29.0\xB0C)"
-            },
-            {
-              "name": "weather_rain",
-              "value": 0.7525,
-              "weight": 5,
-              "contribution": 0.1881,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "Precipitaci\xF3n 0.0 mm, prob. lluvia 55%"
-            },
-            {
-              "name": "weather_uv",
-              "value": 0.3571,
-              "weight": 1,
-              "contribution": 0.0179,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "\xCDndice UV 9.0 (m\xE1x. aceptable 14.0)"
-            },
-            {
-              "name": "weather_wind",
-              "value": 0.47,
-              "weight": 1,
-              "contribution": 0.0235,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "Viento 21.2 km/h (m\xE1x. aceptable 40.0)"
-            },
-            {
-              "name": "calendar_weekend",
-              "value": 1,
-              "weight": 2,
-              "contribution": 0.1,
-              "data_source": "calendar",
-              "data_date": "2026-11-18",
-              "explanation": "D\xEDa de semana"
-            },
-            {
-              "name": "calendar_crowd",
-              "value": 1,
-              "weight": 5,
-              "contribution": 0.25,
-              "data_source": "calendar",
-              "data_date": "2026-11-18",
-              "explanation": "Nivel de aglomeraci\xF3n por eventos: 0/5"
-            },
-            {
-              "name": "external_rating",
-              "value": 0.84,
-              "weight": 3,
-              "contribution": 0.126,
-              "data_source": "google_places",
-              "data_date": "2026-11-18",
-              "explanation": "Calificaci\xF3n verificada 4.2/5.0"
-            }
-          ]
-        }
-      },
-      {
         "id": "place_predict_305",
         "slug": "museo-de-juguete",
         "name": "Museo de Juguete",
@@ -43828,351 +42900,6 @@ var init_initialPlaces = __esm({
         }
       },
       {
-        "id": "place_predict_309",
-        "slug": "casa-de-la-emancipacion",
-        "name": "Casa de la Emancipaci\xF3n",
-        "category": "atractivos",
-        "subcategory": "Atractivo Tur\xEDstico",
-        "localityId": "trujillo",
-        "localityName": "Trujillo",
-        "address": "Casa de la Emancipaci\xF3n, Trujillo, La Libertad",
-        "coordinates": {
-          "lat": -8.1106238,
-          "lng": -79.0263301
-        },
-        "geohash": "6nxccew",
-        "shortDescription": "Casa de la Emancipaci\xF3n en Trujillo, destacado punto de atractivo tur\xEDstico en La Libertad.",
-        "fullDescription": "Casa de la Emancipaci\xF3n es un referente tur\xEDstico situado en Casa de la Emancipaci\xF3n, Trujillo, La Libertad. Representa una de las opciones destacadas para visitantes y viajeros que exploran el circuito tur\xEDstico regional de La Libertad.",
-        "rating": 4.5,
-        "reviewsCount": 50,
-        "images": [
-          {
-            "id": "img_place_predict_309_1",
-            "url": "/images/places/place_309.webp",
-            "caption": "Casa de la Emancipaci\xF3n - Atractivo Tur\xEDstico",
-            "isCover": true
-          }
-        ],
-        "verification": {
-          "isVerified": true,
-          "verificationLevel": "community",
-          "verifiedAt": "2026-11-05",
-          "notes": "Integrado desde registro tur\xEDstico verificado (OSM)"
-        },
-        "sources": [
-          {
-            "placeId": "place_predict_309",
-            "sourceId": "openstreetmap",
-            "externalId": "7551382",
-            "lastSyncedAt": "2026-11-05"
-          }
-        ],
-        "tags": [
-          "Trujillo",
-          "Atractivo Tur\xEDstico",
-          "Interiores",
-          "Casa",
-          "Emancipaci\xF3n"
-        ],
-        "recommendedDurationMinutes": 60,
-        "website": "https://www.google.com/maps/search/?api=1&query=Casa+de+la+Emancipaci%C3%B3n+-8.110624,-79.026330",
-        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Casa+de+la+Emancipaci%C3%B3n+-8.110624,-79.026330",
-        "safetyScore": 40.8,
-        "safetyReport": {
-          "score": 40.8,
-          "riskLevel": "Riesgo Urbano / Desfavorable de Noche",
-          "incidentCount": 2e3,
-          "radiusMeters": 1e3,
-          "criticalShift": "tarde",
-          "source": "MININTER - Sistema de Denuncias Policiales (SIDPOL)",
-          "unsafeHours": "18:30 a 05:00 hrs (Horas de baja visibilidad y mayor registro en turno tarde).",
-          "safeHours": "09:00 a 17:00 hrs (Franja recomendada para recorridos y actividades).",
-          "unsafeDatesNotice": "Mayor incidencia estad\xEDstica en fines de semana (viernes noche, s\xE1bado y domingo) y fechas festivas locales de alta afluencia comercial.",
-          "topCrimes": [
-            {
-              "name": "Hurto simple de pertenencias / carteristas",
-              "count": 825,
-              "percentage": 41.2
-            },
-            {
-              "name": "Conflictos dom\xE9sticos / violencia psicol\xF3gica",
-              "count": 239,
-              "percentage": 11.9
-            },
-            {
-              "name": "Arrebato de tel\xE9fono celular",
-              "count": 171,
-              "percentage": 8.6
-            },
-            {
-              "name": "Estafa o enga\xF1o comercial",
-              "count": 135,
-              "percentage": 6.8
-            },
-            {
-              "name": "Violencia interpersonal / f\xEDsica",
-              "count": 121,
-              "percentage": 6
-            }
-          ],
-          "recommendations": [
-            "Evite manipular o exponer tel\xE9fonos m\xF3viles de gama alta en aceras concurridas o cerca de la calzada.",
-            "Lleve mochilas y bolsos hacia adelante en zonas de aglomeraci\xF3n y esquinas comerciales.",
-            "Contrate servicios tur\xEDsticos, transporte y tours \xFAnicamente en agencias formales registradas ante MINCETUR.",
-            "Planifique retornar a su hospedaje antes de las 19:00 hrs y priorice el uso de taxis de aplicativo o autorizados.",
-            "Porte solo una copia fotost\xE1tica de su documento de identidad y mantenga las tarjetas bancarias protegidas."
-          ],
-          "evaluatedAt": "2026-11-05T17:47:01.671522Z"
-        },
-        "predictionScore": {
-          "score": 85.8,
-          "confidence": 0.81,
-          "date": "2026-11-18",
-          "breakdown": [
-            {
-              "name": "weather_temperature",
-              "value": 1,
-              "weight": 3,
-              "contribution": 0.1765,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "Temperatura promedio 25.4\xB0C (rango ideal 17.0-29.0\xB0C)"
-            },
-            {
-              "name": "weather_rain",
-              "value": 0.7525,
-              "weight": 5,
-              "contribution": 0.2213,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "Precipitaci\xF3n 0.0 mm, prob. lluvia 55%"
-            },
-            {
-              "name": "weather_uv",
-              "value": 0.3571,
-              "weight": 1,
-              "contribution": 0.021,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "\xCDndice UV 9.0 (m\xE1x. aceptable 14.0)"
-            },
-            {
-              "name": "weather_wind",
-              "value": 0.47,
-              "weight": 1,
-              "contribution": 0.0276,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "Viento 21.2 km/h (m\xE1x. aceptable 40.0)"
-            },
-            {
-              "name": "calendar_weekend",
-              "value": 1,
-              "weight": 2,
-              "contribution": 0.1176,
-              "data_source": "calendar",
-              "data_date": "2026-11-18",
-              "explanation": "D\xEDa de semana"
-            },
-            {
-              "name": "calendar_crowd",
-              "value": 1,
-              "weight": 5,
-              "contribution": 0.2941,
-              "data_source": "calendar",
-              "data_date": "2026-11-18",
-              "explanation": "Nivel de aglomeraci\xF3n por eventos: 0/5"
-            }
-          ]
-        }
-      },
-      {
-        "id": "place_predict_310",
-        "slug": "casa-urquiaga",
-        "name": "Casa Urquiaga",
-        "category": "atractivos",
-        "subcategory": "Atractivo Tur\xEDstico",
-        "localityId": "trujillo",
-        "localityName": "Trujillo",
-        "address": "Casa Urquiaga, Trujillo, La Libertad",
-        "coordinates": {
-          "lat": -8.1125362,
-          "lng": -79.0279039
-        },
-        "geohash": "6nxccej",
-        "shortDescription": "Casa Urquiaga en Trujillo, destacado punto de atractivo tur\xEDstico en La Libertad.",
-        "fullDescription": "Casa Urquiaga es un referente tur\xEDstico situado en Casa Urquiaga, Trujillo, La Libertad. Representa una de las opciones destacadas para visitantes y viajeros que exploran el circuito tur\xEDstico regional de La Libertad.",
-        "rating": 4.4,
-        "reviewsCount": 136,
-        "images": [
-          {
-            "id": "img_place_predict_310_1",
-            "url": "/images/places/place_310.webp",
-            "caption": "Casa Urquiaga - Atractivo Tur\xEDstico",
-            "isCover": true
-          }
-        ],
-        "verification": {
-          "isVerified": true,
-          "verificationLevel": "partner_verified",
-          "verifiedAt": "2026-11-05",
-          "notes": "Integrado desde registro tur\xEDstico verificado (OSM)"
-        },
-        "sources": [
-          {
-            "placeId": "place_predict_310",
-            "sourceId": "openstreetmap",
-            "externalId": "19973993",
-            "lastSyncedAt": "2026-11-05"
-          }
-        ],
-        "tags": [
-          "Trujillo",
-          "Atractivo Tur\xEDstico",
-          "Interiores",
-          "Casa",
-          "Urquiaga"
-        ],
-        "recommendedDurationMinutes": 60,
-        "phone": "+51 981 064 315",
-        "website": "https://www.google.com/maps/search/?api=1&query=Casa+Urquiaga+-8.112536,-79.027904",
-        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Casa+Urquiaga+-8.112536,-79.027904",
-        "safetyScore": 41.3,
-        "safetyReport": {
-          "score": 41.3,
-          "riskLevel": "Riesgo Urbano / Desfavorable de Noche",
-          "incidentCount": 1933,
-          "radiusMeters": 1e3,
-          "criticalShift": "tarde",
-          "source": "MININTER - Sistema de Denuncias Policiales (SIDPOL)",
-          "unsafeHours": "18:30 a 05:00 hrs (Horas de baja visibilidad y mayor registro en turno tarde).",
-          "safeHours": "09:00 a 17:00 hrs (Franja recomendada para recorridos y actividades).",
-          "unsafeDatesNotice": "Mayor incidencia estad\xEDstica en fines de semana (viernes noche, s\xE1bado y domingo) y fechas festivas locales de alta afluencia comercial.",
-          "topCrimes": [
-            {
-              "name": "Hurto simple de pertenencias / carteristas",
-              "count": 779,
-              "percentage": 40.3
-            },
-            {
-              "name": "Conflictos dom\xE9sticos / violencia psicol\xF3gica",
-              "count": 227,
-              "percentage": 11.7
-            },
-            {
-              "name": "Arrebato de tel\xE9fono celular",
-              "count": 177,
-              "percentage": 9.2
-            },
-            {
-              "name": "Estafa o enga\xF1o comercial",
-              "count": 140,
-              "percentage": 7.2
-            },
-            {
-              "name": "Violencia interpersonal / f\xEDsica",
-              "count": 99,
-              "percentage": 5.1
-            }
-          ],
-          "recommendations": [
-            "Evite manipular o exponer tel\xE9fonos m\xF3viles de gama alta en aceras concurridas o cerca de la calzada.",
-            "Lleve mochilas y bolsos hacia adelante en zonas de aglomeraci\xF3n y esquinas comerciales.",
-            "Contrate servicios tur\xEDsticos, transporte y tours \xFAnicamente en agencias formales registradas ante MINCETUR.",
-            "Planifique retornar a su hospedaje antes de las 19:00 hrs y priorice el uso de taxis de aplicativo o autorizados.",
-            "Porte solo una copia fotost\xE1tica de su documento de identidad y mantenga las tarjetas bancarias protegidas."
-          ],
-          "evaluatedAt": "2026-11-05T17:47:01.674400Z"
-        },
-        "reviews": [
-          {
-            "authorName": "Jenny Portal Villanueva",
-            "rating": 5,
-            "text": "Excelente lugar, con explicaci\xF3n detallada de los due\xF1os de la casa, me encanta el lugar"
-          },
-          {
-            "authorName": "sumac urpi rojas rondan",
-            "rating": 4,
-            "text": "Esta en buen estado de conservaci\xF3n, hay un mi peque\xF1a colecci\xF3n numism\xE1tica. A falta de gu\xEDa, tienen QR para escuchar de manera clara y muy precisa la historia que conlleva est\xE1 casona."
-          },
-          {
-            "authorName": "C. Reyes",
-            "rating": 5,
-            "text": "Llegamos por casualidad a esta casa museo y la verdad que nos sorprendi\xF3 mucho lo bonita que es, con muebles originales y piezas muy interesantes de la historia no solo del Peru sino que tambi\xE9n de Latinoam\xE9rica. El gu\xEDa tambi\xE9n ayud\xF3 mucho a que la experiencia fuera mejor. Un 10 para el museo y el gu\xEDa."
-          }
-        ],
-        "predictionScore": {
-          "score": 86.2,
-          "confidence": 0.83,
-          "date": "2026-11-18",
-          "breakdown": [
-            {
-              "name": "weather_temperature",
-              "value": 1,
-              "weight": 3,
-              "contribution": 0.15,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "Temperatura promedio 25.4\xB0C (rango ideal 17.0-29.0\xB0C)"
-            },
-            {
-              "name": "weather_rain",
-              "value": 0.7525,
-              "weight": 5,
-              "contribution": 0.1881,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "Precipitaci\xF3n 0.0 mm, prob. lluvia 55%"
-            },
-            {
-              "name": "weather_uv",
-              "value": 0.3571,
-              "weight": 1,
-              "contribution": 0.0179,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "\xCDndice UV 9.0 (m\xE1x. aceptable 14.0)"
-            },
-            {
-              "name": "weather_wind",
-              "value": 0.47,
-              "weight": 1,
-              "contribution": 0.0235,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "Viento 21.2 km/h (m\xE1x. aceptable 40.0)"
-            },
-            {
-              "name": "calendar_weekend",
-              "value": 1,
-              "weight": 2,
-              "contribution": 0.1,
-              "data_source": "calendar",
-              "data_date": "2026-11-18",
-              "explanation": "D\xEDa de semana"
-            },
-            {
-              "name": "calendar_crowd",
-              "value": 1,
-              "weight": 5,
-              "contribution": 0.25,
-              "data_source": "calendar",
-              "data_date": "2026-11-18",
-              "explanation": "Nivel de aglomeraci\xF3n por eventos: 0/5"
-            },
-            {
-              "name": "external_rating",
-              "value": 0.88,
-              "weight": 3,
-              "contribution": 0.132,
-              "data_source": "google_places",
-              "data_date": "2026-11-18",
-              "explanation": "Calificaci\xF3n verificada 4.4/5.0"
-            }
-          ]
-        }
-      },
-      {
         "id": "place_predict_311",
         "slug": "catedralicio",
         "name": "Catedralicio",
@@ -44670,190 +43397,6 @@ var init_initialPlaces = __esm({
               "data_source": "open-meteo",
               "data_date": "2026-11-18",
               "explanation": "Viento 21.2 km/h (m\xE1x. aceptable 40.0)"
-            },
-            {
-              "name": "calendar_weekend",
-              "value": 1,
-              "weight": 2,
-              "contribution": 0.1,
-              "data_source": "calendar",
-              "data_date": "2026-11-18",
-              "explanation": "D\xEDa de semana"
-            },
-            {
-              "name": "calendar_crowd",
-              "value": 1,
-              "weight": 5,
-              "contribution": 0.25,
-              "data_source": "calendar",
-              "data_date": "2026-11-18",
-              "explanation": "Nivel de aglomeraci\xF3n por eventos: 0/5"
-            },
-            {
-              "name": "external_rating",
-              "value": 0.88,
-              "weight": 3,
-              "contribution": 0.132,
-              "data_source": "google_places",
-              "data_date": "2026-11-18",
-              "explanation": "Calificaci\xF3n verificada 4.4/5.0"
-            }
-          ]
-        }
-      },
-      {
-        "id": "place_predict_343",
-        "slug": "huaca-arcoiris",
-        "name": "Huaca arcoiris",
-        "category": "arqueologia",
-        "subcategory": "Sitio Arqueol\xF3gico",
-        "localityId": "la-esperanza",
-        "localityName": "La Esperanza",
-        "address": "Huaca arcoiris, La Esperanza, La Libertad",
-        "coordinates": {
-          "lat": -8.0764323,
-          "lng": -79.0488434
-        },
-        "geohash": "6nxf11w",
-        "shortDescription": "Huaca arcoiris: imponente legado arqueol\xF3gico prehisp\xE1nico conservado en el valle de La Esperanza.",
-        "fullDescription": "Huaca arcoiris es un referente tur\xEDstico situado en Huaca arcoiris, La Esperanza, La Libertad. Representa una de las opciones destacadas para visitantes y viajeros que exploran el circuito tur\xEDstico regional de La Libertad.",
-        "rating": 4.4,
-        "reviewsCount": 1208,
-        "images": [
-          {
-            "id": "img_place_predict_343_1",
-            "url": "/images/places/place_343.webp",
-            "caption": "Huaca arcoiris - Sitio Arqueol\xF3gico",
-            "isCover": true
-          }
-        ],
-        "verification": {
-          "isVerified": true,
-          "verificationLevel": "partner_verified",
-          "verifiedAt": "2026-11-05",
-          "notes": "Integrado desde registro tur\xEDstico verificado (OSM)"
-        },
-        "sources": [
-          {
-            "placeId": "place_predict_343",
-            "sourceId": "openstreetmap",
-            "externalId": "4876324221",
-            "lastSyncedAt": "2026-11-05"
-          }
-        ],
-        "tags": [
-          "La Esperanza",
-          "Sitio Arqueol\xF3gico",
-          "Interiores",
-          "Huaca",
-          "Arcoiris",
-          "Historia Prehisp\xE1nica"
-        ],
-        "recommendedDurationMinutes": 120,
-        "website": "https://www.google.com/maps/search/?api=1&query=Huaca+arcoiris+-8.076432,-79.048843",
-        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Huaca+arcoiris+-8.076432,-79.048843",
-        "safetyScore": 51.5,
-        "safetyReport": {
-          "score": 51.5,
-          "riskLevel": "Riesgo Urbano / Desfavorable de Noche",
-          "incidentCount": 660,
-          "radiusMeters": 1e3,
-          "criticalShift": "noche",
-          "source": "MININTER - Sistema de Denuncias Policiales (SIDPOL)",
-          "unsafeHours": "18:30 a 05:00 hrs (Horas de baja visibilidad y mayor registro en turno noche).",
-          "safeHours": "09:00 a 17:00 hrs (Franja recomendada para recorridos y actividades).",
-          "unsafeDatesNotice": "Mayor incidencia estad\xEDstica en fines de semana (viernes noche, s\xE1bado y domingo) y fechas festivas locales de alta afluencia comercial.",
-          "topCrimes": [
-            {
-              "name": "Conflictos dom\xE9sticos / violencia psicol\xF3gica",
-              "count": 177,
-              "percentage": 26.8
-            },
-            {
-              "name": "Violencia interpersonal / f\xEDsica",
-              "count": 102,
-              "percentage": 15.5
-            },
-            {
-              "name": "Incidencias de extorsi\xF3n comercial",
-              "count": 89,
-              "percentage": 13.5
-            },
-            {
-              "name": "Hurto simple de pertenencias / carteristas",
-              "count": 82,
-              "percentage": 12.4
-            },
-            {
-              "name": "Hurto De Vehiculo",
-              "count": 60,
-              "percentage": 9.1
-            }
-          ],
-          "recommendations": [
-            "Lleve mochilas y bolsos hacia adelante en zonas de aglomeraci\xF3n y esquinas comerciales.",
-            "Planifique retornar a su hospedaje antes de las 19:00 hrs y priorice el uso de taxis de aplicativo o autorizados.",
-            "Porte solo una copia fotost\xE1tica de su documento de identidad y mantenga las tarjetas bancarias protegidas."
-          ],
-          "evaluatedAt": "2026-11-05T17:47:03.922351Z"
-        },
-        "reviews": [
-          {
-            "authorName": "KOZHAN",
-            "rating": 5,
-            "text": "Es un complejo peque\xF1o, pero no tienes que pagar extra si compraste una entrada para el complejo arqueol\xF3gico; Chan-Chan est\xE1 incluido en el precio."
-          },
-          {
-            "authorName": "Gerardo Cailloma Navarrete",
-            "rating": 4,
-            "text": "Un espacio arqueol\xF3gico que es poco visitado en nuestra ciudad,  a diferencia de espacios como Chan Chan o las Huacas del Sol y la Luna. Este resto arqueol\xF3gico sufri\xF3 da\xF1os leves por parte de unos estudiantes que incluso grabaron su acci\xF3n delictiva. Hay ahora una escenograf\xEDa nueva que representan escenas de la vida moche de entonces."
-          },
-          {
-            "authorName": "Carlosfrancisco Mart\xEDn Leiva Mart\xEDnez",
-            "rating": 5,
-            "text": "En este hermoso lugar aprendes mucho de la cultura chim\xFA,  sus tradiciones,  dioses y lo m\xE1s importante te permiten entrar al templo de sacrificios. Los gu\xEDas tur\xEDsticos te explican detalladamente sobre el lugar y desde fuera se puede notar el constante mantenimiento que recibe.  Cuenta con una tienda de recuerdos."
-          }
-        ],
-        "predictionScore": {
-          "score": 85.9,
-          "confidence": 0.83,
-          "date": "2026-11-18",
-          "breakdown": [
-            {
-              "name": "weather_temperature",
-              "value": 1,
-              "weight": 3,
-              "contribution": 0.15,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "Temperatura promedio 25.8\xB0C (rango ideal 17.0-29.0\xB0C)"
-            },
-            {
-              "name": "weather_rain",
-              "value": 0.7525,
-              "weight": 5,
-              "contribution": 0.1881,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "Precipitaci\xF3n 0.0 mm, prob. lluvia 55%"
-            },
-            {
-              "name": "weather_uv",
-              "value": 0.3429,
-              "weight": 1,
-              "contribution": 0.0171,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "\xCDndice UV 9.2 (m\xE1x. aceptable 14.0)"
-            },
-            {
-              "name": "weather_wind",
-              "value": 0.4425,
-              "weight": 1,
-              "contribution": 0.0221,
-              "data_source": "open-meteo",
-              "data_date": "2026-11-18",
-              "explanation": "Viento 22.3 km/h (m\xE1x. aceptable 40.0)"
             },
             {
               "name": "calendar_weekend",
@@ -47363,106 +45906,6 @@ var init_initialPlaces = __esm({
         "recommendedDurationMinutes": 60
       },
       {
-        "id": "place_predict_433",
-        "slug": "plazuela-el-recreo",
-        "name": "Plazuela El Recreo",
-        "category": "atractivos",
-        "subcategory": "Atractivo Tur\xEDstico",
-        "localityId": "trujillo",
-        "localityName": "Trujillo",
-        "address": "Trujillo, La Libertad",
-        "coordinates": {
-          "lat": -8.1070931,
-          "lng": -79.0237271
-        },
-        "geohash": "6nxccu0",
-        "shortDescription": "Plazuela El Recreo en Trujillo, destacado punto de atractivo tur\xEDstico en La Libertad.",
-        "fullDescription": "Plazuela El Recreo es un referente tur\xEDstico situado en Trujillo, La Libertad. Representa una de las opciones destacadas para visitantes y viajeros que exploran el circuito tur\xEDstico regional de La Libertad.",
-        "rating": 4.5,
-        "reviewsCount": 50,
-        "images": [
-          {
-            "id": "img_place_predict_433_fb",
-            "url": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
-            "caption": "Plazuela El Recreo en Trujillo",
-            "isCover": true
-          }
-        ],
-        "verification": {
-          "isVerified": true,
-          "verificationLevel": "community",
-          "verifiedAt": "2026-11-05",
-          "notes": "Integrado desde registro tur\xEDstico verificado (OPENSTREETMAP)"
-        },
-        "sources": [
-          {
-            "placeId": "place_predict_433",
-            "sourceId": "openstreetmap",
-            "externalId": "111216576",
-            "lastSyncedAt": "2026-11-05"
-          }
-        ],
-        "tags": [
-          "Trujillo",
-          "Atractivo Tur\xEDstico",
-          "Interiores",
-          "Plazuela",
-          "Recreo"
-        ],
-        "recommendedDurationMinutes": 60
-      },
-      {
-        "id": "place_predict_434",
-        "slug": "hotel-costa-del-sol",
-        "name": "Hotel Costa del Sol",
-        "category": "hoteles",
-        "subcategory": "Hotel & Hospedaje Tur\xEDstico",
-        "localityId": "trujillo",
-        "localityName": "Trujillo",
-        "address": "Jir\xF3n Independencia, Trujillo",
-        "coordinates": {
-          "lat": -8.1107931,
-          "lng": -79.0289303
-        },
-        "geohash": "6nxccek",
-        "shortDescription": "Hotel Costa del Sol: alojamiento confortable y acogedor con ubicaci\xF3n estrat\xE9gica en Trujillo.",
-        "fullDescription": "Hotel Costa del Sol es un referente tur\xEDstico situado en Jir\xF3n Independencia, Trujillo. Representa una de las opciones destacadas para visitantes y viajeros que exploran el circuito tur\xEDstico regional de La Libertad.",
-        "rating": 4.5,
-        "reviewsCount": 50,
-        "images": [
-          {
-            "id": "img_place_predict_434_fb",
-            "url": "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
-            "caption": "Hotel Costa del Sol en Trujillo",
-            "isCover": true
-          }
-        ],
-        "verification": {
-          "isVerified": true,
-          "verificationLevel": "community",
-          "verifiedAt": "2026-11-05",
-          "notes": "Integrado desde registro tur\xEDstico verificado (OPENSTREETMAP)"
-        },
-        "sources": [
-          {
-            "placeId": "place_predict_434",
-            "sourceId": "openstreetmap",
-            "externalId": "7552019",
-            "lastSyncedAt": "2026-11-05"
-          }
-        ],
-        "tags": [
-          "Trujillo",
-          "Hotel & Hospedaje Tur\xEDstico",
-          "Interiores",
-          "Hotel",
-          "Costa",
-          "Alojamiento"
-        ],
-        "recommendedDurationMinutes": 60,
-        "priceLevel": 2
-      },
-      {
         "id": "place_predict_435",
         "slug": "hotel-recreo",
         "name": "Hotel Recreo",
@@ -47570,9 +46013,9 @@ var init_initialPlaces = __esm({
         "name": "Hotel Chicama",
         "category": "hoteles",
         "subcategory": "Hotel & Hospedaje Tur\xEDstico",
-        "localityId": "puerto-malabrigo",
-        "localityName": "Puerto Malabrigo (Chicama)",
-        "address": "Calle Rosate 280, Trujillo",
+        "localityId": "victor-larco",
+        "localityName": "V\xEDctor Larco Herrera",
+        "address": "Calle Rosate 280, Urb. California, V\xEDctor Larco Herrera",
         "coordinates": {
           "lat": -8.1228209,
           "lng": -79.0426889
@@ -47605,11 +46048,11 @@ var init_initialPlaces = __esm({
           }
         ],
         "tags": [
-          "Puerto Malabrigo (Chicama)",
+          "V\xEDctor Larco Herrera",
           "Hotel & Hospedaje Tur\xEDstico",
           "Interiores",
           "Hotel",
-          "Chicama",
+          "V\xEDctor Larco Herrera",
           "Alojamiento"
         ],
         "recommendedDurationMinutes": 60,
@@ -48483,57 +46926,6 @@ var init_initialPlaces = __esm({
         "priceLevel": 2
       },
       {
-        "id": "place_predict_455",
-        "slug": "gran-recreo-hotel",
-        "name": "Gran Recreo Hotel",
-        "category": "hoteles",
-        "subcategory": "Hotel & Hospedaje Tur\xEDstico",
-        "localityId": "trujillo",
-        "localityName": "Trujillo",
-        "address": "Jir\xF3n Estete 466, Trujillo",
-        "coordinates": {
-          "lat": -8.1072502,
-          "lng": -79.0245388
-        },
-        "geohash": "6nxccu0",
-        "shortDescription": "Gran Recreo Hotel: alojamiento confortable y acogedor con ubicaci\xF3n estrat\xE9gica en Trujillo.",
-        "fullDescription": "Gran Recreo Hotel es un referente tur\xEDstico situado en Jir\xF3n Estete 466, Trujillo. Representa una de las opciones destacadas para visitantes y viajeros que exploran el circuito tur\xEDstico regional de La Libertad.",
-        "rating": 4.5,
-        "reviewsCount": 50,
-        "images": [
-          {
-            "id": "img_place_predict_455_fb",
-            "url": "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
-            "caption": "Gran Recreo Hotel en Trujillo",
-            "isCover": true
-          }
-        ],
-        "verification": {
-          "isVerified": true,
-          "verificationLevel": "community",
-          "verifiedAt": "2026-11-05",
-          "notes": "Integrado desde registro tur\xEDstico verificado (OPENSTREETMAP)"
-        },
-        "sources": [
-          {
-            "placeId": "place_predict_455",
-            "sourceId": "openstreetmap",
-            "externalId": "9829847817",
-            "lastSyncedAt": "2026-11-05"
-          }
-        ],
-        "tags": [
-          "Trujillo",
-          "Hotel & Hospedaje Tur\xEDstico",
-          "Interiores",
-          "Gran",
-          "Recreo",
-          "Hotel"
-        ],
-        "recommendedDurationMinutes": 60,
-        "priceLevel": 2
-      },
-      {
         "id": "place_predict_456",
         "slug": "hotel-turismo",
         "name": "Hotel Turismo",
@@ -48942,6 +47334,735 @@ var init_initialPlaces = __esm({
         "priceLevel": 2
       }
     ];
+  }
+});
+
+// src/types/geo.ts
+var LA_LIBERTAD_BOUNDS, LA_LIBERTAD_LOCALITIES;
+var init_geo = __esm({
+  "src/types/geo.ts"() {
+    LA_LIBERTAD_BOUNDS = {
+      minLat: -8.95,
+      maxLat: -6.95,
+      minLng: -79.8,
+      maxLng: -77
+    };
+    LA_LIBERTAD_LOCALITIES = [
+      {
+        id: "trujillo",
+        name: "Trujillo",
+        department: "La Libertad",
+        province: "Trujillo",
+        coordinates: { lat: -8.1118, lng: -79.0287 },
+        defaultZoom: 14.5,
+        isPriority: true,
+        description: "La Ciudad de la Eterna Primavera, centro hist\xF3rico monumental, gastronom\xEDa norte\xF1a y cuna de la Marinera.",
+        highlights: ["Plaza Mayor", "Catedral de Trujillo", "El Rinc\xF3n de Vallejo", "Casonas Coloniales"],
+        heroImage: "https://images.unsplash.com/photo-1580619305218-8423a7ef79b4?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        id: "huanchaco",
+        name: "Huanchaco",
+        department: "La Libertad",
+        province: "Trujillo",
+        coordinates: { lat: -8.0779, lng: -79.1197 },
+        defaultZoom: 14.8,
+        isPriority: true,
+        description: "Hist\xF3rico balneario y Reserva Mundial de Surf con milenarios caballitos de totora y cevicher\xEDas frente al mar.",
+        highlights: ["Caballitos de totora", "Muelle de Huanchaco", "Ceviche tradicional", "Surf en el Pac\xEDfico"],
+        heroImage: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        id: "moche",
+        name: "Moche",
+        department: "La Libertad",
+        province: "Trujillo",
+        coordinates: { lat: -8.1722, lng: -79.0097 },
+        defaultZoom: 14.2,
+        isPriority: true,
+        description: "Coraz\xF3n de la cultura Mochica, hogar de las majestuosas Huaca del Sol y de la Luna y campi\xF1a tradicional.",
+        highlights: ["Huaca de la Luna", "Huaca del Sol", "Museo Huacas de Moche", "Sopa te\xF3loga"],
+        heroImage: "https://images.unsplash.com/photo-1589802829985-817e51171b92?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        id: "victor-larco",
+        name: "V\xEDctor Larco Herrera",
+        department: "La Libertad",
+        province: "Trujillo",
+        coordinates: { lat: -8.1364, lng: -79.0494 },
+        defaultZoom: 14.6,
+        isPriority: true,
+        description: "Distrito costero moderno que integra Buenos Aires, el Paseo de las Aguas y gastronom\xEDa marina de vanguardia.",
+        highlights: ["Paseo de las Aguas", "Plaza de Armas de Vista Alegre", "Restaurantes de autor"],
+        heroImage: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        id: "la-esperanza",
+        name: "La Esperanza",
+        department: "La Libertad",
+        province: "Trujillo",
+        coordinates: { lat: -8.0827, lng: -79.0435 },
+        defaultZoom: 14,
+        isPriority: false,
+        description: "Acceso a la Huaca Arco Iris (Huaca del Drag\xF3n) con frisos ceremoniales de adobe y proximidad al complejo Chan Chan.",
+        highlights: ["Huaca Arco Iris", "Plaza C\xEDvica de La Esperanza", "Artesan\xEDa en barro"],
+        heroImage: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        id: "magdalena-cao",
+        name: "Magdalena de Cao",
+        department: "La Libertad",
+        province: "Ascope",
+        coordinates: { lat: -7.9547, lng: -79.2411 },
+        defaultZoom: 13.8,
+        isPriority: false,
+        description: "Cuna del Complejo Arqueol\xF3gico El Brujo y el Museo de la Se\xF1ora de Cao, gobernante moche del siglo IV.",
+        highlights: ["Complejo El Brujo", "Museo Se\xF1ora de Cao", "Plaza de Armas", "Chicha de a\xF1o"],
+        heroImage: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        id: "pacasmayo",
+        name: "Pacasmayo",
+        department: "La Libertad",
+        province: "Pacasmayo",
+        coordinates: { lat: -7.4008, lng: -79.5714 },
+        defaultZoom: 14,
+        isPriority: false,
+        description: "Puerto y balneario se\xF1orial con su muelle de hierro decimon\xF3nico, casonas republicanas y deportes de viento.",
+        highlights: ["Muelle Hist\xF3rico", "Malec\xF3n Grau", "Surf en El Faro", "Arquitectura republicana"],
+        heroImage: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        id: "huamachuco",
+        name: "Huamachuco",
+        department: "La Libertad",
+        province: "S\xE1nchez Carri\xF3n",
+        coordinates: { lat: -7.8142, lng: -78.0494 },
+        defaultZoom: 13.5,
+        isPriority: false,
+        description: "Imponente sierra liberte\xF1a con la fortaleza preinca de Marcahuamachuco y la hermosa laguna Sausacocha.",
+        highlights: ["Marcahuamachuco", "Laguna Sausacocha", "Plaza Mayor", "Aguas termales El Ed\xE9n"],
+        heroImage: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        id: "cascas",
+        name: "Cascas",
+        department: "La Libertad",
+        province: "Gran Chim\xFA",
+        coordinates: { lat: -7.48, lng: -78.8167 },
+        defaultZoom: 13.8,
+        isPriority: false,
+        description: "Capital del vino y la uva de La Libertad, rodeada de f\xE9rtiles vi\xF1edos, cascadas naturales y clima templado.",
+        highlights: ["Bodegas vitivin\xEDcolas", "Cascada El Chorro", "Pinturas rupestres", "Enoturismo"],
+        heroImage: "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        id: "puerto-malabrigo",
+        name: "Puerto Malabrigo (Chicama)",
+        department: "La Libertad",
+        province: "Ascope",
+        coordinates: { lat: -7.7011, lng: -79.4358 },
+        defaultZoom: 14,
+        isPriority: false,
+        description: "Hogar de la ola izquierda perfecta m\xE1s larga del planeta, destino de culto para surfistas de todo el mundo.",
+        highlights: ["La ola izquierda m\xE1s larga", "Muelle de Malabrigo", "Caleta de pescadores", "Gastronom\xEDa marina"],
+        heroImage: "https://images.unsplash.com/photo-1502680390469-be75c86b636f?auto=format&fit=crop&w=1200&q=80"
+      }
+    ];
+  }
+});
+
+// src/utils/geoBoundary.ts
+function isWithinLaLibertad(coords) {
+  if (typeof coords.lat !== "number" || typeof coords.lng !== "number") {
+    return false;
+  }
+  if (isNaN(coords.lat) || isNaN(coords.lng)) {
+    return false;
+  }
+  const { minLat, maxLat, minLng, maxLng } = LA_LIBERTAD_BOUNDS;
+  return coords.lat >= minLat && coords.lat <= maxLat && coords.lng >= minLng && coords.lng <= maxLng;
+}
+function validateLocalityId(localityId) {
+  if (!localityId || typeof localityId !== "string") return false;
+  const normalized = localityId.trim().toLowerCase();
+  return LA_LIBERTAD_LOCALITIES.some((loc) => loc.id === normalized);
+}
+function getLocality(localityId) {
+  if (!localityId) return void 0;
+  const normalized = localityId.trim().toLowerCase();
+  return LA_LIBERTAD_LOCALITIES.find((loc) => loc.id === normalized);
+}
+var init_geoBoundary = __esm({
+  "src/utils/geoBoundary.ts"() {
+    init_geo();
+  }
+});
+
+// src/server/repositories/placeRepository.ts
+var placeRepository_exports = {};
+__export(placeRepository_exports, {
+  PlaceRepository: () => PlaceRepository,
+  getPlaceRepository: () => getPlaceRepository,
+  resetPlaceRepositoryForTesting: () => resetPlaceRepositoryForTesting,
+  setPlaceRepositoryInstance: () => setPlaceRepositoryInstance
+});
+import crypto from "crypto";
+function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
+  const R = 6371e3;
+  const \u03C61 = lat1 * Math.PI / 180;
+  const \u03C62 = lat2 * Math.PI / 180;
+  const \u0394\u03C6 = (lat2 - lat1) * Math.PI / 180;
+  const \u0394\u03BB = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(\u0394\u03C6 / 2) * Math.sin(\u0394\u03C6 / 2) + Math.cos(\u03C61) * Math.cos(\u03C62) * Math.sin(\u0394\u03BB / 2) * Math.sin(\u0394\u03BB / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return Math.round(R * c);
+}
+function calculateStringSimilarity(str1, str2) {
+  const clean = (s) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9\s]/g, " ").trim();
+  const s1 = clean(str1);
+  const s2 = clean(str2);
+  if (s1 === s2) return 1;
+  if (!s1 || !s2) return 0;
+  if (s1.includes(s2) || s2.includes(s1)) {
+    const longer = Math.max(s1.length, s2.length);
+    const shorter = Math.min(s1.length, s2.length);
+    return Math.max(0.8, shorter / longer);
+  }
+  const words1 = new Set(s1.split(/\s+/).filter((w) => w.length > 2));
+  const words2 = new Set(s2.split(/\s+/).filter((w) => w.length > 2));
+  let wordMatches = 0;
+  words1.forEach((w) => {
+    if (words2.has(w)) wordMatches++;
+  });
+  const wordUnion = (/* @__PURE__ */ new Set([...words1, ...words2])).size;
+  const jaccard = wordUnion > 0 ? wordMatches / wordUnion : 0;
+  const getBigrams = (str) => {
+    const s = /* @__PURE__ */ new Set();
+    for (let i = 0; i < str.length - 1; i++) {
+      s.add(str.slice(i, i + 2));
+    }
+    return s;
+  };
+  const bg1 = getBigrams(s1);
+  const bg2 = getBigrams(s2);
+  let intersection = 0;
+  bg1.forEach((b) => {
+    if (bg2.has(b)) intersection++;
+  });
+  const dice = 2 * intersection / (bg1.size + bg2.size || 1);
+  return Math.max(jaccard, dice);
+}
+function getPlaceRepository() {
+  if (!placeRepositoryInstance) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error(
+        "[Storage Architecture] FATAL: Place repository is not initialized with PostgreSQL in production environment."
+      );
+    }
+    placeRepositoryInstance = new PlaceRepository();
+  }
+  return placeRepositoryInstance;
+}
+function setPlaceRepositoryInstance(repo) {
+  placeRepositoryInstance = repo;
+}
+function resetPlaceRepositoryForTesting() {
+  placeRepositoryInstance = new PlaceRepository();
+}
+var PlaceRepository, placeRepositoryInstance;
+var init_placeRepository = __esm({
+  "src/server/repositories/placeRepository.ts"() {
+    init_initialPlaces();
+    init_geoBoundary();
+    init_geo();
+    PlaceRepository = class {
+      constructor() {
+        this.places = /* @__PURE__ */ new Map();
+        this.auditLogs = [];
+        this.seedInitialPlaces();
+      }
+      seedInitialPlaces() {
+        const now = (/* @__PURE__ */ new Date()).toISOString();
+        for (const p of INITIAL_PLACES) {
+          if (!isWithinLaLibertad(p.coordinates)) continue;
+          const record = {
+            ...p,
+            status: "PUBLISHED",
+            createdBy: "system_seed",
+            updatedBy: "system_seed",
+            createdAt: now,
+            updatedAt: now
+          };
+          this.places.set(record.id, record);
+        }
+        this.auditLogs.push({
+          id: `audit_seed_${Date.now()}`,
+          placeId: "all",
+          adminUserId: "system",
+          adminName: "Sistema LibertadGO",
+          action: "CREATE",
+          previousData: null,
+          newData: null,
+          changeSummary: `Cat\xE1logo inicial cargado con ${this.places.size} lugares verificados de La Libertad.`,
+          createdAt: now
+        });
+      }
+      async listPlaces(filters) {
+        let result = Array.from(this.places.values());
+        if (filters?.search) {
+          const q = filters.search.toLowerCase().trim();
+          result = result.filter(
+            (p) => p.name.toLowerCase().includes(q) || p.address.toLowerCase().includes(q) || p.localityName.toLowerCase().includes(q) || p.category.toLowerCase().includes(q) || p.id.toLowerCase().includes(q) || p.tags.some((t) => t.toLowerCase().includes(q))
+          );
+        }
+        if (filters?.status && filters.status !== "ALL") {
+          result = result.filter((p) => p.status === filters.status);
+        }
+        if (filters?.category && filters.category !== "todas") {
+          const cat = filters.category.toLowerCase();
+          result = result.filter((p) => p.category.toLowerCase() === cat);
+        }
+        if (filters?.localityId && filters.localityId !== "todas") {
+          const locId = filters.localityId.toLowerCase();
+          result = result.filter((p) => p.localityId.toLowerCase() === locId);
+        }
+        if (filters?.isVerified !== void 0 && filters.isVerified !== "ALL") {
+          const target = Boolean(filters.isVerified);
+          result = result.filter((p) => p.verification.isVerified === target);
+        }
+        const sortBy = filters?.sortBy || "updatedAt";
+        const sortOrder = filters?.sortOrder || "desc";
+        result.sort((a, b) => {
+          let comparison = 0;
+          if (sortBy === "name") {
+            comparison = a.name.localeCompare(b.name);
+          } else if (sortBy === "rating") {
+            comparison = (a.rating || 0) - (b.rating || 0);
+          } else if (sortBy === "reviewsCount") {
+            comparison = (a.reviewsCount || 0) - (b.reviewsCount || 0);
+          } else if (sortBy === "createdAt") {
+            comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+          } else {
+            comparison = new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
+          }
+          return sortOrder === "desc" ? -comparison : comparison;
+        });
+        const total = result.length;
+        const page = Math.max(1, filters?.page || 1);
+        const limit = Math.max(1, Math.min(500, filters?.limit || 20));
+        const startIndex = (page - 1) * limit;
+        const paginated = result.slice(startIndex, startIndex + limit);
+        return {
+          places: paginated,
+          total,
+          page,
+          totalPages: Math.ceil(total / limit) || 1
+        };
+      }
+      async getPlaceById(id) {
+        return this.places.get(id) || null;
+      }
+      async getPlaceBySlug(slug) {
+        for (const p of this.places.values()) {
+          if (p.slug === slug) return p;
+        }
+        return null;
+      }
+      async createPlace(data, adminUserId, adminName) {
+        const id = data.id || `place_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+        const baseSlug = (data.name || "nuevo-lugar").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+        let slug = baseSlug;
+        let counter = 1;
+        while (Array.from(this.places.values()).some((p) => p.slug === slug)) {
+          slug = `${baseSlug}-${counter++}`;
+        }
+        const now = (/* @__PURE__ */ new Date()).toISOString();
+        const record = {
+          id,
+          slug: data.slug || slug,
+          name: data.name || "Nuevo Lugar Tur\xEDstico",
+          category: data.category || "atractivos",
+          subcategory: data.subcategory || "",
+          localityId: data.localityId || "trujillo",
+          localityName: data.localityName || "Trujillo",
+          address: data.address || "Trujillo, La Libertad",
+          coordinates: data.coordinates || { lat: -8.1118, lng: -79.0287 },
+          geohash: data.geohash || "",
+          shortDescription: data.shortDescription || "",
+          fullDescription: data.fullDescription || "",
+          phone: data.phone || "",
+          email: data.email || "",
+          website: data.website || "",
+          mapsUrl: data.mapsUrl || "",
+          googlePlaceId: data.googlePlaceId || "",
+          priceLevel: data.priceLevel || 2,
+          rating: data.rating !== void 0 ? data.rating : 4.5,
+          reviewsCount: data.reviewsCount || 0,
+          images: Array.isArray(data.images) && data.images.length > 0 ? data.images : [
+            {
+              id: `img_${Date.now()}`,
+              url: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80",
+              caption: data.name || "Lugar tur\xEDstico",
+              isCover: true
+            }
+          ],
+          openingHours: data.openingHours || [],
+          verification: data.verification || {
+            isVerified: true,
+            verificationLevel: "partner_verified",
+            verifiedBy: adminName,
+            verifiedAt: now
+          },
+          sources: data.sources || [
+            {
+              placeId: id,
+              sourceId: "panel_admin_libertadgo",
+              externalId: id,
+              lastSyncedAt: now
+            }
+          ],
+          tags: Array.isArray(data.tags) ? data.tags : ["turismo", "la-libertad"],
+          recommendedDurationMinutes: data.recommendedDurationMinutes || 60,
+          safetyScore: data.safetyScore !== void 0 ? data.safetyScore : 85,
+          safetyReport: data.safetyReport,
+          predictionScore: data.predictionScore,
+          status: data.status || "PUBLISHED",
+          createdBy: adminUserId,
+          updatedBy: adminUserId,
+          createdAt: now,
+          updatedAt: now
+        };
+        this.places.set(id, record);
+        this.auditLogs.unshift({
+          id: `audit_${Date.now()}_${crypto.randomBytes(3).toString("hex")}`,
+          placeId: id,
+          adminUserId,
+          adminName,
+          action: "CREATE",
+          previousData: null,
+          newData: record,
+          changeSummary: `Creado nuevo lugar: "${record.name}" (${record.category}, ${record.localityName}) con estado ${record.status}.`,
+          createdAt: now
+        });
+        return record;
+      }
+      async updatePlace(id, data, adminUserId, adminName, summary) {
+        const existing = this.places.get(id);
+        if (!existing) return null;
+        const now = (/* @__PURE__ */ new Date()).toISOString();
+        const updated = {
+          ...existing,
+          ...data,
+          id: existing.id,
+          // prevent ID change
+          updatedBy: adminUserId,
+          updatedAt: now
+        };
+        this.places.set(id, updated);
+        this.auditLogs.unshift({
+          id: `audit_${Date.now()}_${crypto.randomBytes(3).toString("hex")}`,
+          placeId: id,
+          adminUserId,
+          adminName,
+          action: "UPDATE",
+          previousData: existing,
+          newData: updated,
+          changeSummary: summary || `Actualizados datos de "${updated.name}" por ${adminName}.`,
+          createdAt: now
+        });
+        return updated;
+      }
+      async updateStatus(id, status, adminUserId, adminName, reason) {
+        const existing = this.places.get(id);
+        if (!existing) return null;
+        const previousStatus = existing.status;
+        const now = (/* @__PURE__ */ new Date()).toISOString();
+        const updated = {
+          ...existing,
+          status,
+          updatedBy: adminUserId,
+          updatedAt: now
+        };
+        this.places.set(id, updated);
+        this.auditLogs.unshift({
+          id: `audit_${Date.now()}_${crypto.randomBytes(3).toString("hex")}`,
+          placeId: id,
+          adminUserId,
+          adminName,
+          action: status === "ARCHIVED" ? "ARCHIVE" : "STATUS_CHANGE",
+          previousData: { status: previousStatus },
+          newData: { status },
+          changeSummary: `Cambio de estado en "${existing.name}": de ${previousStatus} a ${status}.${reason ? ` Motivo: ${reason}` : ""}`,
+          createdAt: now
+        });
+        return updated;
+      }
+      async verifyPlace(id, isVerified, level, notes, adminUserId, adminName) {
+        const existing = this.places.get(id);
+        if (!existing) return null;
+        const now = (/* @__PURE__ */ new Date()).toISOString();
+        const prevVerification = existing.verification;
+        const updatedVerification = {
+          isVerified,
+          verificationLevel: level,
+          verifiedBy: isVerified ? adminName : void 0,
+          verifiedAt: isVerified ? now : void 0,
+          notes: notes || void 0
+        };
+        const updated = {
+          ...existing,
+          verification: updatedVerification,
+          updatedBy: adminUserId,
+          updatedAt: now
+        };
+        this.places.set(id, updated);
+        this.auditLogs.unshift({
+          id: `audit_${Date.now()}_${crypto.randomBytes(3).toString("hex")}`,
+          placeId: id,
+          adminUserId,
+          adminName,
+          action: "VERIFY",
+          previousData: { verification: prevVerification },
+          newData: { verification: updatedVerification },
+          changeSummary: `${isVerified ? "Verificado" : "Desverificado"} "${existing.name}" (Nivel: ${level}).${notes ? ` Notas: ${notes}` : ""}`,
+          createdAt: now
+        });
+        return updated;
+      }
+      async getAuditLogs(placeId, limit = 50) {
+        if (!placeId || placeId === "all") {
+          return this.auditLogs.slice(0, limit);
+        }
+        return this.auditLogs.filter((log) => log.placeId === placeId).slice(0, limit);
+      }
+      async findDuplicates() {
+        const all = Array.from(this.places.values()).filter((p) => p.status !== "ARCHIVED");
+        const pairs = [];
+        const seen = /* @__PURE__ */ new Set();
+        for (let i = 0; i < all.length; i++) {
+          for (let j = i + 1; j < all.length; j++) {
+            const p1 = all[i];
+            const p2 = all[j];
+            const pairKey = [p1.id, p2.id].sort().join("___");
+            if (seen.has(pairKey)) continue;
+            const distanceMeters = calculateDistanceMeters(
+              p1.coordinates.lat,
+              p1.coordinates.lng,
+              p2.coordinates.lat,
+              p2.coordinates.lng
+            );
+            const nameSimilarity = calculateStringSimilarity(p1.name, p2.name);
+            const sameCategory = p1.category === p2.category;
+            const sameLocality = p1.localityId === p2.localityId;
+            const p1ExternalIds = new Set(p1.sources.map((s) => `${s.sourceId}:${s.externalId}`));
+            const sharesExternalId = p2.sources.some((s) => p1ExternalIds.has(`${s.sourceId}:${s.externalId}`));
+            const reasons = [];
+            if (sharesExternalId) {
+              reasons.push("Coincidencia exacta de identificador externo de fuente");
+            }
+            if (nameSimilarity > 0.85) {
+              reasons.push(`Nombres casi id\xE9nticos (${Math.round(nameSimilarity * 100)}% similitud)`);
+            } else if (nameSimilarity > 0.65 && distanceMeters < 300) {
+              reasons.push(`Nombres similares (${Math.round(nameSimilarity * 100)}%) y proximidad (${distanceMeters}m)`);
+            }
+            if (distanceMeters < 150 && sameCategory && sameLocality) {
+              reasons.push(`Distancia f\xEDsica muy cercana (${distanceMeters}m) en la misma localidad y categor\xEDa`);
+            }
+            const isDuplicateCandidate = sharesExternalId || nameSimilarity > 0.82 && distanceMeters < 1500 || nameSimilarity > 0.6 && distanceMeters < 150;
+            if (isDuplicateCandidate && reasons.length > 0) {
+              seen.add(pairKey);
+              const p1Score = (p1.verification.isVerified ? 10 : 0) + p1.images.length * 2 + (p1.reviewsCount || 0);
+              const p2Score = (p2.verification.isVerified ? 10 : 0) + p2.images.length * 2 + (p2.reviewsCount || 0);
+              const primary = p1Score >= p2Score ? p1 : p2;
+              const duplicate = p1Score >= p2Score ? p2 : p1;
+              pairs.push({
+                id: pairKey,
+                primaryPlace: primary,
+                duplicatePlace: duplicate,
+                similarityScore: Math.round(nameSimilarity * 100) / 100,
+                distanceMeters,
+                reasons
+              });
+            }
+          }
+        }
+        return pairs.sort((a, b) => b.similarityScore - a.similarityScore);
+      }
+      async mergeDuplicates(primaryId, duplicateIds, adminUserId, adminName) {
+        const primary = this.places.get(primaryId);
+        if (!primary) {
+          throw new Error(`Lugar principal ${primaryId} no encontrado`);
+        }
+        let mergedCount = 0;
+        const now = (/* @__PURE__ */ new Date()).toISOString();
+        const mergedImages = [...primary.images];
+        const mergedSources = [...primary.sources];
+        const mergedTags = new Set(primary.tags);
+        for (const dupId of duplicateIds) {
+          if (dupId === primaryId) continue;
+          const dup = this.places.get(dupId);
+          if (!dup) continue;
+          for (const img of dup.images) {
+            if (!mergedImages.some((existingImg) => existingImg.url === img.url)) {
+              mergedImages.push({
+                ...img,
+                id: `img_merged_${Date.now()}_${Math.random().toString(36).substring(2, 5)}`,
+                isCover: false
+              });
+            }
+          }
+          for (const src of dup.sources) {
+            if (!mergedSources.some((s) => s.sourceId === src.sourceId && s.externalId === src.externalId)) {
+              mergedSources.push(src);
+            }
+          }
+          for (const t of dup.tags) {
+            mergedTags.add(t);
+          }
+          const archivedDup = {
+            ...dup,
+            status: "ARCHIVED",
+            updatedBy: adminUserId,
+            updatedAt: now
+          };
+          this.places.set(dupId, archivedDup);
+          this.auditLogs.unshift({
+            id: `audit_${Date.now()}_${crypto.randomBytes(3).toString("hex")}`,
+            placeId: dupId,
+            adminUserId,
+            adminName,
+            action: "ARCHIVE",
+            previousData: { status: dup.status },
+            newData: { status: "ARCHIVED" },
+            changeSummary: `Lugar archivado por fusi\xF3n de duplicados hacia el lugar principal "${primary.name}" (${primary.id}).`,
+            createdAt: now
+          });
+          mergedCount++;
+        }
+        const updatedPrimary = {
+          ...primary,
+          images: mergedImages,
+          sources: mergedSources,
+          tags: Array.from(mergedTags),
+          updatedBy: adminUserId,
+          updatedAt: now
+        };
+        this.places.set(primaryId, updatedPrimary);
+        this.auditLogs.unshift({
+          id: `audit_${Date.now()}_${crypto.randomBytes(3).toString("hex")}`,
+          placeId: primaryId,
+          adminUserId,
+          adminName,
+          action: "MERGE",
+          previousData: primary,
+          newData: updatedPrimary,
+          changeSummary: `Fusi\xF3n exitosa: se integraron datos de ${mergedCount} lugar(es) duplicado(s) archivado(s).`,
+          createdAt: now
+        });
+        return {
+          success: true,
+          primaryPlace: updatedPrimary,
+          mergedCount
+        };
+      }
+      async getCategoriesStats() {
+        const counts = {};
+        for (const p of this.places.values()) {
+          if (!counts[p.category]) counts[p.category] = { total: 0, published: 0 };
+          counts[p.category].total++;
+          if (p.status === "PUBLISHED") counts[p.category].published++;
+        }
+        return Object.entries(counts).map(([category, { total, published }]) => ({
+          category,
+          count: total,
+          published
+        }));
+      }
+      async getLocalitiesStats() {
+        const counts = {};
+        for (const loc of LA_LIBERTAD_LOCALITIES) {
+          counts[loc.id] = { name: loc.name, total: 0, published: 0 };
+        }
+        for (const p of this.places.values()) {
+          if (!counts[p.localityId]) {
+            counts[p.localityId] = { name: p.localityName, total: 0, published: 0 };
+          }
+          counts[p.localityId].total++;
+          if (p.status === "PUBLISHED") counts[p.localityId].published++;
+        }
+        return Object.entries(counts).map(([localityId, { name, total, published }]) => ({
+          localityId,
+          localityName: name,
+          count: total,
+          published
+        }));
+      }
+      async getSourcesStats() {
+        const counts = {};
+        for (const p of this.places.values()) {
+          for (const s of p.sources) {
+            counts[s.sourceId] = (counts[s.sourceId] || 0) + 1;
+          }
+        }
+        return Object.entries(counts).map(([sourceId, count]) => ({ sourceId, count }));
+      }
+      async getDashboardMetrics() {
+        const all = Array.from(this.places.values());
+        let published = 0;
+        let draft = 0;
+        let flagged = 0;
+        let archived = 0;
+        let verified = 0;
+        for (const p of all) {
+          if (p.status === "PUBLISHED") published++;
+          else if (p.status === "DRAFT") draft++;
+          else if (p.status === "FLAGGED") flagged++;
+          else if (p.status === "ARCHIVED") archived++;
+          if (p.verification.isVerified) verified++;
+        }
+        const duplicates = await this.findDuplicates();
+        const categoriesStats = await this.getCategoriesStats();
+        const localitiesStats = await this.getLocalitiesStats();
+        const sourcesStats = await this.getSourcesStats();
+        const recentAuditLogs = await this.getAuditLogs("all", 12);
+        return {
+          totalPlaces: all.length,
+          publishedCount: published,
+          draftCount: draft,
+          flaggedCount: flagged,
+          archivedCount: archived,
+          verifiedCount: verified,
+          unverifiedCount: all.length - verified,
+          placesByCategory: categoriesStats,
+          placesByLocality: localitiesStats,
+          sourcesDistribution: sourcesStats,
+          potentialDuplicatesCount: duplicates.length,
+          recentAuditLogs
+        };
+      }
+      async getPublicPlaces(filters) {
+        let result = Array.from(this.places.values()).filter((p) => p.status === "PUBLISHED");
+        if (filters?.localityId && filters.localityId !== "todas") {
+          const locId = filters.localityId.toLowerCase().trim();
+          result = result.filter((p) => p.localityId.toLowerCase() === locId);
+        }
+        if (filters?.category && filters.category !== "todas") {
+          const cat = filters.category.toLowerCase().trim();
+          result = result.filter(
+            (p) => p.category.toLowerCase() === cat || p.subcategory && p.subcategory.toLowerCase().includes(cat)
+          );
+        }
+        if (filters?.search) {
+          const q = filters.search.toLowerCase().trim();
+          result = result.filter(
+            (p) => p.name.toLowerCase().includes(q) || p.address.toLowerCase().includes(q) || p.shortDescription.toLowerCase().includes(q) || p.tags.some((t) => t.toLowerCase().includes(q))
+          );
+        }
+        return result.filter((p) => isWithinLaLibertad(p.coordinates));
+      }
+    };
+    placeRepositoryInstance = null;
   }
 });
 
@@ -49699,6 +48820,1086 @@ var init_postgresCreatorsRepository = __esm({
   }
 });
 
+// src/server/repositories/dbPool.ts
+var dbPool_exports = {};
+__export(dbPool_exports, {
+  closeDbPool: () => closeDbPool,
+  getDbPool: () => getDbPool,
+  setDbPoolForTesting: () => setDbPoolForTesting
+});
+import { Pool as Pool2 } from "pg";
+function getDbPool(connectionString) {
+  if (!poolInstance) {
+    const connStr = connectionString || process.env.DATABASE_URL?.trim();
+    if (!connStr) {
+      throw new Error("[Storage Architecture] DATABASE_URL is not configured");
+    }
+    poolInstance = new Pool2({
+      connectionString: connStr,
+      ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : void 0,
+      max: 15,
+      idleTimeoutMillis: 3e4,
+      connectionTimeoutMillis: 5e3
+    });
+    poolInstance.on("error", (err) => {
+      console.error("[Neon Pool Idle Error]", err?.message || err);
+    });
+  }
+  return poolInstance;
+}
+function setDbPoolForTesting(pool) {
+  poolInstance = pool;
+}
+async function closeDbPool() {
+  if (poolInstance) {
+    await poolInstance.end();
+    poolInstance = null;
+  }
+}
+var poolInstance;
+var init_dbPool = __esm({
+  "src/server/repositories/dbPool.ts"() {
+    poolInstance = null;
+  }
+});
+
+// src/server/repositories/postgresPlaceRepository.ts
+import crypto2 from "crypto";
+function calculateDistanceMeters2(lat1, lon1, lat2, lon2) {
+  const R = 6371e3;
+  const \u03C61 = lat1 * Math.PI / 180;
+  const \u03C62 = lat2 * Math.PI / 180;
+  const \u0394\u03C6 = (lat2 - lat1) * Math.PI / 180;
+  const \u0394\u03BB = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(\u0394\u03C6 / 2) * Math.sin(\u0394\u03C6 / 2) + Math.cos(\u03C61) * Math.cos(\u03C62) * Math.sin(\u0394\u03BB / 2) * Math.sin(\u0394\u03BB / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return Math.round(R * c);
+}
+function calculateStringSimilarity2(str1, str2) {
+  const clean = (s) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9\s]/g, " ").trim();
+  const s1 = clean(str1);
+  const s2 = clean(str2);
+  if (s1 === s2) return 1;
+  if (!s1 || !s2) return 0;
+  if (s1.includes(s2) || s2.includes(s1)) {
+    const longer = Math.max(s1.length, s2.length);
+    const shorter = Math.min(s1.length, s2.length);
+    return Math.max(0.8, shorter / longer);
+  }
+  const words1 = new Set(s1.split(/\s+/).filter((w) => w.length > 2));
+  const words2 = new Set(s2.split(/\s+/).filter((w) => w.length > 2));
+  let wordMatches = 0;
+  words1.forEach((w) => {
+    if (words2.has(w)) wordMatches++;
+  });
+  const wordUnion = (/* @__PURE__ */ new Set([...words1, ...words2])).size;
+  const jaccard = wordUnion > 0 ? wordMatches / wordUnion : 0;
+  const getBigrams = (str) => {
+    const s = /* @__PURE__ */ new Set();
+    for (let i = 0; i < str.length - 1; i++) {
+      s.add(str.slice(i, i + 2));
+    }
+    return s;
+  };
+  const bg1 = getBigrams(s1);
+  const bg2 = getBigrams(s2);
+  let intersection = 0;
+  bg1.forEach((b) => {
+    if (bg2.has(b)) intersection++;
+  });
+  const dice = 2 * intersection / (bg1.size + bg2.size || 1);
+  return Math.max(jaccard, dice);
+}
+var PostgresPlaceRepository;
+var init_postgresPlaceRepository = __esm({
+  "src/server/repositories/postgresPlaceRepository.ts"() {
+    init_initialPlaces();
+    init_geoBoundary();
+    PostgresPlaceRepository = class {
+      constructor(pool) {
+        this.pool = pool;
+      }
+      async testConnection() {
+        const res = await this.pool.query("SELECT 1 as ping");
+        if (!res || !res.rows || res.rows.length === 0) {
+          throw new Error("Database ping query returned no results.");
+        }
+      }
+      /**
+       * Idempotent seed of the 297 verified places of La Libertad.
+       * Uses ON CONFLICT (id) DO NOTHING so existing administrator edits are preserved.
+       */
+      async seedInitialPlaces() {
+        const client = await this.pool.connect();
+        let insertedCount = 0;
+        try {
+          await client.query("BEGIN");
+          for (const p of INITIAL_PLACES) {
+            if (!isWithinLaLibertad(p.coordinates)) continue;
+            const checkRes = await client.query("SELECT id FROM places WHERE id = $1", [p.id]);
+            if (checkRes.rows.length > 0) continue;
+            await client.query(
+              `INSERT INTO places (
+            id, slug, name, category, subcategory, locality_id, locality_name,
+            address, latitude, longitude, geohash, description, short_description,
+            phone, email, website, maps_url, google_place_id, price_level,
+            rating, reviews_count, recommended_duration_minutes, tags,
+            safety_data, prediction_data, status, verification_level,
+            is_verified, verified_by, verified_at, verification_notes,
+            created_by, updated_by, created_at, updated_at
+          ) VALUES (
+            $1, $2, $3, $4, $5, $6, $7,
+            $8, $9, $10, $11, $12, $13,
+            $14, $15, $16, $17, $18, $19,
+            $20, $21, $22, $23,
+            $24, $25, $26, $27,
+            $28, $29, $30, $31,
+            $32, $33, NOW(), NOW()
+          ) ON CONFLICT (id) DO NOTHING`,
+              [
+                p.id,
+                p.slug,
+                p.name,
+                p.category,
+                p.subcategory || null,
+                p.localityId,
+                p.localityName,
+                p.address,
+                p.coordinates.lat,
+                p.coordinates.lng,
+                p.geohash || null,
+                p.fullDescription || null,
+                p.shortDescription,
+                p.phone || null,
+                p.email || null,
+                p.website || null,
+                p.mapsUrl || null,
+                p.googlePlaceId || null,
+                p.priceLevel || 2,
+                p.rating || 4.5,
+                p.reviewsCount || 0,
+                p.recommendedDurationMinutes || 60,
+                p.tags || [],
+                p.safetyReport ? JSON.stringify(p.safetyReport) : null,
+                p.predictionScore ? JSON.stringify(p.predictionScore) : null,
+                "PUBLISHED",
+                p.verification?.verificationLevel || "partner_verified",
+                Boolean(p.verification?.isVerified),
+                p.verification?.verifiedBy || null,
+                p.verification?.verifiedAt || null,
+                p.verification?.notes || null,
+                null,
+                // admin_user_id null for system seed
+                null
+              ]
+            );
+            if (Array.isArray(p.images)) {
+              for (let i = 0; i < p.images.length; i++) {
+                const img = p.images[i];
+                await client.query(
+                  `INSERT INTO place_images (
+                id, place_id, url, caption, author, license, is_cover, order_index, created_at
+              ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
+              ON CONFLICT (id) DO NOTHING`,
+                  [
+                    img.id || `img_${p.id}_${i}`,
+                    p.id,
+                    img.url,
+                    img.caption || null,
+                    img.author || null,
+                    img.license || null,
+                    Boolean(img.isCover),
+                    i
+                  ]
+                );
+              }
+            }
+            if (Array.isArray(p.sources)) {
+              for (let i = 0; i < p.sources.length; i++) {
+                const src = p.sources[i];
+                await client.query(
+                  `INSERT INTO place_sources (
+                id, place_id, source_id, external_id, raw_data_ref, last_synced_at, created_at
+              ) VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+              ON CONFLICT DO NOTHING`,
+                  [
+                    `src_${p.id}_${i}`,
+                    p.id,
+                    src.sourceId,
+                    src.externalId,
+                    src.rawDataRef || null
+                  ]
+                );
+              }
+            }
+            if (Array.isArray(p.openingHours)) {
+              for (const h of p.openingHours) {
+                await client.query(
+                  `INSERT INTO place_opening_hours (
+                id, place_id, day_of_week, open_time, close_time, is_closed
+              ) VALUES ($1, $2, $3, $4, $5, $6)
+              ON CONFLICT DO NOTHING`,
+                  [
+                    `hrs_${p.id}_${h.dayOfWeek}`,
+                    p.id,
+                    h.dayOfWeek,
+                    h.openTime,
+                    h.closeTime,
+                    Boolean(h.isClosed)
+                  ]
+                );
+              }
+            }
+            insertedCount++;
+          }
+          if (insertedCount > 0) {
+            await client.query(
+              `INSERT INTO place_audit_log (
+            id, place_id, actor_type, admin_user_id, admin_name, action,
+            previous_data, new_data, change_summary, created_at
+          ) VALUES ($1, $2, 'SYSTEM', NULL, $3, $4, NULL, NULL, $5, NOW())`,
+              [
+                `audit_seed_${Date.now()}`,
+                "all",
+                "Sistema LibertadGO",
+                "CREATE",
+                `Cat\xE1logo inicial migrado a PostgreSQL Neon con ${insertedCount} lugares verificados de La Libertad.`
+              ]
+            );
+          }
+          await client.query("COMMIT");
+          const totalRes = await client.query("SELECT COUNT(*) as total FROM places");
+          const total = parseInt(totalRes.rows[0].total, 10);
+          return { inserted: insertedCount, total };
+        } catch (err) {
+          await client.query("ROLLBACK");
+          throw err;
+        } finally {
+          client.release();
+        }
+      }
+      // --- Helpers to map rows to domain objects ---
+      mapRowToPlace(row, images = [], sources = [], hours = []) {
+        return {
+          id: row.id,
+          slug: row.slug,
+          name: row.name,
+          category: row.category,
+          subcategory: row.subcategory || void 0,
+          localityId: row.locality_id,
+          localityName: row.locality_name,
+          address: row.address,
+          coordinates: {
+            lat: parseFloat(row.latitude),
+            lng: parseFloat(row.longitude)
+          },
+          geohash: row.geohash || "",
+          shortDescription: row.short_description || "",
+          fullDescription: row.description || void 0,
+          phone: row.phone || void 0,
+          email: row.email || void 0,
+          website: row.website || void 0,
+          mapsUrl: row.maps_url || void 0,
+          googlePlaceId: row.google_place_id || void 0,
+          priceLevel: row.price_level || 2,
+          rating: row.rating ? parseFloat(row.rating) : 4.5,
+          reviewsCount: row.reviews_count || 0,
+          images,
+          openingHours: hours,
+          verification: {
+            isVerified: Boolean(row.is_verified),
+            verificationLevel: row.verification_level || "partner_verified",
+            verifiedBy: row.verified_by || void 0,
+            verifiedAt: row.verified_at ? new Date(row.verified_at).toISOString() : void 0,
+            notes: row.verification_notes || void 0
+          },
+          sources,
+          tags: row.tags || [],
+          recommendedDurationMinutes: row.recommended_duration_minutes || 60,
+          safetyScore: row.safety_data?.score || 85,
+          safetyReport: row.safety_data || void 0,
+          predictionScore: row.prediction_data || void 0,
+          status: row.status,
+          createdBy: row.created_by || void 0,
+          updatedBy: row.updated_by || void 0,
+          createdAt: row.created_at ? new Date(row.created_at).toISOString() : (/* @__PURE__ */ new Date()).toISOString(),
+          updatedAt: row.updated_at ? new Date(row.updated_at).toISOString() : (/* @__PURE__ */ new Date()).toISOString()
+        };
+      }
+      async listPlaces(filters) {
+        return this.listPlacesAsync(filters);
+      }
+      async listPlacesAsync(filters) {
+        const conditions = [];
+        const values = [];
+        let idx = 1;
+        if (filters?.search) {
+          const q = `%${filters.search.toLowerCase().trim()}%`;
+          conditions.push(`(
+        LOWER(name) LIKE $${idx} OR
+        LOWER(address) LIKE $${idx} OR
+        LOWER(locality_name) LIKE $${idx} OR
+        LOWER(category) LIKE $${idx} OR
+        LOWER(id) LIKE $${idx}
+      )`);
+          values.push(q);
+          idx++;
+        }
+        if (filters?.status && filters.status !== "ALL") {
+          conditions.push(`status = $${idx}`);
+          values.push(filters.status);
+          idx++;
+        }
+        if (filters?.category && filters.category !== "todas") {
+          conditions.push(`category = $${idx}`);
+          values.push(filters.category.toLowerCase());
+          idx++;
+        }
+        if (filters?.localityId && filters.localityId !== "todas") {
+          conditions.push(`locality_id = $${idx}`);
+          values.push(filters.localityId.toLowerCase());
+          idx++;
+        }
+        if (filters?.isVerified !== void 0 && filters.isVerified !== "ALL") {
+          conditions.push(`is_verified = $${idx}`);
+          values.push(Boolean(filters.isVerified));
+          idx++;
+        }
+        const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+        const countQuery = `SELECT COUNT(*) as total FROM places ${whereClause}`;
+        const countRes = await this.pool.query(countQuery, values);
+        const total = parseInt(countRes.rows[0].total, 10);
+        const sortBy = filters?.sortBy || "updatedAt";
+        const sortOrder = filters?.sortOrder === "asc" ? "ASC" : "DESC";
+        const colMap = {
+          name: "name",
+          rating: "rating",
+          reviewsCount: "reviews_count",
+          createdAt: "created_at",
+          updatedAt: "updated_at"
+        };
+        const orderCol = colMap[sortBy] || "updated_at";
+        const page = Math.max(1, filters?.page || 1);
+        const limit = Math.max(1, Math.min(500, filters?.limit || 20));
+        const offset = (page - 1) * limit;
+        const dataQuery = `
+      SELECT * FROM places
+      ${whereClause}
+      ORDER BY ${orderCol} ${sortOrder}
+      LIMIT $${idx} OFFSET $${idx + 1}
+    `;
+        const dataRes = await this.pool.query(dataQuery, [...values, limit, offset]);
+        const places = [];
+        for (const row of dataRes.rows) {
+          const imgRes = await this.pool.query(
+            "SELECT * FROM place_images WHERE place_id = $1 ORDER BY order_index ASC",
+            [row.id]
+          );
+          const images = imgRes.rows.map((img) => ({
+            id: img.id,
+            url: img.url,
+            caption: img.caption || void 0,
+            author: img.author || void 0,
+            license: img.license || void 0,
+            isCover: Boolean(img.is_cover)
+          }));
+          places.push(this.mapRowToPlace(row, images));
+        }
+        return {
+          places,
+          total,
+          page,
+          totalPages: Math.ceil(total / limit) || 1
+        };
+      }
+      async getPlaceById(id) {
+        return this.getPlaceByIdAsync(id);
+      }
+      async getPlaceByIdAsync(id) {
+        const res = await this.pool.query("SELECT * FROM places WHERE id = $1", [id]);
+        if (res.rows.length === 0) return null;
+        const row = res.rows[0];
+        const imgRes = await this.pool.query(
+          "SELECT * FROM place_images WHERE place_id = $1 ORDER BY order_index ASC",
+          [id]
+        );
+        const images = imgRes.rows.map((img) => ({
+          id: img.id,
+          url: img.url,
+          caption: img.caption || void 0,
+          author: img.author || void 0,
+          license: img.license || void 0,
+          isCover: Boolean(img.is_cover)
+        }));
+        const srcRes = await this.pool.query("SELECT * FROM place_sources WHERE place_id = $1", [id]);
+        const sources = srcRes.rows.map((s) => ({
+          placeId: s.place_id,
+          sourceId: s.source_id,
+          externalId: s.external_id,
+          rawDataRef: s.raw_data_ref || void 0,
+          lastSyncedAt: s.last_synced_at ? new Date(s.last_synced_at).toISOString() : (/* @__PURE__ */ new Date()).toISOString()
+        }));
+        const hrsRes = await this.pool.query("SELECT * FROM place_opening_hours WHERE place_id = $1", [id]);
+        const hours = hrsRes.rows.map((h) => ({
+          dayOfWeek: h.day_of_week,
+          openTime: h.open_time,
+          closeTime: h.close_time,
+          isClosed: Boolean(h.is_closed)
+        }));
+        return this.mapRowToPlace(row, images, sources, hours);
+      }
+      async getPlaceBySlug(slug) {
+        return this.getPlaceBySlugAsync(slug);
+      }
+      async getPlaceBySlugAsync(slug) {
+        const res = await this.pool.query("SELECT * FROM places WHERE slug = $1", [slug]);
+        if (res.rows.length === 0) return null;
+        return this.getPlaceByIdAsync(res.rows[0].id);
+      }
+      async createPlace(data, adminUserId, adminName) {
+        return this.createPlaceAsync(data, adminUserId, adminName);
+      }
+      async createPlaceAsync(data, adminUserId, adminName) {
+        const client = await this.pool.connect();
+        try {
+          await client.query("BEGIN");
+          const id = data.id || `place_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+          const baseSlug = (data.name || "nuevo-lugar").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+          let slug = baseSlug;
+          let counter = 1;
+          while (true) {
+            const check = await client.query("SELECT id FROM places WHERE slug = $1", [slug]);
+            if (check.rows.length === 0) break;
+            slug = `${baseSlug}-${counter++}`;
+          }
+          await client.query(
+            `INSERT INTO places (
+          id, slug, name, category, subcategory, locality_id, locality_name,
+          address, latitude, longitude, geohash, description, short_description,
+          phone, email, website, maps_url, google_place_id, price_level,
+          rating, reviews_count, recommended_duration_minutes, tags,
+          safety_data, prediction_data, status, verification_level,
+          is_verified, verified_by, verified_at, verification_notes,
+          created_by, updated_by, created_at, updated_at
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6, $7,
+          $8, $9, $10, $11, $12, $13,
+          $14, $15, $16, $17, $18, $19,
+          $20, $21, $22, $23,
+          $24, $25, $26, $27,
+          $28, $29, $30, $31,
+          $32, $33, NOW(), NOW()
+        )`,
+            [
+              id,
+              data.slug || slug,
+              data.name || "Nuevo Lugar Tur\xEDstico",
+              data.category || "atractivos",
+              data.subcategory || null,
+              data.localityId || "trujillo",
+              data.localityName || "Trujillo",
+              data.address || "Trujillo, La Libertad",
+              data.coordinates?.lat || -8.1118,
+              data.coordinates?.lng || -79.0287,
+              data.geohash || null,
+              data.fullDescription || null,
+              data.shortDescription || "",
+              data.phone || null,
+              data.email || null,
+              data.website || null,
+              data.mapsUrl || null,
+              data.googlePlaceId || null,
+              data.priceLevel || 2,
+              data.rating !== void 0 ? data.rating : 4.5,
+              data.reviewsCount || 0,
+              data.recommendedDurationMinutes || 60,
+              data.tags || ["turismo", "la-libertad"],
+              data.safetyReport ? JSON.stringify(data.safetyReport) : null,
+              data.predictionScore ? JSON.stringify(data.predictionScore) : null,
+              data.status || "PUBLISHED",
+              data.verification?.verificationLevel || "partner_verified",
+              Boolean(data.verification?.isVerified ?? true),
+              adminName,
+              (/* @__PURE__ */ new Date()).toISOString(),
+              data.verification?.notes || null,
+              adminUserId.startsWith("user_") ? adminUserId : null,
+              adminUserId.startsWith("user_") ? adminUserId : null
+            ]
+          );
+          const images = Array.isArray(data.images) && data.images.length > 0 ? data.images : [
+            {
+              id: `img_${Date.now()}`,
+              url: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80",
+              caption: data.name,
+              isCover: true
+            }
+          ];
+          for (let i = 0; i < images.length; i++) {
+            const img = images[i];
+            await client.query(
+              `INSERT INTO place_images (
+            id, place_id, url, caption, author, license, is_cover, order_index, created_at
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())`,
+              [
+                img.id || `img_${id}_${i}`,
+                id,
+                img.url,
+                img.caption || null,
+                img.author || null,
+                img.license || null,
+                Boolean(img.isCover),
+                i
+              ]
+            );
+          }
+          const isCreateSystem = !adminUserId || adminUserId === "system" || !adminUserId.startsWith("user_");
+          await client.query(
+            `INSERT INTO place_audit_log (
+          id, place_id, actor_type, admin_user_id, admin_name, action,
+          previous_data, new_data, change_summary, created_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, NULL, $7, $8, NOW())`,
+            [
+              `audit_${Date.now()}_${crypto2.randomBytes(3).toString("hex")}`,
+              id,
+              isCreateSystem ? "SYSTEM" : "ADMIN",
+              isCreateSystem ? null : adminUserId,
+              adminName || (isCreateSystem ? "Sistema LibertadGO" : "Administrador"),
+              "CREATE",
+              JSON.stringify(data),
+              `Creado nuevo lugar: "${data.name}" (${data.category}) con estado ${data.status || "PUBLISHED"}.`
+            ]
+          );
+          await client.query("COMMIT");
+          const created = await this.getPlaceByIdAsync(id);
+          return created;
+        } catch (err) {
+          await client.query("ROLLBACK");
+          throw err;
+        } finally {
+          client.release();
+        }
+      }
+      async updatePlace(id, data, adminUserId, adminName, summary) {
+        return this.updatePlaceAsync(id, data, adminUserId, adminName, summary);
+      }
+      async updatePlaceAsync(id, data, adminUserId, adminName, summary) {
+        const client = await this.pool.connect();
+        try {
+          await client.query("BEGIN");
+          const existing = await this.getPlaceByIdAsync(id);
+          if (!existing) {
+            await client.query("ROLLBACK");
+            return null;
+          }
+          const isUpdateSystem = !adminUserId || adminUserId === "system" || !adminUserId.startsWith("user_");
+          const resolvedUserId = isUpdateSystem ? null : adminUserId;
+          await client.query(
+            `UPDATE places SET
+          name = COALESCE($1, name),
+          category = COALESCE($2, category),
+          subcategory = COALESCE($3, subcategory),
+          locality_id = COALESCE($4, locality_id),
+          locality_name = COALESCE($5, locality_name),
+          address = COALESCE($6, address),
+          latitude = COALESCE($7, latitude),
+          longitude = COALESCE($8, longitude),
+          short_description = COALESCE($9, short_description),
+          description = COALESCE($10, description),
+          phone = COALESCE($11, phone),
+          email = COALESCE($12, email),
+          website = COALESCE($13, website),
+          maps_url = COALESCE($14, maps_url),
+          price_level = COALESCE($15, price_level),
+          recommended_duration_minutes = COALESCE($16, recommended_duration_minutes),
+          status = COALESCE($17, status),
+          tags = COALESCE($18, tags),
+          safety_data = COALESCE($19, safety_data),
+          updated_by = $20,
+          updated_at = NOW()
+        WHERE id = $21`,
+            [
+              data.name || null,
+              data.category || null,
+              data.subcategory || null,
+              data.localityId || null,
+              data.localityName || null,
+              data.address || null,
+              data.coordinates?.lat || null,
+              data.coordinates?.lng || null,
+              data.shortDescription || null,
+              data.fullDescription || null,
+              data.phone || null,
+              data.email || null,
+              data.website || null,
+              data.mapsUrl || null,
+              data.priceLevel || null,
+              data.recommendedDurationMinutes || null,
+              data.status || null,
+              data.tags || null,
+              data.safetyReport ? JSON.stringify(data.safetyReport) : null,
+              resolvedUserId,
+              id
+            ]
+          );
+          await client.query(
+            `INSERT INTO place_audit_log (
+          id, place_id, actor_type, admin_user_id, admin_name, action,
+          previous_data, new_data, change_summary, created_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())`,
+            [
+              `audit_${Date.now()}_${crypto2.randomBytes(3).toString("hex")}`,
+              id,
+              isUpdateSystem ? "SYSTEM" : "ADMIN",
+              resolvedUserId,
+              adminName || (isUpdateSystem ? "Sistema LibertadGO" : "Administrador"),
+              "UPDATE",
+              JSON.stringify(existing),
+              JSON.stringify(data),
+              summary || `Actualizados datos de "${data.name || existing.name}" por ${adminName}.`
+            ]
+          );
+          await client.query("COMMIT");
+          return await this.getPlaceByIdAsync(id);
+        } catch (err) {
+          await client.query("ROLLBACK");
+          throw err;
+        } finally {
+          client.release();
+        }
+      }
+      async updateStatus(id, status, adminUserId, adminName, reason) {
+        return this.updateStatusAsync(id, status, adminUserId, adminName, reason);
+      }
+      async updateStatusAsync(id, status, adminUserId, adminName, reason) {
+        const client = await this.pool.connect();
+        try {
+          await client.query("BEGIN");
+          const existing = await this.getPlaceByIdAsync(id);
+          if (!existing) {
+            await client.query("ROLLBACK");
+            return null;
+          }
+          const isStatusSystem = !adminUserId || adminUserId === "system" || !adminUserId.startsWith("user_");
+          const resolvedUserId = isStatusSystem ? null : adminUserId;
+          await client.query("UPDATE places SET status = $1, updated_by = $2, updated_at = NOW() WHERE id = $3", [
+            status,
+            resolvedUserId,
+            id
+          ]);
+          await client.query(
+            `INSERT INTO place_audit_log (
+          id, place_id, actor_type, admin_user_id, admin_name, action,
+          previous_data, new_data, change_summary, created_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())`,
+            [
+              `audit_${Date.now()}_${crypto2.randomBytes(3).toString("hex")}`,
+              id,
+              isStatusSystem ? "SYSTEM" : "ADMIN",
+              resolvedUserId,
+              adminName || (isStatusSystem ? "Sistema LibertadGO" : "Administrador"),
+              status === "ARCHIVED" ? "ARCHIVE" : "STATUS_CHANGE",
+              JSON.stringify({ status: existing.status }),
+              JSON.stringify({ status }),
+              `Cambio de estado en "${existing.name}": de ${existing.status} a ${status}.${reason ? ` Motivo: ${reason}` : ""}`
+            ]
+          );
+          await client.query("COMMIT");
+          return await this.getPlaceByIdAsync(id);
+        } catch (err) {
+          await client.query("ROLLBACK");
+          throw err;
+        } finally {
+          client.release();
+        }
+      }
+      async verifyPlace(id, isVerified, level, notes, adminUserId, adminName) {
+        return this.verifyPlaceAsync(id, isVerified, level, notes, adminUserId, adminName);
+      }
+      async verifyPlaceAsync(id, isVerified, level, notes, adminUserId, adminName) {
+        const client = await this.pool.connect();
+        try {
+          await client.query("BEGIN");
+          const existing = await this.getPlaceByIdAsync(id);
+          if (!existing) {
+            await client.query("ROLLBACK");
+            return null;
+          }
+          const isVerifySystem = !adminUserId || adminUserId === "system" || !adminUserId.startsWith("user_");
+          const resolvedUserId = isVerifySystem ? null : adminUserId;
+          await client.query(
+            `UPDATE places SET
+          is_verified = $1,
+          verification_level = $2,
+          verified_by = $3,
+          verified_at = NOW(),
+          verification_notes = $4,
+          updated_at = NOW()
+        WHERE id = $5`,
+            [isVerified, level, resolvedUserId, notes || null, id]
+          );
+          await client.query(
+            `INSERT INTO place_audit_log (
+          id, place_id, actor_type, admin_user_id, admin_name, action,
+          previous_data, new_data, change_summary, created_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())`,
+            [
+              `audit_${Date.now()}_${crypto2.randomBytes(3).toString("hex")}`,
+              id,
+              isVerifySystem ? "SYSTEM" : "ADMIN",
+              resolvedUserId,
+              adminName || (isVerifySystem ? "Sistema LibertadGO" : "Administrador"),
+              "VERIFY",
+              JSON.stringify({ verification: existing.verification }),
+              JSON.stringify({ isVerified, level, notes }),
+              `${isVerified ? "Verificado" : "Desverificado"} "${existing.name}" (Nivel: ${level}).${notes ? ` Notas: ${notes}` : ""}`
+            ]
+          );
+          await client.query("COMMIT");
+          return await this.getPlaceByIdAsync(id);
+        } catch (err) {
+          await client.query("ROLLBACK");
+          throw err;
+        } finally {
+          client.release();
+        }
+      }
+      async getAuditLogs(placeId, limit = 50) {
+        return this.getAuditLogsAsync(placeId, limit);
+      }
+      async getAuditLogsAsync(placeId, limit = 50) {
+        const query = placeId && placeId !== "all" ? "SELECT * FROM place_audit_log WHERE place_id = $1 ORDER BY created_at DESC LIMIT $2" : "SELECT * FROM place_audit_log ORDER BY created_at DESC LIMIT $1";
+        const params = placeId && placeId !== "all" ? [placeId, limit] : [limit];
+        const res = await this.pool.query(query, params);
+        return res.rows.map((r) => ({
+          id: r.id,
+          placeId: r.place_id,
+          adminUserId: r.admin_user_id || "system",
+          adminName: r.admin_name,
+          action: r.action,
+          previousData: r.previous_data,
+          newData: r.new_data,
+          changeSummary: r.change_summary,
+          createdAt: r.created_at ? new Date(r.created_at).toISOString() : (/* @__PURE__ */ new Date()).toISOString()
+        }));
+      }
+      async findDuplicates() {
+        return this.findDuplicatesAsync();
+      }
+      async findDuplicatesAsync() {
+        const res = await this.pool.query("SELECT * FROM places WHERE status != 'ARCHIVED'");
+        const all = [];
+        for (const r of res.rows) {
+          all.push(this.mapRowToPlace(r));
+        }
+        const pairs = [];
+        const seen = /* @__PURE__ */ new Set();
+        for (let i = 0; i < all.length; i++) {
+          for (let j = i + 1; j < all.length; j++) {
+            const p1 = all[i];
+            const p2 = all[j];
+            const pairKey = [p1.id, p2.id].sort().join("___");
+            if (seen.has(pairKey)) continue;
+            const distanceMeters = calculateDistanceMeters2(
+              p1.coordinates.lat,
+              p1.coordinates.lng,
+              p2.coordinates.lat,
+              p2.coordinates.lng
+            );
+            const nameSimilarity = calculateStringSimilarity2(p1.name, p2.name);
+            const sameCategory = p1.category === p2.category;
+            const sameLocality = p1.localityId === p2.localityId;
+            const reasons = [];
+            if (nameSimilarity > 0.82) {
+              reasons.push(`Nombres similares (${Math.round(nameSimilarity * 100)}%)`);
+            }
+            if (distanceMeters < 150 && (sameCategory || sameLocality)) {
+              reasons.push(`Distancia f\xEDsica muy cercana (${distanceMeters}m)`);
+            }
+            if (nameSimilarity > 0.82 && distanceMeters < 1500 || nameSimilarity > 0.6 && distanceMeters < 150) {
+              seen.add(pairKey);
+              const primary = p1.verification.isVerified ? p1 : p2;
+              const duplicate = p1.verification.isVerified ? p2 : p1;
+              pairs.push({
+                id: pairKey,
+                primaryPlace: primary,
+                duplicatePlace: duplicate,
+                similarityScore: Math.round(nameSimilarity * 100) / 100,
+                distanceMeters,
+                reasons
+              });
+            }
+          }
+        }
+        return pairs.sort((a, b) => b.similarityScore - a.similarityScore);
+      }
+      async mergeDuplicates(primaryId, duplicateIds, adminUserId, adminName) {
+        return this.mergeDuplicatesAsync(primaryId, duplicateIds, adminUserId, adminName);
+      }
+      /**
+       * ATOMIC TRANSACTION:
+       * BEGIN -> copy non-duplicate images and sources -> append tags -> archive duplicates -> record audit logs -> COMMIT.
+       * On any failure -> ROLLBACK.
+       */
+      async mergeDuplicatesAsync(primaryId, duplicateIds, adminUserId, adminName) {
+        const client = await this.pool.connect();
+        try {
+          await client.query("BEGIN");
+          const primary = await this.getPlaceByIdAsync(primaryId);
+          if (!primary) {
+            throw new Error(`Lugar principal ${primaryId} no encontrado`);
+          }
+          const isMergeSystem = !adminUserId || adminUserId === "system" || !adminUserId.startsWith("user_");
+          const resolvedUserId = isMergeSystem ? null : adminUserId;
+          const resolvedAdminName = adminName || (isMergeSystem ? "Sistema LibertadGO" : "Administrador");
+          let mergedCount = 0;
+          for (const dupId of duplicateIds) {
+            if (dupId === primaryId) continue;
+            const dup = await this.getPlaceByIdAsync(dupId);
+            if (!dup) continue;
+            for (const img of dup.images) {
+              if (!primary.images.some((pi) => pi.url === img.url)) {
+                await client.query(
+                  `INSERT INTO place_images (
+                id, place_id, url, caption, author, license, is_cover, order_index, created_at
+              ) VALUES ($1, $2, $3, $4, $5, $6, FALSE, 99, NOW())
+              ON CONFLICT DO NOTHING`,
+                  [
+                    `img_mrg_${Date.now()}_${Math.random().toString(36).substring(2, 5)}`,
+                    primaryId,
+                    img.url,
+                    img.caption || null,
+                    img.author || null,
+                    img.license || null
+                  ]
+                );
+              }
+            }
+            for (const src of dup.sources) {
+              await client.query(
+                `INSERT INTO place_sources (
+              id, place_id, source_id, external_id, raw_data_ref, last_synced_at, created_at
+            ) VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+            ON CONFLICT DO NOTHING`,
+                [
+                  `src_mrg_${Date.now()}_${Math.random().toString(36).substring(2, 5)}`,
+                  primaryId,
+                  src.sourceId,
+                  src.externalId,
+                  src.rawDataRef || null
+                ]
+              );
+            }
+            await client.query(
+              `UPDATE places SET status = 'ARCHIVED', updated_by = $1, updated_at = NOW() WHERE id = $2`,
+              [resolvedUserId, dupId]
+            );
+            await client.query(
+              `INSERT INTO place_audit_log (
+            id, place_id, actor_type, admin_user_id, admin_name, action,
+            previous_data, new_data, change_summary, created_at
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())`,
+              [
+                `audit_${Date.now()}_${crypto2.randomBytes(3).toString("hex")}`,
+                dupId,
+                isMergeSystem ? "SYSTEM" : "ADMIN",
+                resolvedUserId,
+                resolvedAdminName,
+                "ARCHIVE",
+                JSON.stringify({ status: dup.status }),
+                JSON.stringify({ status: "ARCHIVED" }),
+                `Lugar archivado por fusi\xF3n hacia el lugar principal "${primary.name}" (${primary.id}).`
+              ]
+            );
+            mergedCount++;
+          }
+          await client.query(
+            `INSERT INTO place_audit_log (
+          id, place_id, actor_type, admin_user_id, admin_name, action,
+          previous_data, new_data, change_summary, created_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, NULL, NULL, $7, NOW())`,
+            [
+              `audit_${Date.now()}_${crypto2.randomBytes(3).toString("hex")}`,
+              primaryId,
+              isMergeSystem ? "SYSTEM" : "ADMIN",
+              resolvedUserId,
+              resolvedAdminName,
+              "MERGE",
+              `Fusi\xF3n at\xF3mica exitosa: se integraron ${mergedCount} lugares duplicados hacia "${primary.name}".`
+            ]
+          );
+          await client.query("COMMIT");
+          const updatedPrimary = await this.getPlaceByIdAsync(primaryId);
+          return {
+            success: true,
+            primaryPlace: updatedPrimary,
+            mergedCount
+          };
+        } catch (err) {
+          await client.query("ROLLBACK");
+          throw err;
+        } finally {
+          client.release();
+        }
+      }
+      async getCategoriesStats() {
+        return this.getCategoriesStatsAsync();
+      }
+      async getCategoriesStatsAsync() {
+        const res = await this.pool.query(`
+      SELECT
+        category,
+        COUNT(*) as total,
+        COUNT(*) FILTER (WHERE status = 'PUBLISHED') as published
+      FROM places
+      GROUP BY category
+    `);
+        return res.rows.map((r) => ({
+          category: r.category,
+          count: parseInt(r.total, 10),
+          published: parseInt(r.published, 10)
+        }));
+      }
+      async getLocalitiesStats() {
+        return this.getLocalitiesStatsAsync();
+      }
+      async getLocalitiesStatsAsync() {
+        const res = await this.pool.query(`
+      SELECT
+        locality_id,
+        locality_name,
+        COUNT(*) as total,
+        COUNT(*) FILTER (WHERE status = 'PUBLISHED') as published
+      FROM places
+      GROUP BY locality_id, locality_name
+    `);
+        return res.rows.map((r) => ({
+          localityId: r.locality_id,
+          localityName: r.locality_name,
+          count: parseInt(r.total, 10),
+          published: parseInt(r.published, 10)
+        }));
+      }
+      async getSourcesStats() {
+        return this.getSourcesStatsAsync();
+      }
+      async getSourcesStatsAsync() {
+        const res = await this.pool.query(`
+      SELECT source_id, COUNT(*) as count
+      FROM place_sources
+      GROUP BY source_id
+    `);
+        return res.rows.map((r) => ({
+          sourceId: r.source_id,
+          count: parseInt(r.count, 10)
+        }));
+      }
+      async getDashboardMetrics() {
+        return this.getDashboardMetricsAsync();
+      }
+      async getDashboardMetricsAsync() {
+        const totalRes = await this.pool.query(`
+      SELECT
+        COUNT(*) as total,
+        COUNT(*) FILTER (WHERE status = 'PUBLISHED') as published,
+        COUNT(*) FILTER (WHERE status = 'DRAFT') as draft,
+        COUNT(*) FILTER (WHERE status = 'FLAGGED') as flagged,
+        COUNT(*) FILTER (WHERE status = 'ARCHIVED') as archived,
+        COUNT(*) FILTER (WHERE is_verified = TRUE) as verified
+      FROM places
+    `);
+        const r = totalRes.rows[0];
+        const total = parseInt(r.total, 10);
+        const verified = parseInt(r.verified, 10);
+        const categories = await this.getCategoriesStatsAsync();
+        const localities = await this.getLocalitiesStatsAsync();
+        const sources = await this.getSourcesStatsAsync();
+        const duplicates = await this.findDuplicatesAsync();
+        const auditLogs = await this.getAuditLogsAsync("all", 12);
+        return {
+          totalPlaces: total,
+          publishedCount: parseInt(r.published, 10),
+          draftCount: parseInt(r.draft, 10),
+          flaggedCount: parseInt(r.flagged, 10),
+          archivedCount: parseInt(r.archived, 10),
+          verifiedCount: verified,
+          unverifiedCount: total - verified,
+          placesByCategory: categories,
+          placesByLocality: localities,
+          sourcesDistribution: sources,
+          potentialDuplicatesCount: duplicates.length,
+          recentAuditLogs: auditLogs
+        };
+      }
+      async getPublicPlaces(filters) {
+        return this.getPublicPlacesAsync(filters);
+      }
+      async getPublicPlacesAsync(filters) {
+        const conditions = ["status = 'PUBLISHED'"];
+        const values = [];
+        let idx = 1;
+        if (filters?.localityId && filters.localityId !== "todas") {
+          conditions.push(`LOWER(locality_id) = $${idx}`);
+          values.push(filters.localityId.toLowerCase().trim());
+          idx++;
+        }
+        if (filters?.category && filters.category !== "todas") {
+          conditions.push(`LOWER(category) = $${idx}`);
+          values.push(filters.category.toLowerCase().trim());
+          idx++;
+        }
+        if (filters?.search) {
+          const q = `%${filters.search.toLowerCase().trim()}%`;
+          conditions.push(`(
+        LOWER(name) LIKE $${idx} OR
+        LOWER(address) LIKE $${idx} OR
+        LOWER(short_description) LIKE $${idx}
+      )`);
+          values.push(q);
+          idx++;
+        }
+        const query = `
+      SELECT p.*,
+        COALESCE(json_agg(DISTINCT img.*) FILTER (WHERE img.id IS NOT NULL), '[]') as images_json,
+        COALESCE(json_agg(DISTINCT src.*) FILTER (WHERE src.id IS NOT NULL), '[]') as sources_json,
+        COALESCE(json_agg(DISTINCT hrs.*) FILTER (WHERE hrs.id IS NOT NULL), '[]') as hours_json
+      FROM places p
+      LEFT JOIN place_images img ON img.place_id = p.id
+      LEFT JOIN place_sources src ON src.place_id = p.id
+      LEFT JOIN place_opening_hours hrs ON hrs.place_id = p.id
+      WHERE ${conditions.join(" AND ")}
+      GROUP BY p.id
+      ORDER BY p.name ASC
+    `;
+        const res = await this.pool.query(query, values);
+        return res.rows.map((row) => {
+          const images = (row.images_json || []).map((img) => ({
+            id: img.id,
+            url: img.url,
+            caption: img.caption || void 0,
+            author: img.author || void 0,
+            license: img.license || void 0,
+            isCover: Boolean(img.is_cover)
+          }));
+          const sources = (row.sources_json || []).map((s) => ({
+            placeId: s.place_id,
+            sourceId: s.source_id,
+            externalId: s.external_id,
+            rawDataRef: s.raw_data_ref || void 0,
+            lastSyncedAt: s.last_synced_at ? new Date(s.last_synced_at).toISOString() : (/* @__PURE__ */ new Date()).toISOString()
+          }));
+          const hours = (row.hours_json || []).map((h) => ({
+            dayOfWeek: h.day_of_week,
+            openTime: h.open_time,
+            closeTime: h.close_time,
+            isClosed: Boolean(h.is_closed)
+          }));
+          return this.mapRowToPlace(row, images, sources, hours);
+        }).filter((p) => isWithinLaLibertad(p.coordinates));
+      }
+    };
+  }
+});
+
 // src/server/repositories/index.ts
 var repositories_exports = {};
 __export(repositories_exports, {
@@ -49734,8 +49935,8 @@ function getSanitizedHost(databaseUrl) {
 }
 function validateDatabaseConfig() {
   const databaseUrl = process.env.DATABASE_URL?.trim();
-  const isProduction = process.env.NODE_ENV === "production";
-  if (isProduction) {
+  const isProduction2 = process.env.NODE_ENV === "production";
+  if (isProduction2) {
     if (!databaseUrl) {
       throw new Error(
         "[Storage Architecture] FATAL: DATABASE_URL is missing in production environment. Refusing to start without persistent PostgreSQL."
@@ -49757,10 +49958,10 @@ function validateDatabaseConfig() {
 function initializeRepositories() {
   validateDatabaseConfig();
   const databaseUrl = process.env.DATABASE_URL?.trim();
-  const isProduction = process.env.NODE_ENV === "production";
+  const isProduction2 = process.env.NODE_ENV === "production";
   if (databaseUrl) {
     if (!isValidPostgresUrl(databaseUrl)) {
-      if (isProduction) {
+      if (isProduction2) {
         throw new Error(
           "[Storage Architecture] FATAL: DATABASE_URL has an invalid PostgreSQL format in production environment."
         );
@@ -49772,6 +49973,15 @@ function initializeRepositories() {
       const sanitized = getSanitizedHost(databaseUrl);
       console.log(`[Storage Architecture] Activating PostgreSQL RDBMS adapter (${sanitized}).`);
       const postgresAdapter = new PostgresCreatorsRepository(databaseUrl);
+      try {
+        const pool = getDbPool(databaseUrl);
+        setPlaceRepositoryInstance(new PostgresPlaceRepository(pool));
+      } catch (placeErr) {
+        console.error("[Storage Architecture] Failed to initialize Postgres place repository:", placeErr);
+        if (isProduction2) {
+          throw placeErr;
+        }
+      }
       return {
         auth: postgresAdapter,
         creators: postgresAdapter,
@@ -49779,7 +49989,7 @@ function initializeRepositories() {
       };
     }
   }
-  if (isProduction) {
+  if (isProduction2) {
     throw new Error(
       "[Storage Architecture] FATAL: Silent in-memory fallback is strictly forbidden in production. DATABASE_URL must be configured."
     );
@@ -49787,6 +49997,7 @@ function initializeRepositories() {
   console.log(
     "[Storage Architecture] DATABASE_URL is not set. Operating in development In-Memory Adapter. All interfaces match PostgreSQL 1:1."
   );
+  setPlaceRepositoryInstance(new PlaceRepository());
   const memoryAdapter = new MemoryCreatorsRepository();
   return {
     auth: memoryAdapter,
@@ -49813,9 +50024,9 @@ function getCreatorsRepository() {
   return creatorsRepoInstance;
 }
 async function verifyDatabaseConnectivity() {
-  const isProduction = process.env.NODE_ENV === "production";
+  const isProduction2 = process.env.NODE_ENV === "production";
   getCreatorsRepository();
-  if (isProduction && (!activeDatabaseAdapter || !(activeDatabaseAdapter instanceof PostgresCreatorsRepository))) {
+  if (isProduction2 && (!activeDatabaseAdapter || !(activeDatabaseAdapter instanceof PostgresCreatorsRepository))) {
     if (!activeDatabaseAdapter || typeof activeDatabaseAdapter.testConnection !== "function") {
       throw new Error(
         "[Storage Architecture] FATAL: Persistent PostgreSQL adapter is mandatory in production. Silent in-memory fallback is strictly forbidden."
@@ -49831,7 +50042,7 @@ async function verifyDatabaseConnectivity() {
       console.error(
         `[Storage Architecture] Database connectivity test failed: ${message}`
       );
-      if (isProduction) {
+      if (isProduction2) {
         throw new Error(
           `[Storage Architecture] FATAL: Unable to establish PostgreSQL connection in production (${message}). Server startup aborted.`
         );
@@ -49843,21 +50054,26 @@ async function verifyDatabaseConnectivity() {
         authRepoInstance = memoryAdapter;
         creatorsRepoInstance = memoryAdapter;
         activeDatabaseAdapter = memoryAdapter;
+        try {
+          const { setPlaceRepositoryInstance: setPlaceRepositoryInstance2 } = await Promise.resolve().then(() => (init_placeRepository(), placeRepository_exports));
+          setPlaceRepositoryInstance2(null);
+        } catch {
+        }
       }
     }
-  } else if (isProduction) {
+  } else if (isProduction2) {
     throw new Error(
       "[Storage Architecture] FATAL: Persistent PostgreSQL adapter is mandatory in production. In-memory adapter cannot be used."
     );
   }
 }
 async function checkDatabaseHealth() {
-  const isProduction = process.env.NODE_ENV === "production";
+  const isProduction2 = process.env.NODE_ENV === "production";
   const databaseUrl = process.env.DATABASE_URL?.trim();
   if (!databaseUrl || !isValidPostgresUrl(databaseUrl)) {
     return {
       connected: false,
-      adapter: isProduction ? "none" : "memory",
+      adapter: isProduction2 ? "none" : "memory",
       error: "DATABASE_URL is not configured or invalid"
     };
   }
@@ -49866,7 +50082,7 @@ async function checkDatabaseHealth() {
   } catch {
     return {
       connected: false,
-      adapter: isProduction ? "none" : "memory",
+      adapter: isProduction2 ? "none" : "memory",
       error: "Failed to initialize database adapter"
     };
   }
@@ -49880,14 +50096,14 @@ async function checkDatabaseHealth() {
     } catch {
       return {
         connected: false,
-        adapter: isProduction ? "none" : "memory",
+        adapter: isProduction2 ? "none" : "memory",
         error: "Database ping failed"
       };
     }
   }
   return {
     connected: false,
-    adapter: isProduction ? "none" : "memory",
+    adapter: isProduction2 ? "none" : "memory",
     error: "No active persistent database adapter"
   };
 }
@@ -49905,8 +50121,14 @@ function resetRepositoriesForTesting() {
   authRepoInstance = null;
   creatorsRepoInstance = null;
   activeDatabaseAdapter = null;
+  setPlaceRepositoryInstance(null);
 }
 async function closeDatabaseConnections() {
+  try {
+    const { closeDbPool: closeDbPool2 } = await Promise.resolve().then(() => (init_dbPool(), dbPool_exports));
+    await closeDbPool2();
+  } catch {
+  }
   if (activeDatabaseAdapter && typeof activeDatabaseAdapter.close === "function") {
     await activeDatabaseAdapter.close();
     console.log("[Storage Architecture] Database connections closed cleanly.");
@@ -49917,6 +50139,9 @@ var init_repositories = __esm({
   "src/server/repositories/index.ts"() {
     init_memoryCreatorsRepository();
     init_postgresCreatorsRepository();
+    init_dbPool();
+    init_postgresPlaceRepository();
+    init_placeRepository();
     authRepoInstance = null;
     creatorsRepoInstance = null;
     activeDatabaseAdapter = null;
@@ -50327,157 +50552,9 @@ var INITIAL_CAMPAIGNS = [
   }
 ];
 
-// src/types/geo.ts
-var LA_LIBERTAD_BOUNDS = {
-  minLat: -8.95,
-  maxLat: -6.95,
-  minLng: -79.8,
-  maxLng: -77
-};
-var LA_LIBERTAD_LOCALITIES = [
-  {
-    id: "trujillo",
-    name: "Trujillo",
-    department: "La Libertad",
-    province: "Trujillo",
-    coordinates: { lat: -8.1118, lng: -79.0287 },
-    defaultZoom: 14.5,
-    isPriority: true,
-    description: "La Ciudad de la Eterna Primavera, centro hist\xF3rico monumental, gastronom\xEDa norte\xF1a y cuna de la Marinera.",
-    highlights: ["Plaza Mayor", "Catedral de Trujillo", "El Rinc\xF3n de Vallejo", "Casonas Coloniales"],
-    heroImage: "https://images.unsplash.com/photo-1580619305218-8423a7ef79b4?auto=format&fit=crop&w=1200&q=80"
-  },
-  {
-    id: "huanchaco",
-    name: "Huanchaco",
-    department: "La Libertad",
-    province: "Trujillo",
-    coordinates: { lat: -8.0779, lng: -79.1197 },
-    defaultZoom: 14.8,
-    isPriority: true,
-    description: "Hist\xF3rico balneario y Reserva Mundial de Surf con milenarios caballitos de totora y cevicher\xEDas frente al mar.",
-    highlights: ["Caballitos de totora", "Muelle de Huanchaco", "Ceviche tradicional", "Surf en el Pac\xEDfico"],
-    heroImage: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80"
-  },
-  {
-    id: "moche",
-    name: "Moche",
-    department: "La Libertad",
-    province: "Trujillo",
-    coordinates: { lat: -8.1722, lng: -79.0097 },
-    defaultZoom: 14.2,
-    isPriority: true,
-    description: "Coraz\xF3n de la cultura Mochica, hogar de las majestuosas Huaca del Sol y de la Luna y campi\xF1a tradicional.",
-    highlights: ["Huaca de la Luna", "Huaca del Sol", "Museo Huacas de Moche", "Sopa te\xF3loga"],
-    heroImage: "https://images.unsplash.com/photo-1589802829985-817e51171b92?auto=format&fit=crop&w=1200&q=80"
-  },
-  {
-    id: "victor-larco",
-    name: "V\xEDctor Larco Herrera",
-    department: "La Libertad",
-    province: "Trujillo",
-    coordinates: { lat: -8.1364, lng: -79.0494 },
-    defaultZoom: 14.6,
-    isPriority: true,
-    description: "Distrito costero moderno que integra Buenos Aires, el Paseo de las Aguas y gastronom\xEDa marina de vanguardia.",
-    highlights: ["Paseo de las Aguas", "Plaza de Armas de Vista Alegre", "Restaurantes de autor"],
-    heroImage: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80"
-  },
-  {
-    id: "la-esperanza",
-    name: "La Esperanza",
-    department: "La Libertad",
-    province: "Trujillo",
-    coordinates: { lat: -8.0827, lng: -79.0435 },
-    defaultZoom: 14,
-    isPriority: false,
-    description: "Acceso a la Huaca Arco Iris (Huaca del Drag\xF3n) con frisos ceremoniales de adobe y proximidad al complejo Chan Chan.",
-    highlights: ["Huaca Arco Iris", "Plaza C\xEDvica de La Esperanza", "Artesan\xEDa en barro"],
-    heroImage: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80"
-  },
-  {
-    id: "magdalena-cao",
-    name: "Magdalena de Cao",
-    department: "La Libertad",
-    province: "Ascope",
-    coordinates: { lat: -7.9547, lng: -79.2411 },
-    defaultZoom: 13.8,
-    isPriority: false,
-    description: "Cuna del Complejo Arqueol\xF3gico El Brujo y el Museo de la Se\xF1ora de Cao, gobernante moche del siglo IV.",
-    highlights: ["Complejo El Brujo", "Museo Se\xF1ora de Cao", "Plaza de Armas", "Chicha de a\xF1o"],
-    heroImage: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1200&q=80"
-  },
-  {
-    id: "pacasmayo",
-    name: "Pacasmayo",
-    department: "La Libertad",
-    province: "Pacasmayo",
-    coordinates: { lat: -7.4008, lng: -79.5714 },
-    defaultZoom: 14,
-    isPriority: false,
-    description: "Puerto y balneario se\xF1orial con su muelle de hierro decimon\xF3nico, casonas republicanas y deportes de viento.",
-    highlights: ["Muelle Hist\xF3rico", "Malec\xF3n Grau", "Surf en El Faro", "Arquitectura republicana"],
-    heroImage: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80"
-  },
-  {
-    id: "huamachuco",
-    name: "Huamachuco",
-    department: "La Libertad",
-    province: "S\xE1nchez Carri\xF3n",
-    coordinates: { lat: -7.8142, lng: -78.0494 },
-    defaultZoom: 13.5,
-    isPriority: false,
-    description: "Imponente sierra liberte\xF1a con la fortaleza preinca de Marcahuamachuco y la hermosa laguna Sausacocha.",
-    highlights: ["Marcahuamachuco", "Laguna Sausacocha", "Plaza Mayor", "Aguas termales El Ed\xE9n"],
-    heroImage: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80"
-  },
-  {
-    id: "cascas",
-    name: "Cascas",
-    department: "La Libertad",
-    province: "Gran Chim\xFA",
-    coordinates: { lat: -7.48, lng: -78.8167 },
-    defaultZoom: 13.8,
-    isPriority: false,
-    description: "Capital del vino y la uva de La Libertad, rodeada de f\xE9rtiles vi\xF1edos, cascadas naturales y clima templado.",
-    highlights: ["Bodegas vitivin\xEDcolas", "Cascada El Chorro", "Pinturas rupestres", "Enoturismo"],
-    heroImage: "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?auto=format&fit=crop&w=1200&q=80"
-  },
-  {
-    id: "puerto-malabrigo",
-    name: "Puerto Malabrigo (Chicama)",
-    department: "La Libertad",
-    province: "Ascope",
-    coordinates: { lat: -7.7011, lng: -79.4358 },
-    defaultZoom: 14,
-    isPriority: false,
-    description: "Hogar de la ola izquierda perfecta m\xE1s larga del planeta, destino de culto para surfistas de todo el mundo.",
-    highlights: ["La ola izquierda m\xE1s larga", "Muelle de Malabrigo", "Caleta de pescadores", "Gastronom\xEDa marina"],
-    heroImage: "https://images.unsplash.com/photo-1502680390469-be75c86b636f?auto=format&fit=crop&w=1200&q=80"
-  }
-];
-
-// src/utils/geoBoundary.ts
-function isWithinLaLibertad(coords) {
-  if (typeof coords.lat !== "number" || typeof coords.lng !== "number") {
-    return false;
-  }
-  if (isNaN(coords.lat) || isNaN(coords.lng)) {
-    return false;
-  }
-  const { minLat, maxLat, minLng, maxLng } = LA_LIBERTAD_BOUNDS;
-  return coords.lat >= minLat && coords.lat <= maxLat && coords.lng >= minLng && coords.lng <= maxLng;
-}
-function validateLocalityId(localityId) {
-  if (!localityId || typeof localityId !== "string") return false;
-  const normalized = localityId.trim().toLowerCase();
-  return LA_LIBERTAD_LOCALITIES.some((loc) => loc.id === normalized);
-}
-function getLocality(localityId) {
-  if (!localityId) return void 0;
-  const normalized = localityId.trim().toLowerCase();
-  return LA_LIBERTAD_LOCALITIES.find((loc) => loc.id === normalized);
-}
+// src/server/repository.ts
+init_geo();
+init_geoBoundary();
 
 // src/utils/dateUtils.ts
 function parseDateParts(dateStr) {
@@ -50526,6 +50603,7 @@ function calculateTripDuration(startDateStr, endDateStr) {
 }
 
 // src/server/repository.ts
+init_placeRepository();
 var CatalogRepository = class {
   constructor() {
     this.places = /* @__PURE__ */ new Map();
@@ -50548,61 +50626,17 @@ var CatalogRepository = class {
     return getLocality(id);
   }
   // --- PLACES & CATALOG ---
-  getPlaces(filters) {
-    let result = Array.from(this.places.values());
-    if (filters?.localityId) {
-      const locId = filters.localityId.toLowerCase().trim();
-      result = result.filter((p) => p.localityId.toLowerCase() === locId);
-    }
-    if (filters?.category && filters.category !== "todas") {
-      const cat = filters.category.toLowerCase().trim();
-      result = result.filter(
-        (p) => p.category.toLowerCase() === cat || p.subcategory && p.subcategory.toLowerCase().includes(cat)
-      );
-    }
-    if (filters?.search) {
-      const q = filters.search.toLowerCase().trim();
-      result = result.filter(
-        (p) => p.name.toLowerCase().includes(q) || p.address.toLowerCase().includes(q) || p.shortDescription.toLowerCase().includes(q) || p.tags.some((t) => t.toLowerCase().includes(q))
-      );
-    }
-    const seen = /* @__PURE__ */ new Set();
-    const deduped = [];
-    for (const p of result) {
-      if (!seen.has(p.id) && !seen.has(p.slug)) {
-        seen.add(p.id);
-        seen.add(p.slug);
-        deduped.push(p);
-      }
-    }
-    return deduped.filter((p) => isWithinLaLibertad(p.coordinates));
+  async getPlaces(filters) {
+    return await getPlaceRepository().getPublicPlaces(filters);
   }
-  getPlaceById(id) {
-    const place = this.places.get(id);
+  async getPlaceById(id) {
+    const place = await getPlaceRepository().getPlaceById(id);
     if (!place || !isWithinLaLibertad(place.coordinates)) return void 0;
+    if (place.status && place.status !== "PUBLISHED") return void 0;
     return place;
   }
-  searchPlaces(query, localityId) {
-    const q = (query || "").toLowerCase().trim();
-    let result = Array.from(this.places.values());
-    if (localityId) {
-      result = result.filter((p) => p.localityId.toLowerCase() === localityId.toLowerCase().trim());
-    }
-    if (q) {
-      result = result.filter((p) => {
-        return p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q) || p.address.toLowerCase().includes(q) || p.shortDescription.toLowerCase().includes(q) || p.tags.some((t) => t.toLowerCase().includes(q));
-      });
-    }
-    const seen = /* @__PURE__ */ new Set();
-    const deduped = [];
-    for (const p of result) {
-      if (!seen.has(p.id) && !seen.has(p.slug)) {
-        seen.add(p.id);
-        seen.add(p.slug);
-        deduped.push(p);
-      }
-    }
-    return deduped.filter((p) => isWithinLaLibertad(p.coordinates));
+  async searchPlaces(query, localityId) {
+    return await getPlaceRepository().getPublicPlaces({ search: query, localityId });
   }
   // --- ITINERARIES ---
   createItinerary(params) {
@@ -50641,10 +50675,10 @@ var CatalogRepository = class {
   getItineraryById(id) {
     return this.itineraries.get(id);
   }
-  addActivity(itineraryId, activityInput) {
+  async addActivity(itineraryId, activityInput) {
     const itinerary = this.itineraries.get(itineraryId);
     if (!itinerary) return { error: "Itinerario no encontrado" };
-    const place = this.places.get(activityInput.placeId);
+    const place = await getPlaceRepository().getPlaceById(activityInput.placeId) || this.places.get(activityInput.placeId);
     if (!place) return { error: "Lugar no encontrado en el cat\xE1logo" };
     if (activityInput.dayNumber < 1 || activityInput.dayNumber > itinerary.totalDays) {
       return { error: `El d\xEDa debe estar entre 1 y ${itinerary.totalDays}` };
@@ -50882,6 +50916,7 @@ var INITIAL_EVENTS = [
 ];
 
 // src/server/schemas.ts
+init_geoBoundary();
 import { z } from "zod";
 var CreateTripSchema = z.object({
   destinationId: z.string().refine(
@@ -50903,6 +50938,7 @@ var CreateTripSchema = z.object({
 import { Router } from "express";
 
 // src/server/creatorsSchemas.ts
+init_geo();
 import { z as z2 } from "zod";
 
 // src/utils/videoUrlParser.ts
@@ -51058,13 +51094,13 @@ init_repositories();
 
 // src/server/authService.ts
 init_repositories();
-import crypto from "crypto";
+import crypto3 from "crypto";
 var DEV_DEFAULT_SECRET = "libertadgo_sec_sig_7b29e01f5c6a84d3e218";
 var TOKEN_EXPIRY_DAYS = 7;
 function getSessionSecret() {
   const secret = process.env.SESSION_SECRET?.trim();
-  const isProduction = process.env.NODE_ENV === "production";
-  if (isProduction) {
+  const isProduction2 = process.env.NODE_ENV === "production";
+  if (isProduction2) {
     if (!secret || secret === DEV_DEFAULT_SECRET || secret.length < 16) {
       throw new Error(
         "[Security] FATAL: SESSION_SECRET is mandatory in production and must not use the development default secret."
@@ -51076,8 +51112,8 @@ function getSessionSecret() {
 }
 function validateSecurityConfig() {
   const secret = process.env.SESSION_SECRET?.trim();
-  const isProduction = process.env.NODE_ENV === "production";
-  if (isProduction) {
+  const isProduction2 = process.env.NODE_ENV === "production";
+  if (isProduction2) {
     if (!secret) {
       throw new Error(
         "[Security] FATAL: SESSION_SECRET is mandatory in production environment. Refusing to start without configured session secret."
@@ -51096,8 +51132,8 @@ function validateSecurityConfig() {
   }
 }
 function hashPassword(password) {
-  const salt = crypto.randomBytes(16).toString("hex");
-  const derivedKey = crypto.scryptSync(password, salt, 64).toString("hex");
+  const salt = crypto3.randomBytes(16).toString("hex");
+  const derivedKey = crypto3.scryptSync(password, salt, 64).toString("hex");
   return `${salt}:${derivedKey}`;
 }
 function verifyPassword(password, storedHash) {
@@ -51105,8 +51141,8 @@ function verifyPassword(password, storedHash) {
     const [salt, key] = storedHash.split(":");
     if (!salt || !key) return false;
     const keyBuffer = Buffer.from(key, "hex");
-    const derivedBuffer = crypto.scryptSync(password, salt, 64);
-    return crypto.timingSafeEqual(keyBuffer, derivedBuffer);
+    const derivedBuffer = crypto3.scryptSync(password, salt, 64);
+    return crypto3.timingSafeEqual(keyBuffer, derivedBuffer);
   } catch {
     return false;
   }
@@ -51120,7 +51156,7 @@ function createToken(user) {
     exp: Math.floor(Date.now() / 1e3) + TOKEN_EXPIRY_DAYS * 86400
   };
   const payloadB64 = Buffer.from(JSON.stringify(payload)).toString("base64url");
-  const signature = crypto.createHmac("sha256", getSessionSecret()).update(payloadB64).digest("base64url");
+  const signature = crypto3.createHmac("sha256", getSessionSecret()).update(payloadB64).digest("base64url");
   return `${payloadB64}.${signature}`;
 }
 function verifyToken(token) {
@@ -51128,8 +51164,8 @@ function verifyToken(token) {
     const parts = token.split(".");
     if (parts.length !== 2) return null;
     const [payloadB64, signature] = parts;
-    const expectedSig = crypto.createHmac("sha256", getSessionSecret()).update(payloadB64).digest("base64url");
-    if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSig))) {
+    const expectedSig = crypto3.createHmac("sha256", getSessionSecret()).update(payloadB64).digest("base64url");
+    if (!crypto3.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSig))) {
       return null;
     }
     const payload = JSON.parse(
@@ -51143,7 +51179,54 @@ function verifyToken(token) {
     return null;
   }
 }
-function authMiddleware(req, _res, next) {
+var revokedTokenHashes = /* @__PURE__ */ new Set();
+function hashToken(token) {
+  return crypto3.createHash("sha256").update(token.trim()).digest("hex");
+}
+async function revokeToken(token, userId) {
+  const tokenHash = hashToken(token);
+  revokedTokenHashes.add(tokenHash);
+  try {
+    if (process.env.DATABASE_URL) {
+      const { getDbPool: getDbPool2 } = await Promise.resolve().then(() => (init_dbPool(), dbPool_exports));
+      const pool = getDbPool2();
+      const payload = verifyToken(token);
+      const expiresAt = payload ? new Date(payload.exp * 1e3) : new Date(Date.now() + TOKEN_EXPIRY_DAYS * 864e5);
+      const targetUserId = userId || payload?.userId || null;
+      await pool.query(
+        `INSERT INTO revoked_tokens (token_hash, user_id, expires_at, revoked_at)
+         VALUES ($1, $2, $3, NOW())
+         ON CONFLICT (token_hash) DO NOTHING`,
+        [tokenHash, targetUserId, expiresAt]
+      );
+    }
+  } catch (err) {
+    console.warn("[Security] Token revocation persisted to memory (database sync bypassed):", err instanceof Error ? err.message : String(err));
+  }
+}
+async function isTokenRevoked(token) {
+  const tokenHash = hashToken(token);
+  if (revokedTokenHashes.has(tokenHash)) {
+    return true;
+  }
+  try {
+    if (process.env.DATABASE_URL) {
+      const { getDbPool: getDbPool2 } = await Promise.resolve().then(() => (init_dbPool(), dbPool_exports));
+      const pool = getDbPool2();
+      const res = await pool.query(
+        "SELECT token_hash FROM revoked_tokens WHERE token_hash = $1",
+        [tokenHash]
+      );
+      if (res.rows.length > 0) {
+        revokedTokenHashes.add(tokenHash);
+        return true;
+      }
+    }
+  } catch {
+  }
+  return false;
+}
+async function authMiddleware(req, _res, next) {
   const authHeader = req.headers.authorization;
   let token = null;
   if (authHeader && authHeader.startsWith("Bearer ")) {
@@ -51155,7 +51238,10 @@ function authMiddleware(req, _res, next) {
   if (token) {
     const payload = verifyToken(token);
     if (payload) {
-      req.user = payload;
+      const revoked = await isTokenRevoked(token);
+      if (!revoked) {
+        req.user = payload;
+      }
     }
   }
   next();
@@ -51223,9 +51309,63 @@ async function bootstrapAdminFromEnv() {
     throw err;
   }
 }
+function csrfProtectionMiddleware(req, res, next) {
+  const method = req.method.toUpperCase();
+  const isMutating = ["POST", "PUT", "PATCH", "DELETE"].includes(method);
+  if (!isMutating) {
+    return next();
+  }
+  const cookieHeader = req.headers.cookie;
+  const hasCookieAuth = Boolean(cookieHeader && cookieHeader.includes("libertadgo_token="));
+  if (!hasCookieAuth) {
+    return next();
+  }
+  const secFetchSite = req.headers["sec-fetch-site"];
+  if (secFetchSite === "cross-site") {
+    res.status(403).json({
+      success: false,
+      error: "Solicitud bloqueada por protecci\xF3n CSRF (origen cruzado no permitido)."
+    });
+    return;
+  }
+  const origin = req.headers.origin;
+  if (origin) {
+    try {
+      const originUrl = new URL(origin);
+      const expectedHost = req.headers["x-forwarded-host"] || req.headers.host;
+      if (expectedHost) {
+        const expectedHostName = (Array.isArray(expectedHost) ? expectedHost[0] : expectedHost).split(":")[0];
+        if (originUrl.hostname !== expectedHostName && originUrl.hostname !== "localhost" && originUrl.hostname !== "127.0.0.1") {
+          res.status(403).json({
+            success: false,
+            error: "Solicitud bloqueada por protecci\xF3n CSRF: encabezado Origin no coincide con el host."
+          });
+          return;
+        }
+      }
+    } catch {
+      res.status(403).json({
+        success: false,
+        error: "Solicitud bloqueada por protecci\xF3n CSRF: encabezado Origin inv\xE1lido."
+      });
+      return;
+    }
+  }
+  next();
+}
 
 // src/server/authRoutes.ts
 var authRouter = Router();
+var isProduction = process.env.NODE_ENV === "production";
+var COOKIE_NAME = "libertadgo_token";
+var COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: isProduction,
+  sameSite: "strict",
+  maxAge: 7 * 24 * 60 * 60 * 1e3,
+  // 7 days
+  path: "/"
+};
 authRouter.post("/register", async (req, res) => {
   const parseResult = RegisterUserSchema.safeParse(req.body);
   if (!parseResult.success) {
@@ -51256,6 +51396,7 @@ authRouter.post("/register", async (req, res) => {
       name: newUser.name,
       role: newUser.role
     });
+    res.cookie(COOKIE_NAME, token, COOKIE_OPTIONS);
     res.status(201).json({
       success: true,
       data: {
@@ -51308,6 +51449,7 @@ authRouter.post("/login", async (req, res) => {
       name: user.name,
       role: user.role
     });
+    res.cookie(COOKIE_NAME, token, COOKIE_OPTIONS);
     res.json({
       success: true,
       data: {
@@ -51326,7 +51468,30 @@ authRouter.post("/login", async (req, res) => {
     res.status(500).json({ success: false, error: "Error interno al iniciar sesi\xF3n" });
   }
 });
-authRouter.post("/logout", (_req, res) => {
+authRouter.post("/logout", async (req, res) => {
+  const authHeader = req.headers.authorization;
+  let token = null;
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    token = authHeader.substring(7).trim();
+  } else if (req.headers.cookie) {
+    const match = req.headers.cookie.match(/libertadgo_token=([^;]+)/);
+    if (match) token = match[1];
+  } else if (req.body?.token) {
+    token = req.body.token;
+  }
+  if (token) {
+    try {
+      await revokeToken(token, req.user?.userId);
+    } catch (err) {
+      console.warn("[Auth Warning] Error invalidating token:", err);
+    }
+  }
+  res.clearCookie(COOKIE_NAME, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: "strict",
+    path: "/"
+  });
   res.json({ success: true, message: "Sesi\xF3n cerrada correctamente" });
 });
 authRouter.get("/me", requireAuth, async (req, res) => {
@@ -51607,6 +51772,97 @@ creatorsRouter.get("/places/:placeId/videos", async (req, res) => {
 import { Router as Router3 } from "express";
 init_repositories();
 init_initialPlaces();
+init_placeRepository();
+
+// src/server/placesSchemas.ts
+import { z as z3 } from "zod";
+var PlaceCoordinatesSchema = z3.object({
+  lat: z3.number().min(-90).max(90),
+  lng: z3.number().min(-180).max(180)
+});
+var PlaceImageSchema = z3.object({
+  id: z3.string().default(() => `img_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`),
+  url: z3.string().url(),
+  caption: z3.string().optional(),
+  author: z3.string().optional(),
+  license: z3.string().optional(),
+  isCover: z3.boolean().default(false)
+});
+var PlaceOpeningHourSchema = z3.object({
+  dayOfWeek: z3.number().min(0).max(6),
+  openTime: z3.string(),
+  closeTime: z3.string(),
+  isClosed: z3.boolean().default(false)
+});
+var PlaceSourceSchema = z3.object({
+  placeId: z3.string().optional(),
+  sourceId: z3.string(),
+  externalId: z3.string(),
+  rawDataRef: z3.string().optional(),
+  lastSyncedAt: z3.string().optional()
+});
+var PlaceVerificationSchema = z3.object({
+  isVerified: z3.boolean(),
+  verificationLevel: z3.enum(["unverified", "community", "official_mincetur", "partner_verified"]),
+  verifiedBy: z3.string().optional(),
+  verifiedAt: z3.string().optional(),
+  notes: z3.string().optional()
+});
+var CreatePlaceSchema = z3.object({
+  name: z3.string().min(2, "El nombre debe tener al menos 2 caracteres"),
+  category: z3.enum([
+    "restaurantes",
+    "gastronomia",
+    "atractivos",
+    "arqueologia",
+    "playas",
+    "museos",
+    "cultura",
+    "naturaleza",
+    "hoteles",
+    "actividades"
+  ]),
+  subcategory: z3.string().optional(),
+  localityId: z3.string().min(1, "La localidad es obligatoria"),
+  localityName: z3.string().min(1, "El nombre de localidad es obligatorio"),
+  address: z3.string().min(3, "La direcci\xF3n es obligatoria"),
+  coordinates: PlaceCoordinatesSchema,
+  geohash: z3.string().optional(),
+  shortDescription: z3.string().min(5, "La descripci\xF3n corta es requerida"),
+  fullDescription: z3.string().optional(),
+  phone: z3.string().optional(),
+  email: z3.string().email().optional().or(z3.literal("")),
+  website: z3.string().url().optional().or(z3.literal("")),
+  mapsUrl: z3.string().optional(),
+  googlePlaceId: z3.string().optional(),
+  priceLevel: z3.union([z3.literal(1), z3.literal(2), z3.literal(3), z3.literal(4)]).optional(),
+  rating: z3.number().min(0).max(5).optional(),
+  reviewsCount: z3.number().min(0).optional(),
+  images: z3.array(PlaceImageSchema).optional(),
+  openingHours: z3.array(PlaceOpeningHourSchema).optional(),
+  verification: PlaceVerificationSchema.optional(),
+  sources: z3.array(PlaceSourceSchema).optional(),
+  tags: z3.array(z3.string()).optional(),
+  recommendedDurationMinutes: z3.number().min(5).optional(),
+  safetyScore: z3.number().min(0).max(100).optional(),
+  status: z3.enum(["DRAFT", "FLAGGED", "PUBLISHED", "ARCHIVED"]).default("PUBLISHED")
+});
+var UpdatePlaceSchema = CreatePlaceSchema.partial();
+var UpdatePlaceStatusSchema = z3.object({
+  status: z3.enum(["DRAFT", "FLAGGED", "PUBLISHED", "ARCHIVED"]),
+  reason: z3.string().optional()
+});
+var VerifyPlaceSchema = z3.object({
+  isVerified: z3.boolean(),
+  verificationLevel: z3.enum(["unverified", "community", "official_mincetur", "partner_verified"]),
+  notes: z3.string().optional()
+});
+var MergeDuplicatesSchema = z3.object({
+  primaryId: z3.string().min(1, "primaryId es obligatorio"),
+  duplicateIds: z3.array(z3.string().min(1)).min(1, "Debe proporcionar al menos un ID duplicado")
+});
+
+// src/server/adminRoutes.ts
 var adminRouter = Router3();
 adminRouter.use(requireAuth, requireAdmin);
 adminRouter.get("/metrics", async (_req, res) => {
@@ -51739,6 +51995,312 @@ adminRouter.put("/moderation/:id/places", async (req, res) => {
     res.status(500).json({ success: false, error: "Error al actualizar lugares asociados" });
   }
 });
+adminRouter.get("/dashboard", async (_req, res) => {
+  try {
+    const repo = getPlaceRepository();
+    const metrics = await repo.getDashboardMetrics();
+    res.json({
+      success: true,
+      data: metrics,
+      timestamp: (/* @__PURE__ */ new Date()).toISOString()
+    });
+  } catch (err) {
+    console.error("[Admin Error] Error fetching admin dashboard metrics:", err);
+    res.status(500).json({ success: false, error: "Error al generar indicadores del panel administrativo" });
+  }
+});
+adminRouter.get("/places", async (req, res) => {
+  try {
+    const {
+      search,
+      status,
+      category,
+      localityId,
+      isVerified,
+      page,
+      limit,
+      sortBy,
+      sortOrder
+    } = req.query;
+    const repo = getPlaceRepository();
+    const result = await repo.listPlaces({
+      search: typeof search === "string" ? search : void 0,
+      status: typeof status === "string" ? status : void 0,
+      category: typeof category === "string" ? category : void 0,
+      localityId: typeof localityId === "string" ? localityId : void 0,
+      isVerified: isVerified === "true" ? true : isVerified === "false" ? false : void 0,
+      page: page ? Number(page) : 1,
+      limit: limit ? Number(limit) : 25,
+      sortBy: typeof sortBy === "string" ? sortBy : "updatedAt",
+      sortOrder: sortOrder === "asc" ? "asc" : "desc"
+    });
+    res.json({
+      success: true,
+      data: result.places,
+      total: result.total,
+      page: result.page,
+      totalPages: result.totalPages
+    });
+  } catch (err) {
+    console.error("[Admin Error] Error listing places:", err);
+    res.status(500).json({ success: false, error: "Error al consultar cat\xE1logo administrativo" });
+  }
+});
+adminRouter.get("/places/:id", async (req, res) => {
+  try {
+    const repo = getPlaceRepository();
+    const place = await repo.getPlaceById(req.params.id);
+    if (!place) {
+      res.status(404).json({ success: false, error: "Lugar no encontrado en el cat\xE1logo" });
+      return;
+    }
+    const history = await repo.getAuditLogs(place.id, 20);
+    res.json({
+      success: true,
+      data: {
+        ...place,
+        auditHistory: history
+      }
+    });
+  } catch (err) {
+    console.error("[Admin Error] Error fetching place details:", err);
+    res.status(500).json({ success: false, error: "Error al consultar detalle del lugar" });
+  }
+});
+adminRouter.post("/places", async (req, res) => {
+  if (!req.user) {
+    res.status(401).json({ success: false, error: "No autorizado" });
+    return;
+  }
+  const parseResult = CreatePlaceSchema.safeParse(req.body);
+  if (!parseResult.success) {
+    const errorMsg = parseResult.error.issues.map((i) => i.message).join(", ");
+    res.status(400).json({ success: false, error: errorMsg });
+    return;
+  }
+  try {
+    const repo = getPlaceRepository();
+    const created = await repo.createPlace(parseResult.data, req.user.userId, req.user.name);
+    res.status(201).json({
+      success: true,
+      data: created,
+      message: `Lugar "${created.name}" creado exitosamente`
+    });
+  } catch (err) {
+    console.error("[Admin Error] Error creating place:", err);
+    res.status(500).json({ success: false, error: "Error al crear lugar en el cat\xE1logo" });
+  }
+});
+adminRouter.put("/places/:id", async (req, res) => {
+  if (!req.user) {
+    res.status(401).json({ success: false, error: "No autorizado" });
+    return;
+  }
+  const parseResult = UpdatePlaceSchema.safeParse(req.body);
+  if (!parseResult.success) {
+    const errorMsg = parseResult.error.issues.map((i) => i.message).join(", ");
+    res.status(400).json({ success: false, error: errorMsg });
+    return;
+  }
+  try {
+    const repo = getPlaceRepository();
+    const updated = await repo.updatePlace(
+      req.params.id,
+      parseResult.data,
+      req.user.userId,
+      req.user.name,
+      req.body.changeSummary
+    );
+    if (!updated) {
+      res.status(404).json({ success: false, error: "Lugar no encontrado para actualizar" });
+      return;
+    }
+    res.json({
+      success: true,
+      data: updated,
+      message: `Lugar "${updated.name}" actualizado exitosamente`
+    });
+  } catch (err) {
+    console.error("[Admin Error] Error updating place:", err);
+    res.status(500).json({ success: false, error: "Error al actualizar lugar" });
+  }
+});
+adminRouter.patch("/places/:id/status", async (req, res) => {
+  if (!req.user) {
+    res.status(401).json({ success: false, error: "No autorizado" });
+    return;
+  }
+  const parseResult = UpdatePlaceStatusSchema.safeParse(req.body);
+  if (!parseResult.success) {
+    const errorMsg = parseResult.error.issues.map((i) => i.message).join(", ");
+    res.status(400).json({ success: false, error: errorMsg });
+    return;
+  }
+  try {
+    const repo = getPlaceRepository();
+    const updated = await repo.updateStatus(
+      req.params.id,
+      parseResult.data.status,
+      req.user.userId,
+      req.user.name,
+      parseResult.data.reason
+    );
+    if (!updated) {
+      res.status(404).json({ success: false, error: "Lugar no encontrado" });
+      return;
+    }
+    res.json({
+      success: true,
+      data: updated,
+      message: `Estado de "${updated.name}" cambiado a ${parseResult.data.status}`
+    });
+  } catch (err) {
+    console.error("[Admin Error] Error changing place status:", err);
+    res.status(500).json({ success: false, error: "Error al actualizar estado del lugar" });
+  }
+});
+adminRouter.patch("/places/:id/verify", async (req, res) => {
+  if (!req.user) {
+    res.status(401).json({ success: false, error: "No autorizado" });
+    return;
+  }
+  const parseResult = VerifyPlaceSchema.safeParse(req.body);
+  if (!parseResult.success) {
+    const errorMsg = parseResult.error.issues.map((i) => i.message).join(", ");
+    res.status(400).json({ success: false, error: errorMsg });
+    return;
+  }
+  try {
+    const repo = getPlaceRepository();
+    const updated = await repo.verifyPlace(
+      req.params.id,
+      parseResult.data.isVerified,
+      parseResult.data.verificationLevel,
+      parseResult.data.notes,
+      req.user.userId,
+      req.user.name
+    );
+    if (!updated) {
+      res.status(404).json({ success: false, error: "Lugar no encontrado" });
+      return;
+    }
+    res.json({
+      success: true,
+      data: updated,
+      message: `Verificaci\xF3n de "${updated.name}" actualizada con \xE9xito`
+    });
+  } catch (err) {
+    console.error("[Admin Error] Error verifying place:", err);
+    res.status(500).json({ success: false, error: "Error al actualizar verificaci\xF3n" });
+  }
+});
+adminRouter.get("/categories", async (_req, res) => {
+  try {
+    const repo = getPlaceRepository();
+    const stats = await repo.getCategoriesStats();
+    res.json({ success: true, data: stats });
+  } catch (err) {
+    console.error("[Admin Error] Error fetching categories stats:", err);
+    res.status(500).json({ success: false, error: "Error al consultar categor\xEDas" });
+  }
+});
+adminRouter.get("/localities", async (_req, res) => {
+  try {
+    const repo = getPlaceRepository();
+    const stats = await repo.getLocalitiesStats();
+    res.json({ success: true, data: stats });
+  } catch (err) {
+    console.error("[Admin Error] Error fetching localities stats:", err);
+    res.status(500).json({ success: false, error: "Error al consultar localidades" });
+  }
+});
+adminRouter.get("/sources", async (_req, res) => {
+  try {
+    const repo = getPlaceRepository();
+    const stats = await repo.getSourcesStats();
+    res.json({ success: true, data: stats });
+  } catch (err) {
+    console.error("[Admin Error] Error fetching sources stats:", err);
+    res.status(500).json({ success: false, error: "Error al consultar fuentes de datos" });
+  }
+});
+adminRouter.get("/duplicates", async (_req, res) => {
+  try {
+    const repo = getPlaceRepository();
+    const duplicates = await repo.findDuplicates();
+    res.json({
+      success: true,
+      data: duplicates,
+      total: duplicates.length
+    });
+  } catch (err) {
+    console.error("[Admin Error] Error detecting duplicates:", err);
+    res.status(500).json({ success: false, error: "Error al identificar duplicados" });
+  }
+});
+adminRouter.post("/duplicates/merge", async (req, res) => {
+  if (!req.user) {
+    res.status(401).json({ success: false, error: "No autorizado" });
+    return;
+  }
+  const parseResult = MergeDuplicatesSchema.safeParse(req.body);
+  if (!parseResult.success) {
+    const errorMsg = parseResult.error.issues.map((i) => i.message).join(", ");
+    res.status(400).json({ success: false, error: errorMsg });
+    return;
+  }
+  try {
+    const repo = getPlaceRepository();
+    const result = await repo.mergeDuplicates(
+      parseResult.data.primaryId,
+      parseResult.data.duplicateIds,
+      req.user.userId,
+      req.user.name
+    );
+    res.json({
+      success: true,
+      data: result.primaryPlace,
+      mergedCount: result.mergedCount,
+      message: `Fusi\xF3n completada: ${result.mergedCount} lugar(es) fusionado(s) exitosamente`
+    });
+  } catch (err) {
+    console.error("[Admin Error] Error merging duplicates:", err);
+    res.status(500).json({
+      success: false,
+      error: err instanceof Error ? err.message : "Error al fusionar lugares duplicados"
+    });
+  }
+});
+adminRouter.get("/audit", async (req, res) => {
+  try {
+    const repo = getPlaceRepository();
+    const placeId = typeof req.query.placeId === "string" ? req.query.placeId : void 0;
+    const limit = req.query.limit ? Number(req.query.limit) : 50;
+    const logs = await repo.getAuditLogs(placeId, limit);
+    res.json({
+      success: true,
+      data: logs,
+      total: logs.length
+    });
+  } catch (err) {
+    console.error("[Admin Error] Error fetching audit trail:", err);
+    res.status(500).json({ success: false, error: "Error al consultar registro de auditor\xEDa" });
+  }
+});
+adminRouter.get("/places/:id/history", async (req, res) => {
+  try {
+    const repo = getPlaceRepository();
+    const logs = await repo.getAuditLogs(req.params.id, 50);
+    res.json({
+      success: true,
+      data: logs,
+      placeId: req.params.id
+    });
+  } catch (err) {
+    console.error("[Admin Error] Error fetching place history:", err);
+    res.status(500).json({ success: false, error: "Error al consultar historial del lugar" });
+  }
+});
 
 // src/server/routes.ts
 init_repositories();
@@ -51782,40 +52344,55 @@ apiRouter.get("/events", (_req, res) => {
     region: "La Libertad, Per\xFA"
   });
 });
-apiRouter.get("/places", (req, res) => {
-  const { localityId, category, q, page, limit } = req.query;
-  const places = catalogRepository.getPlaces({
-    localityId: typeof localityId === "string" ? localityId : void 0,
-    category: typeof category === "string" ? category : void 0,
-    search: typeof q === "string" ? q : void 0
-  });
-  const pageNum = Math.max(1, Number(page) || 1);
-  const pageSize = Math.min(100, Math.max(1, Number(limit) || 50));
-  const total = places.length;
-  const startIndex = (pageNum - 1) * pageSize;
-  const paginated = limit ? places.slice(startIndex, startIndex + pageSize) : places;
-  res.json({
-    success: true,
-    data: paginated,
-    total,
-    page: pageNum,
-    totalPages: Math.ceil(total / pageSize),
-    regionConstraint: "La Libertad",
-    sources: ["MINCETUR", "OpenStreetMap", "Directorio_Oficial_La_Libertad"]
-  });
+apiRouter.get("/places", async (req, res) => {
+  try {
+    const { localityId, category, q, page, limit } = req.query;
+    const places = await catalogRepository.getPlaces({
+      localityId: typeof localityId === "string" ? localityId : void 0,
+      category: typeof category === "string" ? category : void 0,
+      search: typeof q === "string" ? q : void 0
+    });
+    const pageNum = Math.max(1, Number(page) || 1);
+    const pageSize = Math.min(100, Math.max(1, Number(limit) || 50));
+    const total = places.length;
+    const startIndex = (pageNum - 1) * pageSize;
+    const paginated = limit ? places.slice(startIndex, startIndex + pageSize) : places;
+    res.json({
+      success: true,
+      data: paginated,
+      total,
+      page: pageNum,
+      totalPages: Math.ceil(total / pageSize),
+      regionConstraint: "La Libertad",
+      sources: ["MINCETUR", "OpenStreetMap", "Directorio_Oficial_La_Libertad"]
+    });
+  } catch (err) {
+    console.error("[Places Error] Error getting places:", err);
+    res.status(500).json({ success: false, error: "Error al consultar cat\xE1logo de lugares" });
+  }
 });
-apiRouter.get("/places/search", (req, res) => {
-  const q = typeof req.query.q === "string" ? req.query.q : "";
-  const localityId = typeof req.query.localityId === "string" ? req.query.localityId : void 0;
-  const places = catalogRepository.searchPlaces(q, localityId);
-  res.json({
-    success: true,
-    data: places,
-    total: places.length
-  });
+apiRouter.get("/places/search", async (req, res) => {
+  try {
+    const q = typeof req.query.q === "string" ? req.query.q : "";
+    const localityId = typeof req.query.localityId === "string" ? req.query.localityId : void 0;
+    const places = await catalogRepository.searchPlaces(q, localityId);
+    res.json({
+      success: true,
+      data: places,
+      total: places.length
+    });
+  } catch (err) {
+    console.error("[Places Error] Error searching places:", err);
+    res.status(500).json({ success: false, error: "Error al buscar lugares" });
+  }
 });
 apiRouter.get("/places/:id/videos", async (req, res) => {
   try {
+    const place = await catalogRepository.getPlaceById(req.params.id);
+    if (!place) {
+      res.status(404).json({ success: false, error: "Lugar no encontrado en el cat\xE1logo de La Libertad" });
+      return;
+    }
     const { getCreatorsRepository: getCreatorsRepository2 } = await Promise.resolve().then(() => (init_repositories(), repositories_exports));
     const repo = getCreatorsRepository2();
     const videos = await repo.getVideosForPlace(req.params.id);
@@ -51830,13 +52407,18 @@ apiRouter.get("/places/:id/videos", async (req, res) => {
     res.status(500).json({ success: false, error: "Error al consultar videos del lugar" });
   }
 });
-apiRouter.get("/places/:id", (req, res) => {
-  const place = catalogRepository.getPlaceById(req.params.id);
-  if (!place) {
-    res.status(404).json({ success: false, error: "Lugar no encontrado en el cat\xE1logo de La Libertad" });
-    return;
+apiRouter.get("/places/:id", async (req, res) => {
+  try {
+    const place = await catalogRepository.getPlaceById(req.params.id);
+    if (!place) {
+      res.status(404).json({ success: false, error: "Lugar no encontrado en el cat\xE1logo de La Libertad" });
+      return;
+    }
+    res.json({ success: true, data: place });
+  } catch (err) {
+    console.error("[Places Error] Error getting place by id:", err);
+    res.status(500).json({ success: false, error: "Error al consultar lugar" });
   }
-  res.json({ success: true, data: place });
 });
 apiRouter.get("/route", async (req, res) => {
   const coordinates = typeof req.query.coordinates === "string" ? req.query.coordinates.trim() : "";
@@ -51939,13 +52521,13 @@ apiRouter.get("/itineraries/:id", (req, res) => {
   }
   res.json({ success: true, data: itinerary });
 });
-apiRouter.post("/itineraries/:id/activities", (req, res) => {
+apiRouter.post("/itineraries/:id/activities", async (req, res) => {
   const { placeId, dayNumber, timeSlot, notes } = req.body;
   if (!placeId || typeof dayNumber !== "number") {
     res.status(400).json({ success: false, error: "placeId y dayNumber son obligatorios" });
     return;
   }
-  const result = catalogRepository.addActivity(req.params.id, {
+  const result = await catalogRepository.addActivity(req.params.id, {
     placeId,
     dayNumber,
     timeSlot,
@@ -52159,15 +52741,16 @@ async function startServer() {
     );
   }
   const distPath = path.resolve(__dirname, "dist");
-  const isProduction = process.env.NODE_ENV === "production" && fs.existsSync(path.join(distPath, "index.html"));
+  const isProduction2 = process.env.NODE_ENV === "production" && fs.existsSync(path.join(distPath, "index.html"));
   app.use(express.json());
+  app.use(csrfProtectionMiddleware);
   const handleHealthCheck = async (_req, res) => {
     res.setHeader("Content-Type", "application/json");
     const dbHealth = await checkDatabaseHealth();
     res.json({
       status: dbHealth.connected ? "healthy" : "degraded",
       database: dbHealth.connected ? "connected" : "not_configured",
-      environment: isProduction ? "production" : "development",
+      environment: isProduction2 ? "production" : "development",
       timestamp: (/* @__PURE__ */ new Date()).toISOString()
     });
   };
@@ -52178,14 +52761,13 @@ async function startServer() {
       res.setHeader("Content-Type", "application/json");
       res.status(503).json({
         success: false,
-        error: "Servicio no disponible: configuraci\xF3n de producci\xF3n incompleta en Cloud Run.",
-        detail: configError
+        error: "Servicio no disponible: configuraci\xF3n de producci\xF3n incompleta en Cloud Run."
       });
     });
   }
   app.use("/api", apiRouter);
   app.use(express.static(path.resolve(__dirname, "public")));
-  if (isProduction) {
+  if (isProduction2) {
     app.use(express.static(distPath));
     app.get("*", (req, res) => {
       if (req.path.startsWith("/api")) {
@@ -52214,7 +52796,7 @@ async function startServer() {
       `[LibertadGO] Server running on ${HOST}:${PORT}`
     );
     console.log(
-      `[LibertadGO] Environment: ${isProduction ? "production" : "development"}`
+      `[LibertadGO] Environment: ${isProduction2 ? "production" : "development"}`
     );
     if (configError) {
       console.warn(

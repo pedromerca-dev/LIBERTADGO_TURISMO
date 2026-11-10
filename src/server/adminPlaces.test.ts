@@ -8,21 +8,21 @@ test('Place Repository & Admin Workflow Tests', async (t) => {
   resetPlaceRepositoryForTesting();
   const repo = getPlaceRepository();
 
-  await t.test('1. Initial catalog loads exactly 297 verified places', () => {
-    const list = repo.listPlaces({ limit: 400 });
+  await t.test('1. Initial catalog loads exactly 297 verified places', async () => {
+    const list = await repo.listPlaces({ limit: 400 });
     assert.equal(list.total, 297, `Expected exactly 297 places in initial seed, got ${list.total}`);
     assert.ok(list.places.length >= 297);
   });
 
-  await t.test('2. Filtering by status: PUBLISHED returns all places initially', () => {
-    const published = repo.listPlaces({ status: 'PUBLISHED', limit: 400 });
+  await t.test('2. Filtering by status: PUBLISHED returns all places initially', async () => {
+    const published = await repo.listPlaces({ status: 'PUBLISHED', limit: 400 });
     assert.equal(published.total, 297);
-    const drafts = repo.listPlaces({ status: 'DRAFT' });
+    const drafts = await repo.listPlaces({ status: 'DRAFT' });
     assert.equal(drafts.total, 0);
   });
 
-  await t.test('3. Admin can create a new place with validation and audit log', () => {
-    const newPlace = repo.createPlace(
+  await t.test('3. Admin can create a new place with validation and audit log', async () => {
+    const newPlace = await repo.createPlace(
       {
         name: 'Nuevo Restaurante Mochica',
         category: 'restaurantes',
@@ -42,39 +42,39 @@ test('Place Repository & Admin Workflow Tests', async (t) => {
     assert.equal(newPlace.localityId, 'moche');
 
     // Total should now be 298
-    const updatedList = repo.listPlaces({ limit: 400 });
+    const updatedList = await repo.listPlaces({ limit: 400 });
     assert.equal(updatedList.total, 298);
 
     // Audit log was recorded
-    const logs = repo.getAuditLogs(newPlace.id);
+    const logs = await repo.getAuditLogs(newPlace.id);
     assert.ok(logs.length >= 1);
     assert.equal(logs[0].action, 'CREATE');
     assert.equal(logs[0].adminName, 'Pedro Admin');
   });
 
-  await t.test('4. Admin can update place fields and change status to ARCHIVED', () => {
-    const place = repo.listPlaces({ limit: 1 }).places[0];
+  await t.test('4. Admin can update place fields and change status to ARCHIVED', async () => {
+    const place = (await repo.listPlaces({ limit: 1 })).places[0];
     const originalStatus = place.status;
 
-    const updated = repo.updateStatus(place.id, 'ARCHIVED', 'admin_user_1', 'Pedro Admin', 'Cierre temporal');
+    const updated = await repo.updateStatus(place.id, 'ARCHIVED', 'admin_user_1', 'Pedro Admin', 'Cierre temporal');
     assert.ok(updated);
     assert.equal(updated.status, 'ARCHIVED');
 
     // Public catalog should NOT include archived place
-    const publicPlaces = repo.getPublicPlaces();
+    const publicPlaces = await repo.getPublicPlaces();
     assert.ok(!publicPlaces.some((p) => p.id === place.id));
 
     // Audit trail has ARCHIVE action
-    const logs = repo.getAuditLogs(place.id);
+    const logs = await repo.getAuditLogs(place.id);
     assert.ok(logs.some((l) => l.action === 'ARCHIVE'));
 
     // Revert status to PUBLISHED
-    repo.updateStatus(place.id, originalStatus, 'admin_user_1', 'Pedro Admin', 'Reapertura');
+    await repo.updateStatus(place.id, originalStatus, 'admin_user_1', 'Pedro Admin', 'Reapertura');
   });
 
-  await t.test('5. Admin can update verification level and notes', () => {
-    const place = repo.listPlaces({ limit: 1 }).places[0];
-    const verified = repo.verifyPlace(
+  await t.test('5. Admin can update verification level and notes', async () => {
+    const place = (await repo.listPlaces({ limit: 1 })).places[0];
+    const verified = await repo.verifyPlace(
       place.id,
       true,
       'official_mincetur',
@@ -89,8 +89,8 @@ test('Place Repository & Admin Workflow Tests', async (t) => {
     assert.equal(verified.verification.verifiedBy, 'Pedro Admin');
   });
 
-  await t.test('6. Dashboard metrics aggregate correctly', () => {
-    const metrics = repo.getDashboardMetrics();
+  await t.test('6. Dashboard metrics aggregate correctly', async () => {
+    const metrics = await repo.getDashboardMetrics();
     assert.ok(metrics.totalPlaces >= 297);
     assert.ok(metrics.placesByCategory.length > 0);
     assert.ok(metrics.placesByLocality.length >= 10);
@@ -98,9 +98,9 @@ test('Place Repository & Admin Workflow Tests', async (t) => {
     assert.ok(Array.isArray(metrics.recentAuditLogs));
   });
 
-  await t.test('7. Duplicate detection identifies nearby identical places and supports merge', () => {
+  await t.test('7. Duplicate detection identifies nearby identical places and supports merge', async () => {
     // Intentionally create a duplicate place
-    const dup = repo.createPlace(
+    const dup = await repo.createPlace(
       {
         name: 'Museo de Sitio de Chan Chan (Duplicado OSM)',
         category: 'museos',
@@ -114,22 +114,22 @@ test('Place Repository & Admin Workflow Tests', async (t) => {
       'Pedro Admin'
     );
 
-    const duplicates = repo.findDuplicates();
+    const duplicates = await repo.findDuplicates();
     assert.ok(duplicates.length > 0, 'Expected at least 1 duplicate candidate');
 
     // Find pair containing the new place
-    const pair = duplicates.find((d) => d.primaryPlace.id === dup.id || d.duplicatePlace.id === dup.id);
+    const pair = duplicates.find((d: { primaryPlace: { id: string }; duplicatePlace: { id: string } }) => d.primaryPlace.id === dup.id || d.duplicatePlace.id === dup.id);
     assert.ok(pair, 'Duplicate pair was found');
 
     const primaryId = pair.primaryPlace.id === dup.id ? pair.duplicatePlace.id : pair.primaryPlace.id;
     const dupId = dup.id;
 
-    const mergeResult = repo.mergeDuplicates(primaryId, [dupId], 'admin_user_1', 'Pedro Admin');
+    const mergeResult = await repo.mergeDuplicates(primaryId, [dupId], 'admin_user_1', 'Pedro Admin');
     assert.ok(mergeResult.success);
     assert.equal(mergeResult.mergedCount, 1);
 
     // Duplicate should now be ARCHIVED
-    const archivedDup = repo.getPlaceById(dupId);
+    const archivedDup = await repo.getPlaceById(dupId);
     assert.equal(archivedDup?.status, 'ARCHIVED');
   });
 });

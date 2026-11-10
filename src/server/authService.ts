@@ -309,3 +309,63 @@ export async function bootstrapAdminFromEnv(): Promise<{ bootstrapped: boolean; 
     throw err;
   }
 }
+
+/**
+ * Modern CSRF Protection Middleware
+ * Defends cookie-authenticated sessions against cross-site request forgery
+ * by validating Sec-Fetch-Site metadata and Origin/Host match on mutating operations.
+ */
+export function csrfProtectionMiddleware(req: Request, res: Response, next: NextFunction): void {
+  const method = req.method.toUpperCase();
+  const isMutating = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method);
+
+  if (!isMutating) {
+    return next();
+  }
+
+  // Check if request is authenticated via cookie
+  const cookieHeader = req.headers.cookie;
+  const hasCookieAuth = Boolean(cookieHeader && cookieHeader.includes('libertadgo_token='));
+
+  if (!hasCookieAuth) {
+    // Pure Bearer token requests (e.g. mobile apps, non-browser clients) are not vulnerable to ambient cookie CSRF
+    return next();
+  }
+
+  // 1. Sec-Fetch-Site check (standard W3C Fetch Metadata Request Headers)
+  const secFetchSite = req.headers['sec-fetch-site'];
+  if (secFetchSite === 'cross-site') {
+    res.status(403).json({
+      success: false,
+      error: 'Solicitud bloqueada por protección CSRF (origen cruzado no permitido).',
+    });
+    return;
+  }
+
+  // 2. Origin / Host check
+  const origin = req.headers.origin;
+  if (origin) {
+    try {
+      const originUrl = new URL(origin);
+      const expectedHost = req.headers['x-forwarded-host'] || req.headers.host;
+      if (expectedHost) {
+        const expectedHostName = (Array.isArray(expectedHost) ? expectedHost[0] : expectedHost).split(':')[0];
+        if (originUrl.hostname !== expectedHostName && originUrl.hostname !== 'localhost' && originUrl.hostname !== '127.0.0.1') {
+          res.status(403).json({
+            success: false,
+            error: 'Solicitud bloqueada por protección CSRF: encabezado Origin no coincide con el host.',
+          });
+          return;
+        }
+      }
+    } catch {
+      res.status(403).json({
+        success: false,
+        error: 'Solicitud bloqueada por protección CSRF: encabezado Origin inválido.',
+      });
+      return;
+    }
+  }
+
+  next();
+}

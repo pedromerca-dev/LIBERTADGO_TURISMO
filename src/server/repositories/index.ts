@@ -7,6 +7,9 @@
 import type { IAuthRepository, ICreatorsRepository } from './interfaces.ts';
 import { MemoryCreatorsRepository } from './memoryCreatorsRepository.ts';
 import { PostgresCreatorsRepository } from './postgresCreatorsRepository.ts';
+import { getDbPool } from './dbPool.ts';
+import { PostgresPlaceRepository } from './postgresPlaceRepository.ts';
+import { setPlaceRepositoryInstance, PlaceRepository } from './placeRepository.ts';
 
 let authRepoInstance: IAuthRepository | null = null;
 let creatorsRepoInstance: ICreatorsRepository | null = null;
@@ -83,23 +86,15 @@ function initializeRepositories(): {
       console.log(`[Storage Architecture] Activating PostgreSQL RDBMS adapter (${sanitized}).`);
       const postgresAdapter = new PostgresCreatorsRepository(databaseUrl);
 
-      // Lazily initialize persistent Postgres place catalog adapter
+      // Initialize persistent Postgres place catalog adapter
       try {
-        const { getDbPool } = require('./dbPool.ts');
-        const { PostgresPlaceRepository } = require('./postgresPlaceRepository.ts');
-        const { setPlaceRepositoryInstance } = require('./placeRepository.ts');
         const pool = getDbPool(databaseUrl);
         setPlaceRepositoryInstance(new PostgresPlaceRepository(pool));
-      } catch {
-        // Dynamic import fallback for ESM environments
-        import('./dbPool.ts').then(({ getDbPool }) => {
-          import('./postgresPlaceRepository.ts').then(({ PostgresPlaceRepository }) => {
-            import('./placeRepository.ts').then(({ setPlaceRepositoryInstance }) => {
-              const pool = getDbPool(databaseUrl);
-              setPlaceRepositoryInstance(new PostgresPlaceRepository(pool));
-            });
-          });
-        }).catch(() => {});
+      } catch (placeErr) {
+        console.error('[Storage Architecture] Failed to initialize Postgres place repository:', placeErr);
+        if (isProduction) {
+          throw placeErr;
+        }
       }
 
       return {
@@ -120,6 +115,7 @@ function initializeRepositories(): {
   console.log(
     '[Storage Architecture] DATABASE_URL is not set. Operating in development In-Memory Adapter. All interfaces match PostgreSQL 1:1.'
   );
+  setPlaceRepositoryInstance(new PlaceRepository());
   const memoryAdapter = new MemoryCreatorsRepository();
   return {
     auth: memoryAdapter,
@@ -167,6 +163,38 @@ export async function verifyDatabaseConnectivity(): Promise<void> {
     try {
       await activeDatabaseAdapter.testConnection();
       console.log('[Storage Architecture] Database connectivity verified successfully with PostgreSQL.');
+
+      // Verify whether catalog tables (migration 0002) have been applied
+      try {
+        const pool = getDbPool();
+        const tableCheck = await pool.query(`
+          SELECT table_name FROM information_schema.tables 
+          WHERE table_schema = 'public' AND table_name = 'places'
+        `);
+
+        if (tableCheck.rows.length > 0) {
+          console.log('[Storage Architecture] PostgreSQL "places" catalog schema detected. Activating persistent PostgresPlaceRepository.');
+          setPlaceRepositoryInstance(new PostgresPlaceRepository(pool));
+        } else {
+          if (isProduction) {
+            throw new Error(
+              '[Storage Architecture] FATAL: Table "places" does not exist in PostgreSQL. Migration 0002_places_catalog_schema.sql must be executed in Neon.'
+            );
+          } else {
+            console.warn(
+              '[Storage Architecture] WARNING: Table "places" does not exist in PostgreSQL yet. Migration 0002_places_catalog_schema.sql is pending in Neon. Catalog operating with in-memory adapter (297 verified places).'
+            );
+            setPlaceRepositoryInstance(new PlaceRepository());
+          }
+        }
+      } catch (schemaErr) {
+        if (isProduction) {
+          throw schemaErr;
+        } else {
+          console.warn('[Storage Architecture] Catalog table check skipped/failed in development:', schemaErr instanceof Error ? schemaErr.message : String(schemaErr));
+          setPlaceRepositoryInstance(new PlaceRepository());
+        }
+      }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
       console.error(
@@ -184,12 +212,7 @@ export async function verifyDatabaseConnectivity(): Promise<void> {
         authRepoInstance = memoryAdapter;
         creatorsRepoInstance = memoryAdapter;
         activeDatabaseAdapter = memoryAdapter;
-        try {
-          const { setPlaceRepositoryInstance } = await import('./placeRepository.ts');
-          setPlaceRepositoryInstance(null);
-        } catch {
-          // ignore
-        }
+        setPlaceRepositoryInstance(new PlaceRepository());
       }
     }
   } else if (isProduction) {
@@ -272,6 +295,7 @@ export function resetRepositoriesForTesting(): void {
   authRepoInstance = null;
   creatorsRepoInstance = null;
   activeDatabaseAdapter = null;
+  setPlaceRepositoryInstance(null);
 }
 
 export async function closeDatabaseConnections(): Promise<void> {

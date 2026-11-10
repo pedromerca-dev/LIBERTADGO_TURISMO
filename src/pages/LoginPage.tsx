@@ -8,7 +8,7 @@ interface LoginPageProps {
 }
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onBackToApp, onLoginSuccess }) => {
-  const { login, isAdmin } = useAuth();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -36,35 +36,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onBackToApp, onLoginSucces
       setError('Error al procesar el inicio de sesión. Intenta nuevamente.');
     } finally {
       setIsSubmitting(false);
-    }
-  };
-
-  // Helper for evaluation / quick testing in developer mode
-  const handleQuickDemoAdminLogin = async () => {
-    setError(null);
-    setIsSubmitting(true);
-    setStatusMessage('Iniciando sesión administrativa...');
-
-    const defaultAdminEmail = 'admin@libertadgo.pe';
-    const defaultAdminPassword = 'AdminSecret2026!';
-
-    try {
-      const res = await login(defaultAdminEmail, defaultAdminPassword);
-      if (res.success) {
-        onLoginSuccess();
-        return;
-      }
-
-      // If account doesn't exist yet, we attempt self-registration or show friendly feedback
-      // In dev environment, we can register it or prompt the user
-      setError(
-        'La cuenta de administrador principal aún no ha sido creada con estas credenciales. Por favor ingresa el correo y contraseña configurados en las variables de entorno o credenciales de tu equipo.'
-      );
-    } catch {
-      setError('No se pudo completar el acceso automático.');
-    } finally {
-      setIsSubmitting(false);
-      setStatusMessage(null);
     }
   };
 
@@ -166,24 +137,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onBackToApp, onLoginSucces
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
-
-          {/* Quick Admin Helper - Only visible in developer mode */}
-          {import.meta.env.DEV && (
-            <div className="mt-6 pt-6 border-t border-slate-800 text-center">
-              <p className="text-[11px] text-slate-400 mb-3">
-                ¿Pruebas en entorno evaluador?
-              </p>
-              <button
-                type="button"
-                onClick={handleQuickDemoAdminLogin}
-                disabled={isSubmitting}
-                className="w-full py-2 px-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-xs font-medium text-slate-200 transition-colors flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <Shield className="w-3.5 h-3.5 text-[#E85B49]" />
-                <span>Probar Acceso Administrador Demo (Solo Desarrollo)</span>
-              </button>
-            </div>
-          )}
         </div>
       </main>
 

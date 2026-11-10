@@ -242,9 +242,9 @@ export class PostgresPlaceRepository implements IPlaceRepository {
       if (insertedCount > 0) {
         await client.query(
           `INSERT INTO place_audit_log (
-            id, place_id, admin_user_id, admin_name, action,
+            id, place_id, actor_type, admin_user_id, admin_name, action,
             previous_data, new_data, change_summary, created_at
-          ) VALUES ($1, $2, NULL, $3, $4, NULL, NULL, $5, NOW())`,
+          ) VALUES ($1, $2, 'SYSTEM', NULL, $3, $4, NULL, NULL, $5, NOW())`,
           [
             `audit_seed_${Date.now()}`,
             'all',
@@ -318,15 +318,13 @@ export class PostgresPlaceRepository implements IPlaceRepository {
     };
   }
 
-  listPlaces(filters?: PlaceAdminFilters): {
+  async listPlaces(filters?: PlaceAdminFilters): Promise<{
     places: AdminPlaceRecord[];
     total: number;
     page: number;
     totalPages: number;
-  } {
-    // Synchronous interface wrapper matching IPlaceRepository
-    // For synchronous calls in IPlaceRepository, fallback to loaded memory cache or run async internally
-    throw new Error('Use async method listPlacesAsync in PostgreSQL adapter');
+  }> {
+    return this.listPlacesAsync(filters);
   }
 
   async listPlacesAsync(filters?: PlaceAdminFilters): Promise<{
@@ -431,8 +429,8 @@ export class PostgresPlaceRepository implements IPlaceRepository {
     };
   }
 
-  getPlaceById(id: string): AdminPlaceRecord | null {
-    throw new Error('Use async method getPlaceByIdAsync in PostgreSQL adapter');
+  async getPlaceById(id: string): Promise<AdminPlaceRecord | null> {
+    return this.getPlaceByIdAsync(id);
   }
 
   async getPlaceByIdAsync(id: string): Promise<AdminPlaceRecord | null> {
@@ -473,8 +471,8 @@ export class PostgresPlaceRepository implements IPlaceRepository {
     return this.mapRowToPlace(row, images, sources, hours);
   }
 
-  getPlaceBySlug(slug: string): AdminPlaceRecord | null {
-    throw new Error('Use async method getPlaceBySlugAsync in PostgreSQL adapter');
+  async getPlaceBySlug(slug: string): Promise<AdminPlaceRecord | null> {
+    return this.getPlaceBySlugAsync(slug);
   }
 
   async getPlaceBySlugAsync(slug: string): Promise<AdminPlaceRecord | null> {
@@ -483,8 +481,12 @@ export class PostgresPlaceRepository implements IPlaceRepository {
     return this.getPlaceByIdAsync(res.rows[0].id);
   }
 
-  createPlace(data: Partial<AdminPlaceRecord>, adminUserId: string, adminName: string): AdminPlaceRecord {
-    throw new Error('Use async method createPlaceAsync in PostgreSQL adapter');
+  async createPlace(
+    data: Partial<AdminPlaceRecord>,
+    adminUserId: string,
+    adminName: string
+  ): Promise<AdminPlaceRecord> {
+    return this.createPlaceAsync(data, adminUserId, adminName);
   }
 
   async createPlaceAsync(
@@ -596,16 +598,18 @@ export class PostgresPlaceRepository implements IPlaceRepository {
       }
 
       // Audit Log
+      const isCreateSystem = !adminUserId || adminUserId === 'system' || !adminUserId.startsWith('user_');
       await client.query(
         `INSERT INTO place_audit_log (
-          id, place_id, admin_user_id, admin_name, action,
+          id, place_id, actor_type, admin_user_id, admin_name, action,
           previous_data, new_data, change_summary, created_at
-        ) VALUES ($1, $2, $3, $4, $5, NULL, $6, $7, NOW())`,
+        ) VALUES ($1, $2, $3, $4, $5, $6, NULL, $7, $8, NOW())`,
         [
           `audit_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`,
           id,
-          adminUserId.startsWith('user_') ? adminUserId : null,
-          adminName,
+          isCreateSystem ? 'SYSTEM' : 'ADMIN',
+          isCreateSystem ? null : adminUserId,
+          adminName || (isCreateSystem ? 'Sistema LibertadGO' : 'Administrador'),
           'CREATE',
           JSON.stringify(data),
           `Creado nuevo lugar: "${data.name}" (${data.category}) con estado ${data.status || 'PUBLISHED'}.`,
@@ -624,8 +628,14 @@ export class PostgresPlaceRepository implements IPlaceRepository {
     }
   }
 
-  updatePlace(id: string, data: Partial<AdminPlaceRecord>, adminUserId: string, adminName: string, summary?: string): AdminPlaceRecord | null {
-    throw new Error('Use async method updatePlaceAsync in PostgreSQL adapter');
+  async updatePlace(
+    id: string,
+    data: Partial<AdminPlaceRecord>,
+    adminUserId: string,
+    adminName: string,
+    summary?: string
+  ): Promise<AdminPlaceRecord | null> {
+    return this.updatePlaceAsync(id, data, adminUserId, adminName, summary);
   }
 
   async updatePlaceAsync(
@@ -644,6 +654,9 @@ export class PostgresPlaceRepository implements IPlaceRepository {
         await client.query('ROLLBACK');
         return null;
       }
+
+      const isUpdateSystem = !adminUserId || adminUserId === 'system' || !adminUserId.startsWith('user_');
+      const resolvedUserId = isUpdateSystem ? null : adminUserId;
 
       await client.query(
         `UPDATE places SET
@@ -689,7 +702,7 @@ export class PostgresPlaceRepository implements IPlaceRepository {
           data.status || null,
           data.tags || null,
           data.safetyReport ? JSON.stringify(data.safetyReport) : null,
-          adminUserId.startsWith('user_') ? adminUserId : null,
+          resolvedUserId,
           id,
         ]
       );
@@ -697,14 +710,15 @@ export class PostgresPlaceRepository implements IPlaceRepository {
       // Audit log
       await client.query(
         `INSERT INTO place_audit_log (
-          id, place_id, admin_user_id, admin_name, action,
+          id, place_id, actor_type, admin_user_id, admin_name, action,
           previous_data, new_data, change_summary, created_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())`,
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())`,
         [
           `audit_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`,
           id,
-          adminUserId.startsWith('user_') ? adminUserId : null,
-          adminName,
+          isUpdateSystem ? 'SYSTEM' : 'ADMIN',
+          resolvedUserId,
+          adminName || (isUpdateSystem ? 'Sistema LibertadGO' : 'Administrador'),
           'UPDATE',
           JSON.stringify(existing),
           JSON.stringify(data),
@@ -722,8 +736,14 @@ export class PostgresPlaceRepository implements IPlaceRepository {
     }
   }
 
-  updateStatus(id: string, status: PlaceStatus, adminUserId: string, adminName: string, reason?: string): AdminPlaceRecord | null {
-    throw new Error('Use async method updateStatusAsync in PostgreSQL adapter');
+  async updateStatus(
+    id: string,
+    status: PlaceStatus,
+    adminUserId: string,
+    adminName: string,
+    reason?: string
+  ): Promise<AdminPlaceRecord | null> {
+    return this.updateStatusAsync(id, status, adminUserId, adminName, reason);
   }
 
   async updateStatusAsync(
@@ -742,18 +762,26 @@ export class PostgresPlaceRepository implements IPlaceRepository {
         return null;
       }
 
-      await client.query('UPDATE places SET status = $1, updated_at = NOW() WHERE id = $2', [status, id]);
+      const isStatusSystem = !adminUserId || adminUserId === 'system' || !adminUserId.startsWith('user_');
+      const resolvedUserId = isStatusSystem ? null : adminUserId;
+
+      await client.query('UPDATE places SET status = $1, updated_by = $2, updated_at = NOW() WHERE id = $3', [
+        status,
+        resolvedUserId,
+        id,
+      ]);
 
       await client.query(
         `INSERT INTO place_audit_log (
-          id, place_id, admin_user_id, admin_name, action,
+          id, place_id, actor_type, admin_user_id, admin_name, action,
           previous_data, new_data, change_summary, created_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())`,
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())`,
         [
           `audit_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`,
           id,
-          adminUserId.startsWith('user_') ? adminUserId : null,
-          adminName,
+          isStatusSystem ? 'SYSTEM' : 'ADMIN',
+          resolvedUserId,
+          adminName || (isStatusSystem ? 'Sistema LibertadGO' : 'Administrador'),
           status === 'ARCHIVED' ? 'ARCHIVE' : 'STATUS_CHANGE',
           JSON.stringify({ status: existing.status }),
           JSON.stringify({ status }),
@@ -771,8 +799,15 @@ export class PostgresPlaceRepository implements IPlaceRepository {
     }
   }
 
-  verifyPlace(id: string, isVerified: boolean, level: PlaceVerification['verificationLevel'], notes: string | undefined, adminUserId: string, adminName: string): AdminPlaceRecord | null {
-    throw new Error('Use async method verifyPlaceAsync in PostgreSQL adapter');
+  async verifyPlace(
+    id: string,
+    isVerified: boolean,
+    level: PlaceVerification['verificationLevel'],
+    notes: string | undefined,
+    adminUserId: string,
+    adminName: string
+  ): Promise<AdminPlaceRecord | null> {
+    return this.verifyPlaceAsync(id, isVerified, level, notes, adminUserId, adminName);
   }
 
   async verifyPlaceAsync(
@@ -792,6 +827,9 @@ export class PostgresPlaceRepository implements IPlaceRepository {
         return null;
       }
 
+      const isVerifySystem = !adminUserId || adminUserId === 'system' || !adminUserId.startsWith('user_');
+      const resolvedUserId = isVerifySystem ? null : adminUserId;
+
       await client.query(
         `UPDATE places SET
           is_verified = $1,
@@ -801,19 +839,20 @@ export class PostgresPlaceRepository implements IPlaceRepository {
           verification_notes = $4,
           updated_at = NOW()
         WHERE id = $5`,
-        [isVerified, level, isVerified ? adminName : null, notes || null, id]
+        [isVerified, level, resolvedUserId, notes || null, id]
       );
 
       await client.query(
         `INSERT INTO place_audit_log (
-          id, place_id, admin_user_id, admin_name, action,
+          id, place_id, actor_type, admin_user_id, admin_name, action,
           previous_data, new_data, change_summary, created_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())`,
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())`,
         [
           `audit_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`,
           id,
-          adminUserId.startsWith('user_') ? adminUserId : null,
-          adminName,
+          isVerifySystem ? 'SYSTEM' : 'ADMIN',
+          resolvedUserId,
+          adminName || (isVerifySystem ? 'Sistema LibertadGO' : 'Administrador'),
           'VERIFY',
           JSON.stringify({ verification: existing.verification }),
           JSON.stringify({ isVerified, level, notes }),
@@ -831,8 +870,8 @@ export class PostgresPlaceRepository implements IPlaceRepository {
     }
   }
 
-  getAuditLogs(placeId?: string, limit: number = 50): PlaceAuditEntry[] {
-    throw new Error('Use async method getAuditLogsAsync in PostgreSQL adapter');
+  async getAuditLogs(placeId?: string, limit: number = 50): Promise<PlaceAuditEntry[]> {
+    return this.getAuditLogsAsync(placeId, limit);
   }
 
   async getAuditLogsAsync(placeId?: string, limit: number = 50): Promise<PlaceAuditEntry[]> {
@@ -857,8 +896,8 @@ export class PostgresPlaceRepository implements IPlaceRepository {
     }));
   }
 
-  findDuplicates(): DuplicatePair[] {
-    throw new Error('Use async method findDuplicatesAsync in PostgreSQL adapter');
+  async findDuplicates(): Promise<DuplicatePair[]> {
+    return this.findDuplicatesAsync();
   }
 
   async findDuplicatesAsync(): Promise<DuplicatePair[]> {
@@ -917,8 +956,13 @@ export class PostgresPlaceRepository implements IPlaceRepository {
     return pairs.sort((a, b) => b.similarityScore - a.similarityScore);
   }
 
-  mergeDuplicates(primaryId: string, duplicateIds: string[], adminUserId: string, adminName: string): { success: boolean; primaryPlace: AdminPlaceRecord; mergedCount: number } {
-    throw new Error('Use async method mergeDuplicatesAsync in PostgreSQL adapter');
+  async mergeDuplicates(
+    primaryId: string,
+    duplicateIds: string[],
+    adminUserId: string,
+    adminName: string
+  ): Promise<{ success: boolean; primaryPlace: AdminPlaceRecord; mergedCount: number }> {
+    return this.mergeDuplicatesAsync(primaryId, duplicateIds, adminUserId, adminName);
   }
 
   /**
@@ -940,6 +984,10 @@ export class PostgresPlaceRepository implements IPlaceRepository {
       if (!primary) {
         throw new Error(`Lugar principal ${primaryId} no encontrado`);
       }
+
+      const isMergeSystem = !adminUserId || adminUserId === 'system' || !adminUserId.startsWith('user_');
+      const resolvedUserId = isMergeSystem ? null : adminUserId;
+      const resolvedAdminName = adminName || (isMergeSystem ? 'Sistema LibertadGO' : 'Administrador');
 
       let mergedCount = 0;
       for (const dupId of duplicateIds) {
@@ -987,20 +1035,21 @@ export class PostgresPlaceRepository implements IPlaceRepository {
         // 3. Archive duplicate place
         await client.query(
           `UPDATE places SET status = 'ARCHIVED', updated_by = $1, updated_at = NOW() WHERE id = $2`,
-          [adminUserId.startsWith('user_') ? adminUserId : null, dupId]
+          [resolvedUserId, dupId]
         );
 
         // 4. Audit log for archived duplicate
         await client.query(
           `INSERT INTO place_audit_log (
-            id, place_id, admin_user_id, admin_name, action,
+            id, place_id, actor_type, admin_user_id, admin_name, action,
             previous_data, new_data, change_summary, created_at
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())`,
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())`,
           [
             `audit_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`,
             dupId,
-            adminUserId.startsWith('user_') ? adminUserId : null,
-            adminName,
+            isMergeSystem ? 'SYSTEM' : 'ADMIN',
+            resolvedUserId,
+            resolvedAdminName,
             'ARCHIVE',
             JSON.stringify({ status: dup.status }),
             JSON.stringify({ status: 'ARCHIVED' }),
@@ -1014,14 +1063,15 @@ export class PostgresPlaceRepository implements IPlaceRepository {
       // 5. Audit log for primary place
       await client.query(
         `INSERT INTO place_audit_log (
-          id, place_id, admin_user_id, admin_name, action,
+          id, place_id, actor_type, admin_user_id, admin_name, action,
           previous_data, new_data, change_summary, created_at
-        ) VALUES ($1, $2, $3, $4, $5, NULL, NULL, $6, NOW())`,
+        ) VALUES ($1, $2, $3, $4, $5, $6, NULL, NULL, $7, NOW())`,
         [
           `audit_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`,
           primaryId,
-          adminUserId.startsWith('user_') ? adminUserId : null,
-          adminName,
+          isMergeSystem ? 'SYSTEM' : 'ADMIN',
+          resolvedUserId,
+          resolvedAdminName,
           'MERGE',
           `Fusión atómica exitosa: se integraron ${mergedCount} lugares duplicados hacia "${primary.name}".`,
         ]
@@ -1043,8 +1093,8 @@ export class PostgresPlaceRepository implements IPlaceRepository {
     }
   }
 
-  getCategoriesStats(): { category: string; count: number; published: number }[] {
-    throw new Error('Use async method getCategoriesStatsAsync in PostgreSQL adapter');
+  async getCategoriesStats(): Promise<{ category: string; count: number; published: number }[]> {
+    return this.getCategoriesStatsAsync();
   }
 
   async getCategoriesStatsAsync(): Promise<{ category: string; count: number; published: number }[]> {
@@ -1064,8 +1114,8 @@ export class PostgresPlaceRepository implements IPlaceRepository {
     }));
   }
 
-  getLocalitiesStats(): { localityId: string; localityName: string; count: number; published: number }[] {
-    throw new Error('Use async method getLocalitiesStatsAsync in PostgreSQL adapter');
+  async getLocalitiesStats(): Promise<{ localityId: string; localityName: string; count: number; published: number }[]> {
+    return this.getLocalitiesStatsAsync();
   }
 
   async getLocalitiesStatsAsync(): Promise<{ localityId: string; localityName: string; count: number; published: number }[]> {
@@ -1087,8 +1137,8 @@ export class PostgresPlaceRepository implements IPlaceRepository {
     }));
   }
 
-  getSourcesStats(): { sourceId: string; count: number }[] {
-    throw new Error('Use async method getSourcesStatsAsync in PostgreSQL adapter');
+  async getSourcesStats(): Promise<{ sourceId: string; count: number }[]> {
+    return this.getSourcesStatsAsync();
   }
 
   async getSourcesStatsAsync(): Promise<{ sourceId: string; count: number }[]> {
@@ -1104,8 +1154,8 @@ export class PostgresPlaceRepository implements IPlaceRepository {
     }));
   }
 
-  getDashboardMetrics(): AdminDashboardMetrics {
-    throw new Error('Use async method getDashboardMetricsAsync in PostgreSQL adapter');
+  async getDashboardMetrics(): Promise<AdminDashboardMetrics> {
+    return this.getDashboardMetricsAsync();
   }
 
   async getDashboardMetricsAsync(): Promise<AdminDashboardMetrics> {
@@ -1146,7 +1196,7 @@ export class PostgresPlaceRepository implements IPlaceRepository {
     };
   }
 
-  getPublicPlaces(filters?: { localityId?: string; category?: string; search?: string }): any {
+  async getPublicPlaces(filters?: { localityId?: string; category?: string; search?: string }): Promise<Place[]> {
     return this.getPublicPlacesAsync(filters);
   }
 

@@ -8,6 +8,7 @@ import {
   revokeToken,
   isTokenRevoked,
   authMiddleware,
+  csrfProtectionMiddleware,
   clearRevokedTokensForTesting,
 } from './authService.ts';
 
@@ -18,20 +19,20 @@ describe('Security & Persistence Remediation Tests', () => {
   });
 
   describe('Etapa 4: Public Catalog Isolation', () => {
-    test('PUBLISHED places are accessible to the public', () => {
-      const places = catalogRepository.getPlaces();
+    test('PUBLISHED places are accessible to the public', async () => {
+      const places = await catalogRepository.getPlaces();
       assert.ok(places.length > 0, 'Catalog should contain public places');
       const first = places[0];
 
-      const retrieved = catalogRepository.getPlaceById(first.id);
+      const retrieved = await catalogRepository.getPlaceById(first.id);
       assert.ok(retrieved, 'Should retrieve published place by ID');
       assert.equal(retrieved?.id, first.id);
     });
 
-    test('ARCHIVED, DRAFT or FLAGGED places are strictly isolated from public catalog', () => {
+    test('ARCHIVED, DRAFT or FLAGGED places are strictly isolated from public catalog', async () => {
       const repo = getPlaceRepository();
       // Create a test draft place
-      const draftPlace = repo.createPlace(
+      const draftPlace = await repo.createPlace(
         {
           name: 'Restaurante Oculto Borrador',
           category: 'restaurantes',
@@ -45,22 +46,22 @@ describe('Security & Persistence Remediation Tests', () => {
       );
 
       // Verify it exists in admin repository
-      const inAdmin = repo.getPlaceById(draftPlace.id);
+      const inAdmin = await repo.getPlaceById(draftPlace.id);
       assert.ok(inAdmin, 'Draft place must exist in admin repo');
       assert.equal(inAdmin?.status, 'DRAFT');
 
       // Verify public catalog isolation: MUST return undefined (which yields 404 in public API)
-      const inPublic = catalogRepository.getPlaceById(draftPlace.id);
+      const inPublic = await catalogRepository.getPlaceById(draftPlace.id);
       assert.equal(inPublic, undefined, 'Public catalog getPlaceById MUST return undefined for DRAFT places');
 
       // Update to ARCHIVED and verify isolation persists
-      repo.updateStatus(draftPlace.id, 'ARCHIVED', 'test_admin', 'Admin Tester', 'Testing archive');
-      const inPublicArchived = catalogRepository.getPlaceById(draftPlace.id);
+      await repo.updateStatus(draftPlace.id, 'ARCHIVED', 'test_admin', 'Admin Tester', 'Testing archive');
+      const inPublicArchived = await catalogRepository.getPlaceById(draftPlace.id);
       assert.equal(inPublicArchived, undefined, 'Public catalog getPlaceById MUST return undefined for ARCHIVED places');
 
       // Update to PUBLISHED and verify it becomes accessible
-      repo.updateStatus(draftPlace.id, 'PUBLISHED', 'test_admin', 'Admin Tester', 'Approving publication');
-      const inPublicPublished = catalogRepository.getPlaceById(draftPlace.id);
+      await repo.updateStatus(draftPlace.id, 'PUBLISHED', 'test_admin', 'Admin Tester', 'Approving publication');
+      const inPublicPublished = await catalogRepository.getPlaceById(draftPlace.id);
       assert.ok(inPublicPublished, 'Public catalog getPlaceById MUST return place once status is PUBLISHED');
       assert.equal(inPublicPublished?.id, draftPlace.id);
     });
@@ -139,14 +140,63 @@ describe('Security & Persistence Remediation Tests', () => {
       assert.equal(mockReq.user.userId, 'user_sec_cookie');
       assert.equal(mockReq.user.role, 'ADMIN');
     });
+
+    test('CSRF protection blocks cross-site mutating requests with cookie', () => {
+      let blocked = false;
+      let statusCode = 200;
+      const mockReq: any = {
+        method: 'POST',
+        headers: {
+          cookie: 'libertadgo_token=sample_token',
+          'sec-fetch-site': 'cross-site',
+        },
+      };
+      const mockRes: any = {
+        status: (code: number) => {
+          statusCode = code;
+          return {
+            json: () => {
+              blocked = true;
+            },
+          };
+        },
+      };
+
+      csrfProtectionMiddleware(mockReq, mockRes, () => {
+        blocked = false;
+      });
+
+      assert.equal(statusCode, 403, 'Should block cross-site request with 403');
+      assert.equal(blocked, true, 'Should block request');
+    });
+
+    test('CSRF protection allows same-origin requests or Bearer token requests', () => {
+      let nextCalled = false;
+      const mockReq: any = {
+        method: 'POST',
+        headers: {
+          authorization: 'Bearer sample_token',
+        },
+      };
+      const mockRes: any = {
+        status: () => mockRes,
+        json: () => {},
+      };
+
+      csrfProtectionMiddleware(mockReq, mockRes, () => {
+        nextCalled = true;
+      });
+
+      assert.equal(nextCalled, true, 'Bearer token requests without ambient cookies should proceed');
+    });
   });
 
   describe('Etapa 6: ACID Transactions & Deduplication Rules', () => {
-    test('Deduplication correctly detects nearby identical names', () => {
+    test('Deduplication correctly detects nearby identical names', async () => {
       const repo = getPlaceRepository();
 
       // Create two places with identical names and close coordinates
-      const p1 = repo.createPlace(
+      const p1 = await repo.createPlace(
         {
           name: 'Huaca del Sol y de la Luna Tour',
           category: 'arqueologia',
@@ -159,7 +209,7 @@ describe('Security & Persistence Remediation Tests', () => {
         'Admin'
       );
 
-      const p2 = repo.createPlace(
+      const p2 = await repo.createPlace(
         {
           name: 'Huaca del Sol y de la Luna (Moche)',
           category: 'arqueologia',
@@ -172,9 +222,9 @@ describe('Security & Persistence Remediation Tests', () => {
         'Admin'
       );
 
-      const duplicates = repo.findDuplicates();
+      const duplicates = await repo.findDuplicates();
       const match = duplicates.find(
-        (d) =>
+        (d: { primaryPlace: { id: string }; duplicatePlace: { id: string } }) =>
           (d.primaryPlace?.id === p1.id && d.duplicatePlace?.id === p2.id) ||
           (d.primaryPlace?.id === p2.id && d.duplicatePlace?.id === p1.id)
       );
@@ -184,10 +234,10 @@ describe('Security & Persistence Remediation Tests', () => {
       assert.ok(match.distanceMeters < 350, 'Distance should be under 350m');
     });
 
-    test('Merge duplicates archives duplicate place and creates audit record', () => {
+    test('Merge duplicates archives duplicate place and creates audit record', async () => {
       const repo = getPlaceRepository();
 
-      const primary = repo.createPlace(
+      const primary = await repo.createPlace(
         {
           name: 'Chan Chan - Palacio Nik An Principal',
           category: 'arqueologia',
@@ -200,7 +250,7 @@ describe('Security & Persistence Remediation Tests', () => {
         'Admin'
       );
 
-      const dup = repo.createPlace(
+      const dup = await repo.createPlace(
         {
           name: 'Chan Chan Palacio Tschudi Duplicado',
           category: 'arqueologia',
@@ -213,7 +263,7 @@ describe('Security & Persistence Remediation Tests', () => {
         'Admin'
       );
 
-      const mergeResult = repo.mergeDuplicates(
+      const mergeResult = await repo.mergeDuplicates(
         primary.id,
         [dup.id],
         'admin_merger',
@@ -224,12 +274,12 @@ describe('Security & Persistence Remediation Tests', () => {
       assert.equal(mergeResult.mergedCount, 1);
 
       // Verify duplicate is now ARCHIVED
-      const archivedDup = repo.getPlaceById(dup.id);
+      const archivedDup = await repo.getPlaceById(dup.id);
       assert.equal(archivedDup?.status, 'ARCHIVED');
 
       // Verify audit trail logged the merge
-      const logs = repo.getAuditLogs(primary.id);
-      assert.ok(logs.some((l) => l.action === 'MERGE'), 'Audit trail should include MERGE action');
+      const logs = await repo.getAuditLogs(primary.id);
+      assert.ok(logs.some((l: { action: string }) => l.action === 'MERGE'), 'Audit trail should include MERGE action');
     });
   });
 });

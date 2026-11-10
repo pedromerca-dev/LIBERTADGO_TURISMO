@@ -35,20 +35,20 @@ class CatalogRepository {
   }
 
   // --- PLACES & CATALOG ---
-  public getPlaces(filters?: { localityId?: string; category?: string; search?: string }): Place[] {
-    return getPlaceRepository().getPublicPlaces(filters);
+  public async getPlaces(filters?: { localityId?: string; category?: string; search?: string }): Promise<Place[]> {
+    return await getPlaceRepository().getPublicPlaces(filters);
   }
 
-  public getPlaceById(id: string): Place | undefined {
-    const place = getPlaceRepository().getPlaceById(id);
+  public async getPlaceById(id: string): Promise<Place | undefined> {
+    const place = await getPlaceRepository().getPlaceById(id);
     if (!place || !isWithinLaLibertad(place.coordinates)) return undefined;
     // Strict public isolation: only PUBLISHED places can be retrieved via the public catalog
     if (place.status && place.status !== 'PUBLISHED') return undefined;
     return place;
   }
 
-  public searchPlaces(query: string, localityId?: string): Place[] {
-    return getPlaceRepository().getPublicPlaces({ search: query, localityId });
+  public async searchPlaces(query: string, localityId?: string): Promise<Place[]> {
+    return await getPlaceRepository().getPublicPlaces({ search: query, localityId });
   }
 
   // --- ITINERARIES ---
@@ -100,16 +100,16 @@ class CatalogRepository {
     return this.itineraries.get(id);
   }
 
-  public addActivity(itineraryId: string, activityInput: {
+  public async addActivity(itineraryId: string, activityInput: {
     placeId: string;
     dayNumber: number;
     timeSlot?: string;
     notes?: string;
-  }): { activity?: TripActivity; error?: string } {
+  }): Promise<{ activity?: TripActivity; error?: string }> {
     const itinerary = this.itineraries.get(itineraryId);
     if (!itinerary) return { error: 'Itinerario no encontrado' };
 
-    const place = this.places.get(activityInput.placeId);
+    const place = (await getPlaceRepository().getPlaceById(activityInput.placeId)) || this.places.get(activityInput.placeId);
     if (!place) return { error: 'Lugar no encontrado en el catálogo' };
 
     if (activityInput.dayNumber < 1 || activityInput.dayNumber > itinerary.totalDays) {

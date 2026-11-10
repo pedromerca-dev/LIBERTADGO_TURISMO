@@ -96,9 +96,10 @@ CREATE INDEX IF NOT EXISTS idx_place_hours_place_id ON place_opening_hours(place
 CREATE TABLE IF NOT EXISTS place_audit_log (
   id VARCHAR(64) PRIMARY KEY,
   place_id VARCHAR(64) NOT NULL,
+  actor_type VARCHAR(20) NOT NULL DEFAULT 'ADMIN' CHECK (actor_type IN ('ADMIN', 'SYSTEM')),
   admin_user_id VARCHAR(64) REFERENCES users(id) ON DELETE SET NULL,
   admin_name VARCHAR(100) NOT NULL,
-  action VARCHAR(50) NOT NULL, -- CREATE, UPDATE, STATUS_CHANGE, VERIFY, MERGE, ARCHIVE
+  action VARCHAR(50) NOT NULL CHECK (action IN ('CREATE', 'UPDATE', 'STATUS_CHANGE', 'VERIFY', 'MERGE', 'ARCHIVE')),
   previous_data JSONB,
   new_data JSONB,
   change_summary TEXT NOT NULL,
@@ -106,13 +107,16 @@ CREATE TABLE IF NOT EXISTS place_audit_log (
 );
 
 CREATE INDEX IF NOT EXISTS idx_place_audit_place_id ON place_audit_log(place_id);
+CREATE INDEX IF NOT EXISTS idx_place_audit_actor_type ON place_audit_log(actor_type);
 CREATE INDEX IF NOT EXISTS idx_place_audit_created_at ON place_audit_log(created_at DESC);
 
 -- 6. TABLA DE REVOCACIÓN DE TOKENS DE SESIÓN (HASH SHA-256)
 CREATE TABLE IF NOT EXISTS revoked_tokens (
   token_hash VARCHAR(64) PRIMARY KEY,
+  user_id VARCHAR(64) REFERENCES users(id) ON DELETE CASCADE,
   expires_at TIMESTAMPTZ NOT NULL,
   revoked_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX IF NOT EXISTS idx_revoked_tokens_expires_at ON revoked_tokens(expires_at);
+CREATE INDEX IF NOT EXISTS idx_revoked_tokens_user_id ON revoked_tokens(user_id);

@@ -6,7 +6,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import type { Server } from 'http';
 import { apiRouter } from './src/server/routes.ts';
-import { bootstrapAdminFromEnv, validateSecurityConfig } from './src/server/authService.ts';
+import { bootstrapAdminFromEnv, validateSecurityConfig, csrfProtectionMiddleware } from './src/server/authService.ts';
 import {
   validateDatabaseConfig,
   verifyDatabaseConnectivity,
@@ -109,6 +109,7 @@ async function startServer() {
     fs.existsSync(path.join(distPath, 'index.html'));
 
   app.use(express.json());
+  app.use(csrfProtectionMiddleware);
 
   // High-priority Health Endpoints for Cloud Run & Uptime Monitoring
   const handleHealthCheck = async (_req: express.Request, res: express.Response) => {
@@ -132,7 +133,6 @@ async function startServer() {
       res.status(503).json({
         success: false,
         error: 'Servicio no disponible: configuración de producción incompleta en Cloud Run.',
-        ...(process.env.NODE_ENV !== 'production' ? { detail: configError } : {}),
       });
     });
   }

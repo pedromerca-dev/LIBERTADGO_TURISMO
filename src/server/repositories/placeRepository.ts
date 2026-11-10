@@ -20,21 +20,22 @@ import { LA_LIBERTAD_LOCALITIES } from '../../types/geo.ts';
 import crypto from 'crypto';
 
 export interface IPlaceRepository {
-  listPlaces(filters?: PlaceAdminFilters): { places: AdminPlaceRecord[]; total: number; page: number; totalPages: number };
-  getPlaceById(id: string): AdminPlaceRecord | null;
-  getPlaceBySlug(slug: string): AdminPlaceRecord | null;
-  createPlace(data: Partial<AdminPlaceRecord>, adminUserId: string, adminName: string): AdminPlaceRecord;
-  updatePlace(id: string, data: Partial<AdminPlaceRecord>, adminUserId: string, adminName: string, summary?: string): AdminPlaceRecord | null;
-  updateStatus(id: string, status: PlaceStatus, adminUserId: string, adminName: string, reason?: string): AdminPlaceRecord | null;
-  verifyPlace(id: string, isVerified: boolean, level: PlaceVerification['verificationLevel'], notes: string | undefined, adminUserId: string, adminName: string): AdminPlaceRecord | null;
-  getAuditLogs(placeId?: string, limit?: number): PlaceAuditEntry[];
-  findDuplicates(): DuplicatePair[];
-  mergeDuplicates(primaryId: string, duplicateIds: string[], adminUserId: string, adminName: string): { success: boolean; primaryPlace: AdminPlaceRecord; mergedCount: number };
-  getCategoriesStats(): { category: string; count: number; published: number }[];
-  getLocalitiesStats(): { localityId: string; localityName: string; count: number; published: number }[];
-  getSourcesStats(): { sourceId: string; count: number }[];
-  getDashboardMetrics(): AdminDashboardMetrics;
-  getPublicPlaces(filters?: { localityId?: string; category?: string; search?: string }): Place[];
+  listPlaces(filters?: PlaceAdminFilters): Promise<{ places: AdminPlaceRecord[]; total: number; page: number; totalPages: number }>;
+  getPlaceById(id: string): Promise<AdminPlaceRecord | null>;
+  getPlaceBySlug(slug: string): Promise<AdminPlaceRecord | null>;
+  createPlace(data: Partial<AdminPlaceRecord>, adminUserId: string, adminName: string): Promise<AdminPlaceRecord>;
+  updatePlace(id: string, data: Partial<AdminPlaceRecord>, adminUserId: string, adminName: string, summary?: string): Promise<AdminPlaceRecord | null>;
+  updateStatus(id: string, status: PlaceStatus, adminUserId: string, adminName: string, reason?: string): Promise<AdminPlaceRecord | null>;
+  verifyPlace(id: string, isVerified: boolean, level: PlaceVerification['verificationLevel'], notes: string | undefined, adminUserId: string, adminName: string): Promise<AdminPlaceRecord | null>;
+  getAuditLogs(placeId?: string, limit?: number): Promise<PlaceAuditEntry[]>;
+  findDuplicates(): Promise<DuplicatePair[]>;
+  mergeDuplicates(primaryId: string, duplicateIds: string[], adminUserId: string, adminName: string): Promise<{ success: boolean; primaryPlace: AdminPlaceRecord; mergedCount: number }>;
+  getCategoriesStats(): Promise<{ category: string; count: number; published: number }[]>;
+  getLocalitiesStats(): Promise<{ localityId: string; localityName: string; count: number; published: number }[]>;
+  getSourcesStats(): Promise<{ sourceId: string; count: number }[]>;
+  getDashboardMetrics(): Promise<AdminDashboardMetrics>;
+  getPublicPlaces(filters?: { localityId?: string; category?: string; search?: string }): Promise<Place[]>;
+  testConnection?(): Promise<void>;
 }
 
 // Distance calculation using Haversine formula (meters)
@@ -106,7 +107,7 @@ function calculateStringSimilarity(str1: string, str2: string): number {
   return Math.max(jaccard, dice);
 }
 
-class PlaceRepository implements IPlaceRepository {
+export class PlaceRepository implements IPlaceRepository {
   private places: Map<string, AdminPlaceRecord> = new Map();
   private auditLogs: PlaceAuditEntry[] = [];
 
@@ -145,12 +146,12 @@ class PlaceRepository implements IPlaceRepository {
     });
   }
 
-  public listPlaces(filters?: PlaceAdminFilters): {
+  public async listPlaces(filters?: PlaceAdminFilters): Promise<{
     places: AdminPlaceRecord[];
     total: number;
     page: number;
     totalPages: number;
-  } {
+  }> {
     let result = Array.from(this.places.values());
 
     if (filters?.search) {
@@ -220,22 +221,22 @@ class PlaceRepository implements IPlaceRepository {
     };
   }
 
-  public getPlaceById(id: string): AdminPlaceRecord | null {
+  public async getPlaceById(id: string): Promise<AdminPlaceRecord | null> {
     return this.places.get(id) || null;
   }
 
-  public getPlaceBySlug(slug: string): AdminPlaceRecord | null {
+  public async getPlaceBySlug(slug: string): Promise<AdminPlaceRecord | null> {
     for (const p of this.places.values()) {
       if (p.slug === slug) return p;
     }
     return null;
   }
 
-  public createPlace(
+  public async createPlace(
     data: Partial<AdminPlaceRecord>,
     adminUserId: string,
     adminName: string
-  ): AdminPlaceRecord {
+  ): Promise<AdminPlaceRecord> {
     const id = data.id || `place_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
     const baseSlug = (data.name || 'nuevo-lugar')
       .toLowerCase()
@@ -243,7 +244,7 @@ class PlaceRepository implements IPlaceRepository {
       .replace(/(^-|-$)/g, '');
     let slug = baseSlug;
     let counter = 1;
-    while (this.getPlaceBySlug(slug)) {
+    while (Array.from(this.places.values()).some((p) => p.slug === slug)) {
       slug = `${baseSlug}-${counter++}`;
     }
 
@@ -322,13 +323,13 @@ class PlaceRepository implements IPlaceRepository {
     return record;
   }
 
-  public updatePlace(
+  public async updatePlace(
     id: string,
     data: Partial<AdminPlaceRecord>,
     adminUserId: string,
     adminName: string,
     summary?: string
-  ): AdminPlaceRecord | null {
+  ): Promise<AdminPlaceRecord | null> {
     const existing = this.places.get(id);
     if (!existing) return null;
 
@@ -358,13 +359,13 @@ class PlaceRepository implements IPlaceRepository {
     return updated;
   }
 
-  public updateStatus(
+  public async updateStatus(
     id: string,
     status: PlaceStatus,
     adminUserId: string,
     adminName: string,
     reason?: string
-  ): AdminPlaceRecord | null {
+  ): Promise<AdminPlaceRecord | null> {
     const existing = this.places.get(id);
     if (!existing) return null;
 
@@ -395,14 +396,14 @@ class PlaceRepository implements IPlaceRepository {
     return updated;
   }
 
-  public verifyPlace(
+  public async verifyPlace(
     id: string,
     isVerified: boolean,
     level: PlaceVerification['verificationLevel'],
     notes: string | undefined,
     adminUserId: string,
     adminName: string
-  ): AdminPlaceRecord | null {
+  ): Promise<AdminPlaceRecord | null> {
     const existing = this.places.get(id);
     if (!existing) return null;
 
@@ -441,14 +442,14 @@ class PlaceRepository implements IPlaceRepository {
     return updated;
   }
 
-  public getAuditLogs(placeId?: string, limit: number = 50): PlaceAuditEntry[] {
+  public async getAuditLogs(placeId?: string, limit: number = 50): Promise<PlaceAuditEntry[]> {
     if (!placeId || placeId === 'all') {
       return this.auditLogs.slice(0, limit);
     }
     return this.auditLogs.filter((log) => log.placeId === placeId).slice(0, limit);
   }
 
-  public findDuplicates(): DuplicatePair[] {
+  public async findDuplicates(): Promise<DuplicatePair[]> {
     const all = Array.from(this.places.values()).filter((p) => p.status !== 'ARCHIVED');
     const pairs: DuplicatePair[] = [];
     const seen = new Set<string>();
@@ -520,12 +521,12 @@ class PlaceRepository implements IPlaceRepository {
     return pairs.sort((a, b) => b.similarityScore - a.similarityScore);
   }
 
-  public mergeDuplicates(
+  public async mergeDuplicates(
     primaryId: string,
     duplicateIds: string[],
     adminUserId: string,
     adminName: string
-  ): { success: boolean; primaryPlace: AdminPlaceRecord; mergedCount: number } {
+  ): Promise<{ success: boolean; primaryPlace: AdminPlaceRecord; mergedCount: number }> {
     const primary = this.places.get(primaryId);
     if (!primary) {
       throw new Error(`Lugar principal ${primaryId} no encontrado`);
@@ -620,7 +621,7 @@ class PlaceRepository implements IPlaceRepository {
     };
   }
 
-  public getCategoriesStats(): { category: string; count: number; published: number }[] {
+  public async getCategoriesStats(): Promise<{ category: string; count: number; published: number }[]> {
     const counts: Record<string, { total: number; published: number }> = {};
     for (const p of this.places.values()) {
       if (!counts[p.category]) counts[p.category] = { total: 0, published: 0 };
@@ -635,7 +636,7 @@ class PlaceRepository implements IPlaceRepository {
     }));
   }
 
-  public getLocalitiesStats(): { localityId: string; localityName: string; count: number; published: number }[] {
+  public async getLocalitiesStats(): Promise<{ localityId: string; localityName: string; count: number; published: number }[]> {
     const counts: Record<string, { name: string; total: number; published: number }> = {};
 
     for (const loc of LA_LIBERTAD_LOCALITIES) {
@@ -658,7 +659,7 @@ class PlaceRepository implements IPlaceRepository {
     }));
   }
 
-  public getSourcesStats(): { sourceId: string; count: number }[] {
+  public async getSourcesStats(): Promise<{ sourceId: string; count: number }[]> {
     const counts: Record<string, number> = {};
     for (const p of this.places.values()) {
       for (const s of p.sources) {
@@ -668,7 +669,7 @@ class PlaceRepository implements IPlaceRepository {
     return Object.entries(counts).map(([sourceId, count]) => ({ sourceId, count }));
   }
 
-  public getDashboardMetrics(): AdminDashboardMetrics {
+  public async getDashboardMetrics(): Promise<AdminDashboardMetrics> {
     const all = Array.from(this.places.values());
     let published = 0;
     let draft = 0;
@@ -685,7 +686,11 @@ class PlaceRepository implements IPlaceRepository {
       if (p.verification.isVerified) verified++;
     }
 
-    const duplicates = this.findDuplicates();
+    const duplicates = await this.findDuplicates();
+    const categoriesStats = await this.getCategoriesStats();
+    const localitiesStats = await this.getLocalitiesStats();
+    const sourcesStats = await this.getSourcesStats();
+    const recentAuditLogs = await this.getAuditLogs('all', 12);
 
     return {
       totalPlaces: all.length,
@@ -695,15 +700,15 @@ class PlaceRepository implements IPlaceRepository {
       archivedCount: archived,
       verifiedCount: verified,
       unverifiedCount: all.length - verified,
-      placesByCategory: this.getCategoriesStats(),
-      placesByLocality: this.getLocalitiesStats(),
-      sourcesDistribution: this.getSourcesStats(),
+      placesByCategory: categoriesStats,
+      placesByLocality: localitiesStats,
+      sourcesDistribution: sourcesStats,
       potentialDuplicatesCount: duplicates.length,
-      recentAuditLogs: this.getAuditLogs('all', 12),
+      recentAuditLogs,
     };
   }
 
-  public getPublicPlaces(filters?: { localityId?: string; category?: string; search?: string }): Place[] {
+  public async getPublicPlaces(filters?: { localityId?: string; category?: string; search?: string }): Promise<Place[]> {
     // For public users, only show PUBLISHED places
     let result = Array.from(this.places.values()).filter((p) => p.status === 'PUBLISHED');
 
@@ -740,9 +745,14 @@ let placeRepositoryInstance: IPlaceRepository | null = null;
 
 export function getPlaceRepository(): IPlaceRepository {
   if (!placeRepositoryInstance) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(
+        '[Storage Architecture] FATAL: Place repository is not initialized with PostgreSQL in production environment.'
+      );
+    }
     placeRepositoryInstance = new PlaceRepository();
   }
-  return placeRepositoryInstance;
+  return placeRepositoryInstance!;
 }
 
 export function setPlaceRepositoryInstance(repo: IPlaceRepository | null): void {
