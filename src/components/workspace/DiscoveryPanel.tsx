@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { Place, PlaceCategory, TripItinerary } from '../../types/catalog.ts';
 import { HorizontalScrollContainer } from '../common/HorizontalScrollContainer.tsx';
+import { TikTokVideoGallery } from '../common/TikTokVideoGallery';
 
 interface DiscoveryPanelProps {
   trip: TripItinerary;
@@ -278,7 +279,30 @@ export const DiscoveryPanel: React.FC<DiscoveryPanelProps> = ({
               </div>
             </div>
           </div>
+             {/* Galería de videos turísticos del lugar seleccionado */}
+             {selectedPlace.name === 'Hostal Paraíso' && (
+            <div className="mt-4">
+              <TikTokVideoGallery
+                title="Videos de este lugar"
+                description="Conoce este destino a través de sus creadores."
+                showFilters={false}
+                showSearch={false}
+                videos={[
+                  {
+                    id: 'video-demo-1',
+                    videoUrl:
+                      'https://www.tiktok.com/@tiocuyitope/video/7621230431219830037',
+                    title: 'Descubre este lugar en Trujillo',
+                    creator: '@tiocuyitope',
+                    placeName: selectedPlace.name,
+                    category: 'Hospedaje',
+                  },
+                ]}
+              />
+            </div>
+          )}
         </div>
+        
       ) : (
         /* Places Cards List */
         <div className="flex-1 overflow-y-auto p-3 space-y-2.5">

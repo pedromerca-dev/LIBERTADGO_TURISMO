@@ -4,13 +4,20 @@ import {
   Search,
   FileText,
   Bookmark,
-  Calendar
+  Calendar,
+  Trophy
 } from 'lucide-react';
 import { TripItinerary } from '../../types/catalog.ts';
 import { generateDayList } from '../../utils/dateUtils.ts';
 import { HorizontalScrollContainer } from '../common/HorizontalScrollContainer.tsx';
 
-export type WorkspaceSection = 'overview' | 'explore' | 'notes' | 'saved' | 'itinerary';
+export type WorkspaceSection =
+  | 'overview'
+  | 'explore'
+  | 'ranking'
+  | 'notes'
+  | 'saved'
+  | 'itinerary';
 
 interface WorkspaceSidebarProps {
   trip: TripItinerary;
@@ -139,6 +146,26 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
             <Search className={`w-3.5 h-3.5 ${activeSection === 'explore' ? 'text-[#E85B49]' : 'text-[#64748B]'}`} />
             <span>Explorar</span>
           </button>
+
+          <button
+  ref={(el) => {
+    if (el) sectionButtonsRef.current.set('ranking', el);
+    else sectionButtonsRef.current.delete('ranking');
+  }}
+  type="button"
+  onClick={() => {
+    onSelectSection('ranking');
+    onSelectDayNumber(null);
+  }}
+  className={`px-3 py-1.5 text-xs rounded-lg shrink-0 flex items-center gap-1.5 whitespace-nowrap ${
+    activeSection === 'ranking'
+      ? 'bg-[#17243A] text-white font-semibold'
+      : 'bg-[#F8FAFC] text-[#475569] border border-[#E2E8F0]'
+  }`}
+>
+  <Trophy className="w-3.5 h-3.5" />
+  <span>Ranking</span>
+</button>
 
           <button
             ref={(el) => {
@@ -314,6 +341,22 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
               </span>
             )}
           </button>
+
+          <button
+  type="button"
+  onClick={() => {
+    onSelectSection('ranking');
+    onSelectDayNumber(null);
+  }}
+  className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-xs font-medium transition-colors ${
+    activeSection === 'ranking'
+      ? 'bg-[#17243A] text-white'
+      : 'text-[#17243A] hover:bg-[#F7F8FA]'
+  }`}
+>
+  <Trophy className="w-4 h-4 opacity-80" />
+  <span>Ranking de videos</span>
+</button>
 
           <button
             type="button"

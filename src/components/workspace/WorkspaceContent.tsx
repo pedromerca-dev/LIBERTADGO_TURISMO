@@ -31,6 +31,11 @@ import {
 } from '../../utils/filterUtils.ts';
 import { ItineraryView } from './ItineraryView.tsx';
 import { HorizontalScrollContainer } from '../common/HorizontalScrollContainer.tsx';
+import { TikTokVideoGallery } from '../common/TikTokVideoGallery';
+import { demoTikTokVideos } from '../../data/demoTikTokVideos';
+import { TikTokRankingPanel } from './TikTokRankingPanel';
+
+
 
 interface WorkspaceContentProps {
   trip: TripItinerary;
@@ -214,95 +219,169 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
   // ==========================================
   // SECCIÓN 1: RESUMEN (OVERVIEW)
   // ==========================================
+
+  // ==========================================
+  // SECCIÓN 1: RESUMEN (PORTADA DEL VIAJE)
+  // ==========================================
   if (activeSection === 'overview') {
     return (
       <div
         ref={scrollContainerRef}
-        className={`${containerWidthClass} h-full min-h-0 bg-white border-r border-[#E9EEF4] flex flex-col p-5 md:p-6 overflow-y-auto select-none`}
+        className={`${containerWidthClass} h-full min-h-0 bg-white border-r border-[#E9EEF4] flex flex-col overflow-y-auto`}
       >
-        <div className="flex items-start justify-between mb-5 pb-4 border-b border-[#E9EEF4]">
-          <div>
-            <span className="text-[10px] font-bold text-[#E85B49] uppercase tracking-wider block mb-1">
-              Resumen del viaje
+        <div className="p-5 sm:p-6 space-y-5">
+
+          {/* Encabezado del destino */}
+          <div className="space-y-2">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#E85B49]">
+              Tu próxima aventura
             </span>
-            <h2 className="text-xl font-bold font-display text-[#17243A]">
-              {trip.title}
+
+            <h2 className="text-2xl font-bold text-[#17243A]">
+              {trip.destinationName}
             </h2>
-            <p className="text-xs text-[#64748B] mt-1">
-              Destino: <strong className="text-[#17243A]">{trip.destinationName}</strong>, La Libertad · {trip.totalDays} días ({trip.totalNights} noches)
+
+            <p className="text-sm text-[#64748B]">
+              Explora, descubre y organiza tu viaje a tu propio ritmo.
             </p>
           </div>
-        </div>
 
-        {/* Indicadores claros y diferenciados */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          <div className="p-3 bg-[#F7F8FA] rounded-xl border border-[#E9EEF4] text-center">
-            <span className="text-lg font-bold font-mono text-[#E85B49] block">
-              {trip.activities.length}
-            </span>
-            <span className="text-[11px] text-[#64748B] font-medium">Actividades</span>
-          </div>
-          <div className="p-3 bg-[#F7F8FA] rounded-xl border border-[#E9EEF4] text-center">
-            <span className="text-lg font-bold font-mono text-[#D97706] block">
-              {savedPlaces.length}
-            </span>
-            <span className="text-[11px] text-[#64748B] font-medium">Por visitar</span>
-          </div>
-          <div className="p-3 bg-[#F7F8FA] rounded-xl border border-[#E9EEF4] text-center">
-            <span className="text-lg font-bold font-mono text-[#17243A] block">
-              {places.length}
-            </span>
-            <span className="text-[11px] text-[#64748B] font-medium">Disponibles</span>
-          </div>
-        </div>
+          {/* Información del viaje */}
+          <div className="rounded-2xl bg-[#17243A] p-4 text-white space-y-3">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-[#FF8A75]" />
+              <span className="text-sm font-semibold">
+                {trip.totalDays} días de aventura
+              </span>
+            </div>
 
-        {/* Guía del destino */}
-        <div className="p-4 bg-[#F7F8FA] rounded-xl border border-[#E9EEF4] mb-5">
-          <h3 className="text-xs font-bold text-[#17243A] mb-1">
-            Planificación en {trip.destinationName}
-          </h3>
-          <p className="text-xs text-[#64748B] leading-relaxed">
-            Organiza tus visitas por zonas geográficas para optimizar traslados. Explora el catálogo, guarda los lugares que te interesen en «Por visitar» o asígnalos directamente a un día.
-          </p>
-        </div>
-
-        {/* Fuentes Oficiales Verificadas */}
-        <div className="p-4 bg-emerald-50/70 border border-emerald-200/90 rounded-xl mb-5">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-950 mb-1">
-            <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span>Datos Certificados de La Libertad</span>
-          </div>
-          <p className="text-[11px] text-emerald-800 leading-relaxed">
-            Lugares verificados con inventarios de <strong>MINCETUR</strong> y cartografía georreferenciada de <strong>OpenStreetMap</strong>.
-          </p>
-        </div>
-
-        {/* Desglose por días */}
-        <div className="space-y-2">
-          <h3 className="text-xs font-bold text-[#17243A] uppercase tracking-wider mb-2">
-            Desglose del Itinerario
-          </h3>
-          {dayItems.map((day) => {
-            const count = trip.activities.filter((a) => a.dayNumber === day.dayNumber).length;
-            return (
-              <div
-                key={day.dayNumber}
-                className="flex items-center justify-between p-3 bg-white border border-[#E9EEF4] rounded-xl hover:border-slate-300 transition-colors"
-              >
-                <div>
-                  <div className="text-xs font-semibold text-[#17243A]">{day.label}</div>
-                  <div className="text-[11px] text-[#64748B]">{day.formattedDate}</div>
-                </div>
-                <span className="text-xs font-mono font-semibold text-[#17243A] bg-[#F7F8FA] px-2 py-0.5 rounded border border-[#E9EEF4]">
-                  {count} {count === 1 ? 'actividad' : 'actividades'}
-                </span>
+            <div className="flex items-center justify-between gap-2">
+              <div>
+                <p className="text-[10px] text-slate-300">Llegada</p>
+                <p className="text-xs font-semibold">
+                  {dayItems[0]?.formattedDate ?? 'Por definir'}
+                </p>
               </div>
-            );
-          })}
+
+              <div className="h-8 w-px bg-white/20" />
+
+              <div>
+                <p className="text-[10px] text-slate-300">Salida</p>
+                <p className="text-xs font-semibold">
+                  {dayItems[dayItems.length - 1]?.formattedDate ?? 'Por definir'}
+                </p>
+              </div>
+
+              <div className="h-8 w-px bg-white/20" />
+
+              <div>
+                <p className="text-[10px] text-slate-300">Estancia</p>
+                <p className="text-xs font-semibold">
+                  {trip.totalNights} noches
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Accesos turísticos */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-bold text-[#17243A]">
+              ¿Qué te gustaría hacer?
+            </h3>
+
+            <button
+              type="button"
+              onClick={() => onSelectSection?.('explore')}
+              className="w-full flex items-center gap-3 p-4 rounded-xl border border-[#E9EEF4] bg-white hover:border-[#E85B49] hover:bg-[#FFF9F7] transition-all text-left"
+            >
+              <div className="w-10 h-10 rounded-xl bg-[#FFF0EC] flex items-center justify-center shrink-0">
+                <Compass className="w-5 h-5 text-[#E85B49]" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-bold text-[#17243A]">
+                  Explorar destinos
+                </p>
+                <p className="text-xs text-[#64748B]">
+                  Descubre playas, restaurantes, cultura y atractivos.
+                </p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-slate-400" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onSelectSection?.('itinerary')}
+              className="w-full flex items-center gap-3 p-4 rounded-xl border border-[#E9EEF4] bg-white hover:border-[#E85B49] hover:bg-[#FFF9F7] transition-all text-left"
+            >
+              <div className="w-10 h-10 rounded-xl bg-[#EEF4FF] flex items-center justify-center shrink-0">
+                <Calendar className="w-5 h-5 text-blue-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-bold text-[#17243A]">
+                  Mi itinerario
+                </p>
+                <p className="text-xs text-[#64748B]">
+                  Organiza tus actividades y visitas por día.
+                </p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-slate-400" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onSelectSection?.('ranking')}
+              className="w-full flex items-center gap-3 p-4 rounded-xl border border-[#E9EEF4] bg-white hover:border-[#E85B49] hover:bg-[#FFF9F7] transition-all text-left"
+            >
+              <div className="w-10 h-10 rounded-xl bg-[#FFF7E8] flex items-center justify-center shrink-0">
+                <Star className="w-5 h-5 text-amber-500" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-bold text-[#17243A]">
+                  Videos turísticos
+                </p>
+                <p className="text-xs text-[#64748B]">
+                  Inspírate con experiencias de otros viajeros.
+                </p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-slate-400" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onSelectSection?.('saved')}
+              className="w-full flex items-center gap-3 p-4 rounded-xl border border-[#E9EEF4] bg-white hover:border-[#E85B49] hover:bg-[#FFF9F7] transition-all text-left"
+            >
+              <div className="w-10 h-10 rounded-xl bg-[#F3F0FF] flex items-center justify-center shrink-0">
+                <Bookmark className="w-5 h-5 text-violet-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-bold text-[#17243A]">
+                  Lugares guardados
+                </p>
+                <p className="text-xs text-[#64748B]">
+                  Consulta los sitios que quieres visitar.
+                </p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-slate-400" />
+            </button>
+          </div>
+
+          {/* Mensaje de bienvenida */}
+          <div className="rounded-xl bg-[#FFF8F5] border border-[#FCE2DA] p-4">
+            <p className="text-xs font-semibold text-[#17243A]">
+              Tu viaje, a tu manera.
+            </p>
+            <p className="text-xs text-[#64748B] mt-1 leading-relaxed">
+              Encuentra lugares, descubre experiencias y construye un itinerario
+              que se adapte a ti.
+            </p>
+          </div>
+
         </div>
       </div>
     );
   }
+
 
   // ==========================================
   // SECCIÓN 2: EXPLORAR (CATÁLOGO DE EXPERIENCIAS)
@@ -576,6 +655,15 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
                 </div>
               </div>
             </div>
+            {/* Galería de videos turísticos del lugar */}
+<TikTokVideoGallery
+ videos={demoTikTokVideos}
+  title="Videos de este lugar"
+  description="Descubre experiencias compartidas por viajeros"
+  showFilters={true}
+  showSearch={false}
+  compact={true}
+/>
           </div>
         ) : (
           /* Lista de Tarjetas de Lugares adaptadas al ancho móvil */
@@ -740,6 +828,17 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
             )}
           </div>
         )}
+      </div>
+    );
+  }
+
+    // ==========================================
+  // SECCIÓN 3: RANKING DE VIDEOS
+  // ==========================================
+  if (activeSection === 'ranking') {
+    return (
+      <div className={`${containerWidthClass} h-full min-h-0 flex flex-col overflow-hidden`}>
+        <TikTokRankingPanel />
       </div>
     );
   }
