@@ -47,6 +47,8 @@ import { getDayColor } from '../../utils/itineraryUtils.ts';
 import { calculateRealRoute, RouteData } from '../../utils/routingService.ts';
 import { WorkspaceSection } from './WorkspaceSidebar.tsx';
 import { HorizontalScrollContainer } from '../common/HorizontalScrollContainer.tsx';
+import { TikTokVideoGallery } from '../common/TikTokVideoGallery.tsx';
+import { demoTikTokVideos } from '../../data/demoTikTokVideos';
 
 interface MapPanelProps {
   trip: TripItinerary;
@@ -1706,7 +1708,16 @@ export const MapPanel: React.FC<MapPanelProps> = ({
                       </div>
                     )}
                   </div>
-
+                  <div className="mt-4">
+                  <TikTokVideoGallery
+  title="Videos de este lugar"
+  description="Conoce este destino a través de sus creadores."
+  showFilters={false}
+  showSearch={false}
+  compact={true}
+  videos={demoTikTokVideos}
+/>
+</div>
                   {/* Asignación directa a días del viaje con toggle independiente */}
                   <div className="pt-3 border-t border-[#E9EEF4] space-y-2">
                     <span className="text-xs font-bold text-[#17243A] block">
