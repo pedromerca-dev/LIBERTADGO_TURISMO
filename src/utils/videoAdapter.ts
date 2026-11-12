@@ -120,11 +120,18 @@ export function adaptVideoSubmissionToTikTokVideo(
   const internalViews = submission.internalViewsCount || 0;
   const internalSaves = submission.internalSavesCount || 0;
 
+  const cleanManualAvatar = submission.creatorAvatarUrl?.trim();
+  const cleanExternalAvatar = submission.externalCreatorAvatarUrl?.trim();
+  const cleanMetricsAvatar = submission.externalMetrics?.creatorAvatarUrl?.trim();
+
   const creatorAvatarUrl =
-    submission.creatorAvatarUrl ||
-    submission.externalCreatorAvatarUrl ||
-    submission.externalMetrics?.creatorAvatarUrl ||
-    undefined;
+    (cleanManualAvatar && cleanManualAvatar.length > 0)
+      ? cleanManualAvatar
+      : (cleanExternalAvatar && cleanExternalAvatar.length > 0)
+      ? cleanExternalAvatar
+      : (cleanMetricsAvatar && cleanMetricsAvatar.length > 0)
+      ? cleanMetricsAvatar
+      : undefined;
 
   const creatorHandle =
     submission.creatorHandle ||

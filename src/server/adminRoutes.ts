@@ -4,7 +4,7 @@
  * Zero trust: Every administrative mutation is verified on the backend and logged in VideoModerationLog.
  */
 
-import { Router, Request, Response } from 'express';
+import express, { Router, Request, Response } from 'express';
 import {
   ModerationActionSchema,
   AdminCreateVideoSchema,
@@ -21,6 +21,13 @@ import {
 } from '../types/creators.ts';
 import { INITIAL_PLACES } from '../data/initialPlaces.ts';
 import { parseAndValidateVideoUrl } from '../utils/videoUrlParser.ts';
+import {
+  uploadCreatorAvatar,
+  deleteLocalAvatar,
+  getR2ConfigStatus,
+  MAX_AVATAR_SIZE_BYTES,
+  ALLOWED_MIME_TYPES,
+} from './services/storageService.ts';
 
 export const adminRouter = Router();
 
@@ -525,6 +532,97 @@ adminRouter.get('/users', async (_req: Request, res: Response) => {
   } catch (err) {
     console.error('[Admin Error] Error listing users for admin:', err);
     res.status(500).json({ success: false, error: 'Error al consultar lista de usuarios' });
+  }
+});
+
+// 5f. GET /api/admin/storage/status - Check Cloudflare R2 and storage configuration
+adminRouter.get('/storage/status', async (_req: Request, res: Response) => {
+  try {
+    const r2Status = getR2ConfigStatus();
+    res.json({
+      success: true,
+      storage: r2Status.isConfigured ? 'r2' : 'local',
+      r2Configured: r2Status.isConfigured,
+      missingConfig: r2Status.missingVariables,
+      bucketName: r2Status.bucketName,
+      publicUrl: r2Status.publicUrl,
+      maxSizeBytes: MAX_AVATAR_SIZE_BYTES,
+      allowedMimeTypes: ALLOWED_MIME_TYPES,
+    });
+  } catch (err) {
+    console.error('[Admin Error] Error querying storage status:', err);
+    res.status(500).json({ success: false, error: 'Error al consultar estado de almacenamiento' });
+  }
+});
+
+// 5g. POST /api/admin/uploads/avatar - Upload creator profile photograph
+adminRouter.post(
+  '/uploads/avatar',
+  express.raw({ type: ['image/jpeg', 'image/png', 'image/webp', 'application/octet-stream'], limit: '6mb' }),
+  express.json({ limit: '8mb' }),
+  async (req: Request, res: Response) => {
+    try {
+      let fileBuffer: Buffer | null = null;
+      let filename: string = 'avatar.jpg';
+      let mimeType: string = 'image/jpeg';
+
+      if (Buffer.isBuffer(req.body) && req.body.length > 0) {
+        fileBuffer = req.body;
+        const rawFilename = req.headers['x-filename'] as string | undefined;
+        if (rawFilename) {
+          try {
+            filename = decodeURIComponent(rawFilename);
+          } catch {
+            filename = rawFilename;
+          }
+        }
+        mimeType = (req.headers['content-type'] as string) || 'image/jpeg';
+      } else if (req.body && typeof req.body.imageBase64 === 'string') {
+        const cleanBase64 = req.body.imageBase64.replace(/^data:image\/[a-zA-Z]+;base64,/, '');
+        fileBuffer = Buffer.from(cleanBase64, 'base64');
+        filename = req.body.filename || 'avatar.jpg';
+        mimeType = req.body.mimeType || 'image/jpeg';
+      }
+
+      if (!fileBuffer || fileBuffer.length === 0) {
+        res.status(400).json({
+          success: false,
+          error: 'No se recibió ningún archivo de imagen para cargar',
+        });
+        return;
+      }
+
+      const result = await uploadCreatorAvatar(fileBuffer, filename, mimeType);
+
+      res.status(201).json({
+        success: true,
+        data: result,
+        message: 'Fotografía de perfil de creador cargada exitosamente',
+      });
+    } catch (err) {
+      console.error('[Admin Error] Error uploading creator avatar:', err);
+      res.status(400).json({
+        success: false,
+        error: err instanceof Error ? err.message : 'Error al procesar la imagen',
+      });
+    }
+  }
+);
+
+// 5h. DELETE /api/admin/uploads/avatar - Remove local creator avatar
+adminRouter.delete('/uploads/avatar', async (req: Request, res: Response) => {
+  const { url } = req.body;
+  if (!url || typeof url !== 'string') {
+    res.status(400).json({ success: false, error: 'URL requerida para eliminar la imagen' });
+    return;
+  }
+
+  try {
+    const deleted = await deleteLocalAvatar(url);
+    res.json({ success: true, deleted });
+  } catch (err) {
+    console.error('[Admin Error] Error deleting avatar:', err);
+    res.status(500).json({ success: false, error: 'Error al eliminar imagen' });
   }
 });
 

@@ -11,11 +11,29 @@ const validLocalityIds = new Set(LA_LIBERTAD_LOCALITIES.map((l) => l.id));
 export const safeUrlSchema = z
   .string()
   .trim()
-  .url('Debe ser una URL válida')
+  .min(1, 'La URL no puede estar vacía')
   .max(500, 'La URL no puede exceder 500 caracteres')
-  .refine((u) => u.startsWith('https://') || u.startsWith('http://'), {
-    message: 'Por seguridad, solo se permiten URLs HTTP o HTTPS',
-  });
+  .refine(
+    (u) => {
+      if (u.startsWith('/uploads/')) {
+        return !u.includes('..') && /^\/uploads\/[a-zA-Z0-9_\-\.\/]+$/.test(u);
+      }
+      try {
+        const parsed = new URL(u);
+        return parsed.protocol === 'https:' || parsed.protocol === 'http:';
+      } catch {
+        return false;
+      }
+    },
+    {
+      message: 'Debe ser una URL válida (HTTP/HTTPS) o una ruta de subida (/uploads/...)',
+    }
+  );
+
+export const optionalUrlOrEmptySchema = safeUrlSchema
+  .or(z.literal(''))
+  .optional()
+  .nullable();
 
 export const RegisterUserSchema = z.object({
   email: z
@@ -66,11 +84,11 @@ export const CreatorProfileSchema = z.object({
     .max(300, 'La biografía no puede exceder 300 caracteres')
     .optional()
     .nullable(),
-  avatarUrl: safeUrlSchema.optional().nullable(),
+  avatarUrl: optionalUrlOrEmptySchema,
   primaryPlatform: z.enum(['tiktok', 'instagram', 'youtube']),
-  tiktokUrl: safeUrlSchema.optional().nullable(),
-  instagramUrl: safeUrlSchema.optional().nullable(),
-  youtubeUrl: safeUrlSchema.optional().nullable(),
+  tiktokUrl: optionalUrlOrEmptySchema,
+  instagramUrl: optionalUrlOrEmptySchema,
+  youtubeUrl: optionalUrlOrEmptySchema,
   tiktokFollowers: z
     .number()
     .int('Los seguidores de TikTok deben ser un número entero')
@@ -355,11 +373,11 @@ export const AdminCreateCreatorSchema = z.object({
     .min(2, 'El nombre debe tener al menos 2 caracteres')
     .max(60, 'El nombre no puede exceder 60 caracteres'),
   bio: z.string().trim().max(300).optional().nullable(),
-  avatarUrl: safeUrlSchema.optional().nullable(),
+  avatarUrl: optionalUrlOrEmptySchema,
   primaryPlatform: z.enum(['tiktok', 'instagram', 'youtube']),
-  tiktokUrl: safeUrlSchema.optional().nullable(),
-  instagramUrl: safeUrlSchema.optional().nullable(),
-  youtubeUrl: safeUrlSchema.optional().nullable(),
+  tiktokUrl: optionalUrlOrEmptySchema,
+  instagramUrl: optionalUrlOrEmptySchema,
+  youtubeUrl: optionalUrlOrEmptySchema,
   tiktokFollowers: z
     .number()
     .int('Los seguidores de TikTok deben ser un número entero')
@@ -382,3 +400,6 @@ export const AdminCreateCreatorSchema = z.object({
   isPublic: z.boolean().default(true),
   isVerified: z.boolean().default(false),
 });
+
+export const AdminUpdateCreatorSchema = AdminCreateCreatorSchema.partial();
+
