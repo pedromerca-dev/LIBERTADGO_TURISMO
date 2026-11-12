@@ -48105,6 +48105,9 @@ var init_memoryCreatorsRepository = __esm({
       async countUsers() {
         return this.users.size;
       }
+      async listUsers() {
+        return Array.from(this.users.values()).map(({ passwordHash, ...rest }) => ({ ...rest }));
+      }
       // --- ICreatorsRepository ---
       async findSubmissionById(id) {
         const sub = this.videoSubmissions.get(id);
@@ -48128,7 +48131,7 @@ var init_memoryCreatorsRepository = __esm({
           thumbnailUrl: data.thumbnailUrl || null,
           description: data.description || null,
           localityId: data.localityId || null,
-          status: "PENDING",
+          status: data.status || "PENDING",
           moderationNotes: null,
           moderatedBy: null,
           moderatedAt: null,
@@ -48143,6 +48146,27 @@ var init_memoryCreatorsRepository = __esm({
           await this.associatePlaces(id, placeIds, primaryPlaceId);
         }
         return { ...submission };
+      }
+      async updateSubmission(id, data, placeIds, primaryPlaceId) {
+        const sub = this.videoSubmissions.get(id);
+        if (!sub) return null;
+        const updated = {
+          ...sub,
+          title: data.title ?? sub.title,
+          description: data.description !== void 0 ? data.description : sub.description,
+          contentType: data.contentType ?? sub.contentType,
+          category: data.category ?? sub.category,
+          localityId: data.localityId !== void 0 ? data.localityId : sub.localityId,
+          thumbnailUrl: data.thumbnailUrl !== void 0 ? data.thumbnailUrl : sub.thumbnailUrl,
+          creatorProfileId: data.creatorProfileId !== void 0 ? data.creatorProfileId : sub.creatorProfileId,
+          status: data.status ?? sub.status,
+          updatedAt: (/* @__PURE__ */ new Date()).toISOString()
+        };
+        this.videoSubmissions.set(id, updated);
+        if (placeIds && Array.isArray(placeIds)) {
+          await this.associatePlaces(id, placeIds, primaryPlaceId);
+        }
+        return { ...updated };
       }
       async updateSubmissionStatus(id, status, notes, adminUserId) {
         const sub = this.videoSubmissions.get(id);
@@ -48299,7 +48323,7 @@ var init_memoryCreatorsRepository = __esm({
           instagramUrl: data.instagramUrl || null,
           youtubeUrl: data.youtubeUrl || null,
           isPublic: data.isPublic,
-          isVerified: existing ? existing.isVerified : false,
+          isVerified: data.isVerified !== void 0 ? data.isVerified : existing ? existing.isVerified : false,
           totalApprovedVideos: existing ? existing.totalApprovedVideos : 0,
           createdAt: existing ? existing.createdAt : now,
           updatedAt: now
@@ -48309,6 +48333,9 @@ var init_memoryCreatorsRepository = __esm({
       }
       async listPublicCreators() {
         return Array.from(this.creatorProfiles.values()).filter((c) => c.isPublic).sort((a, b) => b.totalApprovedVideos - a.totalApprovedVideos);
+      }
+      async listAllCreators() {
+        return Array.from(this.creatorProfiles.values()).sort((a, b) => b.totalApprovedVideos - a.totalApprovedVideos);
       }
       async incrementInternalViews(videoId) {
         const sub = this.videoSubmissions.get(videoId);
@@ -48427,6 +48454,14 @@ var init_postgresCreatorsRepository = __esm({
         const res = await this.pool.query(`SELECT COUNT(*)::int as count FROM users`);
         return res.rows[0]?.count || 0;
       }
+      async listUsers() {
+        const res = await this.pool.query(`
+      SELECT id, email, name, avatar_url as "avatarUrl", role, created_at as "createdAt", updated_at as "updatedAt"
+      FROM users
+      ORDER BY created_at DESC
+    `);
+        return res.rows;
+      }
       // --- ICreatorsRepository ---
       async findSubmissionById(id) {
         const res = await this.pool.query(
@@ -48457,6 +48492,7 @@ var init_postgresCreatorsRepository = __esm({
       async createSubmission(data, placeIds = [], primaryPlaceId) {
         const id = `vid_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
         const client = await this.pool.connect();
+        const initialStatus = data.status || "PENDING";
         try {
           await client.query("BEGIN");
           const res = await client.query(
@@ -48464,7 +48500,7 @@ var init_postgresCreatorsRepository = __esm({
           id, user_id, creator_profile_id, platform, external_video_id,
           video_url, embed_url, thumbnail_url, title, description,
           content_type, category, locality_id, status
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, 'PENDING')
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
         RETURNING id, user_id as "userId", creator_profile_id as "creatorProfileId", platform, external_video_id as "externalVideoId",
                   video_url as "videoUrl", embed_url as "embedUrl", thumbnail_url as "thumbnailUrl", title, description,
                   content_type as "contentType", category, locality_id as "localityId", status, moderation_notes as "moderationNotes",
@@ -48484,7 +48520,8 @@ var init_postgresCreatorsRepository = __esm({
               data.description || null,
               data.contentType,
               data.category,
-              data.localityId || null
+              data.localityId || null,
+              initialStatus
             ]
           );
           const submission = res.rows[0];
@@ -48506,6 +48543,44 @@ var init_postgresCreatorsRepository = __esm({
         } finally {
           client.release();
         }
+      }
+      async updateSubmission(id, data, placeIds, primaryPlaceId) {
+        const existing = await this.findSubmissionById(id);
+        if (!existing) return null;
+        const res = await this.pool.query(
+          `UPDATE video_submissions
+       SET title = COALESCE($1, title),
+           description = COALESCE($2, description),
+           content_type = COALESCE($3, content_type),
+           category = COALESCE($4, category),
+           locality_id = COALESCE($5, locality_id),
+           thumbnail_url = COALESCE($6, thumbnail_url),
+           creator_profile_id = COALESCE($7, creator_profile_id),
+           status = COALESCE($8, status),
+           updated_at = NOW()
+       WHERE id = $9
+       RETURNING id, user_id as "userId", creator_profile_id as "creatorProfileId", platform, external_video_id as "externalVideoId",
+                 video_url as "videoUrl", embed_url as "embedUrl", thumbnail_url as "thumbnailUrl", title, description,
+                 content_type as "contentType", category, locality_id as "localityId", status, moderation_notes as "moderationNotes",
+                 moderated_by as "moderatedBy", moderated_at as "moderatedAt", internal_views_count as "internalViewsCount",
+                 internal_saves_count as "internalSavesCount", external_metrics as "externalMetrics",
+                 created_at as "createdAt", updated_at as "updatedAt"`,
+          [
+            data.title,
+            data.description,
+            data.contentType,
+            data.category,
+            data.localityId,
+            data.thumbnailUrl,
+            data.creatorProfileId,
+            data.status,
+            id
+          ]
+        );
+        if (placeIds && Array.isArray(placeIds)) {
+          await this.associatePlaces(id, placeIds, primaryPlaceId);
+        }
+        return res.rows[0] || null;
       }
       async updateSubmissionStatus(id, status, notes, adminUserId) {
         const res = await this.pool.query(
@@ -48782,6 +48857,17 @@ var init_postgresCreatorsRepository = __esm({
               total_approved_videos as "totalApprovedVideos", created_at as "createdAt", updated_at as "updatedAt"
        FROM creator_profiles
        WHERE is_public = TRUE
+       ORDER BY total_approved_videos DESC, created_at DESC`
+        );
+        return res.rows;
+      }
+      async listAllCreators() {
+        const res = await this.pool.query(
+          `SELECT id, user_id as "userId", handle, display_name as "displayName", bio, avatar_url as "avatarUrl",
+              primary_platform as "primaryPlatform", tiktok_url as "tiktokUrl", instagram_url as "instagramUrl",
+              youtube_url as "youtubeUrl", is_public as "isPublic", is_verified as "isVerified",
+              total_approved_videos as "totalApprovedVideos", created_at as "createdAt", updated_at as "updatedAt"
+       FROM creator_profiles
        ORDER BY total_approved_videos DESC, created_at DESC`
         );
         return res.rows;
@@ -51161,6 +51247,50 @@ var ModerationActionSchema = z2.object({
   internalNotes: z2.string().trim().max(500, "Las notas internas no pueden exceder 500 caracteres").optional().nullable(),
   verifiedPlaceIds: z2.array(z2.string().trim()).optional()
 });
+var AdminCreateVideoSchema = z2.object({
+  videoUrl: z2.string().trim().url("La URL del video debe ser un enlace v\xE1lido").refine((url) => parseAndValidateVideoUrl(url).isValid, {
+    message: "La URL debe corresponder a un video v\xE1lido de TikTok, Instagram o YouTube"
+  }),
+  title: z2.string().trim().min(5, "El t\xEDtulo debe tener al menos 5 caracteres").max(140, "El t\xEDtulo no puede exceder 140 caracteres"),
+  description: z2.string().trim().max(1e3, "La descripci\xF3n no puede exceder 1000 caracteres").optional().nullable(),
+  contentType: z2.enum(["PLACE", "ROUTE", "GENERAL"]).default("PLACE"),
+  category: z2.string().trim().min(2, "La categor\xEDa es requerida"),
+  localityId: z2.string().trim().toLowerCase().optional().nullable().refine((locId) => !locId || validLocalityIds.has(locId), {
+    message: "La localidad especificada debe pertenecer a la regi\xF3n La Libertad"
+  }),
+  thumbnailUrl: z2.string().trim().url("La URL de la miniatura debe ser v\xE1lida").optional().nullable(),
+  creatorProfileId: z2.string().trim().optional().nullable(),
+  placeIds: z2.array(z2.string().trim()).max(10, "No puedes vincular m\xE1s de 10 lugares por video").default([]),
+  primaryPlaceId: z2.string().trim().optional().nullable(),
+  status: z2.enum(["PENDING", "APPROVED"]).default("APPROVED")
+});
+var AdminUpdateVideoSchema = z2.object({
+  title: z2.string().trim().min(5, "El t\xEDtulo debe tener al menos 5 caracteres").max(140, "El t\xEDtulo no puede exceder 140 caracteres").optional(),
+  description: z2.string().trim().max(1e3, "La descripci\xF3n no puede exceder 1000 caracteres").optional().nullable(),
+  contentType: z2.enum(["PLACE", "ROUTE", "GENERAL"]).optional(),
+  category: z2.string().trim().min(2, "La categor\xEDa es requerida").optional(),
+  localityId: z2.string().trim().toLowerCase().optional().nullable().refine((locId) => !locId || validLocalityIds.has(locId), {
+    message: "La localidad especificada debe pertenecer a la regi\xF3n La Libertad"
+  }),
+  thumbnailUrl: z2.string().trim().url("La URL de la miniatura debe ser v\xE1lida").optional().nullable(),
+  creatorProfileId: z2.string().trim().optional().nullable(),
+  placeIds: z2.array(z2.string().trim()).max(10, "No puedes vincular m\xE1s de 10 lugares por video").optional(),
+  primaryPlaceId: z2.string().trim().optional().nullable(),
+  status: z2.enum(["PENDING", "APPROVED", "OBSERVED", "REJECTED", "HIDDEN"]).optional()
+});
+var AdminCreateCreatorSchema = z2.object({
+  userId: z2.string().trim().optional(),
+  handle: z2.string().trim().toLowerCase().regex(/^[a-z0-9_]{3,30}$/, "El handle solo puede contener min\xFAsculas, n\xFAmeros y guiones bajos (3-30 caracteres)"),
+  displayName: z2.string().trim().min(2, "El nombre debe tener al menos 2 caracteres").max(60, "El nombre no puede exceder 60 caracteres"),
+  bio: z2.string().trim().max(300).optional().nullable(),
+  avatarUrl: z2.string().url().optional().nullable(),
+  primaryPlatform: z2.enum(["tiktok", "instagram", "youtube"]),
+  tiktokUrl: z2.string().url().optional().nullable(),
+  instagramUrl: z2.string().url().optional().nullable(),
+  youtubeUrl: z2.string().url().optional().nullable(),
+  isPublic: z2.boolean().default(true),
+  isVerified: z2.boolean().default(false)
+});
 
 // src/server/authRoutes.ts
 init_repositories();
@@ -52066,6 +52196,207 @@ adminRouter.put("/moderation/:id/places", async (req, res) => {
   } catch (err) {
     console.error("[Admin Error] Error updating linked places:", err);
     res.status(500).json({ success: false, error: "Error al actualizar lugares asociados" });
+  }
+});
+adminRouter.post("/videos", async (req, res) => {
+  if (!req.user) {
+    res.status(401).json({ success: false, error: "No autorizado" });
+    return;
+  }
+  const parseResult = AdminCreateVideoSchema.safeParse(req.body);
+  if (!parseResult.success) {
+    const errorMsg = parseResult.error.issues.map((i) => i.message).join(", ");
+    res.status(400).json({ success: false, error: errorMsg });
+    return;
+  }
+  const {
+    videoUrl,
+    title,
+    description,
+    contentType,
+    category,
+    localityId,
+    thumbnailUrl,
+    creatorProfileId,
+    placeIds,
+    primaryPlaceId,
+    status
+  } = parseResult.data;
+  const parsed = parseAndValidateVideoUrl(videoUrl);
+  if (!parsed.isValid || !parsed.data) {
+    res.status(400).json({ success: false, error: parsed.error || "URL no soportada" });
+    return;
+  }
+  const repo = getCreatorsRepository();
+  try {
+    const existing = await repo.findSubmissionByPlatformAndExternalId(
+      parsed.data.platform,
+      parsed.data.externalVideoId
+    );
+    if (existing) {
+      res.status(409).json({
+        success: false,
+        error: `Este video ya se encuentra registrado con estado: ${existing.status}`
+      });
+      return;
+    }
+    const validPlaceIds = placeIds.filter(
+      (pId) => INITIAL_PLACES.some((p) => p.id === pId)
+    );
+    const submission = await repo.createSubmission(
+      {
+        userId: req.user.userId,
+        creatorProfileId: creatorProfileId || null,
+        platform: parsed.data.platform,
+        externalVideoId: parsed.data.externalVideoId,
+        videoUrl: parsed.data.canonicalUrl,
+        embedUrl: parsed.data.embedUrl,
+        thumbnailUrl: thumbnailUrl || null,
+        title,
+        description: description || null,
+        contentType,
+        category,
+        localityId: localityId || null,
+        status: status || "APPROVED"
+      },
+      validPlaceIds,
+      primaryPlaceId || (validPlaceIds[0] || null)
+    );
+    await repo.addModerationLog({
+      videoId: submission.id,
+      adminUserId: req.user.userId,
+      adminName: req.user.name,
+      previousStatus: "PENDING",
+      newStatus: submission.status,
+      reason: "Registro y publicaci\xF3n directa desde el panel de administraci\xF3n",
+      internalNotes: `Creado por administrador ${req.user.name}`
+    });
+    res.status(201).json({
+      success: true,
+      data: submission,
+      message: "Video registrado y catalogado exitosamente"
+    });
+  } catch (err) {
+    console.error("[Admin Error] Error creating video:", err);
+    res.status(500).json({ success: false, error: "Error interno al registrar el video" });
+  }
+});
+adminRouter.put("/videos/:id", async (req, res) => {
+  if (!req.user) {
+    res.status(401).json({ success: false, error: "No autorizado" });
+    return;
+  }
+  const parseResult = AdminUpdateVideoSchema.safeParse(req.body);
+  if (!parseResult.success) {
+    const errorMsg = parseResult.error.issues.map((i) => i.message).join(", ");
+    res.status(400).json({ success: false, error: errorMsg });
+    return;
+  }
+  const repo = getCreatorsRepository();
+  try {
+    const existing = await repo.findSubmissionById(req.params.id);
+    if (!existing) {
+      res.status(404).json({ success: false, error: "Publicaci\xF3n de video no encontrada" });
+      return;
+    }
+    const { placeIds, primaryPlaceId, ...updateFields } = parseResult.data;
+    const validPlaceIds = placeIds ? placeIds.filter((pId) => INITIAL_PLACES.some((p) => p.id === pId)) : void 0;
+    const updated = await repo.updateSubmission(
+      req.params.id,
+      updateFields,
+      validPlaceIds,
+      primaryPlaceId
+    );
+    await repo.addModerationLog({
+      videoId: req.params.id,
+      adminUserId: req.user.userId,
+      adminName: req.user.name,
+      previousStatus: existing.status,
+      newStatus: updated?.status || existing.status,
+      reason: "Edici\xF3n administrativa de metadatos o lugares asociados",
+      internalNotes: `Modificado por ${req.user.name}`
+    });
+    res.json({
+      success: true,
+      data: updated,
+      message: "Metadatos de video actualizados exitosamente"
+    });
+  } catch (err) {
+    console.error("[Admin Error] Error updating video:", err);
+    res.status(500).json({ success: false, error: "Error interno al actualizar el video" });
+  }
+});
+adminRouter.get("/creators", async (_req, res) => {
+  const repo = getCreatorsRepository();
+  try {
+    const creators = await repo.listAllCreators();
+    res.json({
+      success: true,
+      data: creators,
+      total: creators.length
+    });
+  } catch (err) {
+    console.error("[Admin Error] Error listing creators for admin:", err);
+    res.status(500).json({ success: false, error: "Error al consultar directorio de creadores" });
+  }
+});
+adminRouter.post("/creators", async (req, res) => {
+  if (!req.user) {
+    res.status(401).json({ success: false, error: "No autorizado" });
+    return;
+  }
+  const parseResult = AdminCreateCreatorSchema.safeParse(req.body);
+  if (!parseResult.success) {
+    const errorMsg = parseResult.error.issues.map((i) => i.message).join(", ");
+    res.status(400).json({ success: false, error: errorMsg });
+    return;
+  }
+  const repo = getCreatorsRepository();
+  try {
+    const existing = await repo.findCreatorProfileByHandle(parseResult.data.handle);
+    if (existing) {
+      res.status(409).json({
+        success: false,
+        error: `El identificador @${parseResult.data.handle} ya est\xE1 registrado`
+      });
+      return;
+    }
+    const targetUserId = parseResult.data.userId || req.user.userId;
+    const profile = await repo.saveCreatorProfile({
+      userId: targetUserId,
+      handle: parseResult.data.handle,
+      displayName: parseResult.data.displayName,
+      bio: parseResult.data.bio || null,
+      avatarUrl: parseResult.data.avatarUrl || null,
+      primaryPlatform: parseResult.data.primaryPlatform,
+      tiktokUrl: parseResult.data.tiktokUrl || null,
+      instagramUrl: parseResult.data.instagramUrl || null,
+      youtubeUrl: parseResult.data.youtubeUrl || null,
+      isPublic: parseResult.data.isPublic ?? true,
+      isVerified: parseResult.data.isVerified ?? false
+    });
+    res.status(201).json({
+      success: true,
+      data: profile,
+      message: "Perfil de creador registrado exitosamente"
+    });
+  } catch (err) {
+    console.error("[Admin Error] Error registering creator profile:", err);
+    res.status(500).json({ success: false, error: "Error interno al registrar perfil de creador" });
+  }
+});
+adminRouter.get("/users", async (_req, res) => {
+  try {
+    const authRepo = getAuthRepository();
+    if (typeof authRepo.listUsers === "function") {
+      const users = await authRepo.listUsers();
+      res.json({ success: true, data: users });
+      return;
+    }
+    res.json({ success: true, data: [] });
+  } catch (err) {
+    console.error("[Admin Error] Error listing users for admin:", err);
+    res.status(500).json({ success: false, error: "Error al consultar lista de usuarios" });
   }
 });
 adminRouter.get("/dashboard", async (_req, res) => {

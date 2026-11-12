@@ -75,6 +75,10 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
     return this.users.size;
   }
 
+  async listUsers(): Promise<Omit<User, 'passwordHash'>[]> {
+    return Array.from(this.users.values()).map(({ passwordHash, ...rest }) => ({ ...rest }));
+  }
+
   // --- ICreatorsRepository ---
 
   async findSubmissionById(id: string): Promise<VideoSubmission | null> {
@@ -108,6 +112,7 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
       contentType: 'PLACE' | 'ROUTE' | 'GENERAL';
       category: string;
       localityId?: string | null;
+      status?: ModerationStatus;
     },
     placeIds: string[] = [],
     primaryPlaceId?: string | null
@@ -122,7 +127,7 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
       thumbnailUrl: data.thumbnailUrl || null,
       description: data.description || null,
       localityId: data.localityId || null,
-      status: 'PENDING',
+      status: data.status || 'PENDING',
       moderationNotes: null,
       moderatedBy: null,
       moderatedAt: null,
@@ -141,6 +146,46 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
     }
 
     return { ...submission };
+  }
+
+  async updateSubmission(
+    id: string,
+    data: Partial<{
+      title: string;
+      description: string | null;
+      contentType: 'PLACE' | 'ROUTE' | 'GENERAL';
+      category: string;
+      localityId: string | null;
+      thumbnailUrl: string | null;
+      creatorProfileId: string | null;
+      status: ModerationStatus;
+    }>,
+    placeIds?: string[],
+    primaryPlaceId?: string | null
+  ): Promise<VideoSubmission | null> {
+    const sub = this.videoSubmissions.get(id);
+    if (!sub) return null;
+
+    const updated: VideoSubmission = {
+      ...sub,
+      title: data.title ?? sub.title,
+      description: data.description !== undefined ? data.description : sub.description,
+      contentType: data.contentType ?? sub.contentType,
+      category: data.category ?? sub.category,
+      localityId: data.localityId !== undefined ? data.localityId : sub.localityId,
+      thumbnailUrl: data.thumbnailUrl !== undefined ? data.thumbnailUrl : sub.thumbnailUrl,
+      creatorProfileId: data.creatorProfileId !== undefined ? data.creatorProfileId : sub.creatorProfileId,
+      status: data.status ?? sub.status,
+      updatedAt: new Date().toISOString(),
+    };
+
+    this.videoSubmissions.set(id, updated);
+
+    if (placeIds && Array.isArray(placeIds)) {
+      await this.associatePlaces(id, placeIds, primaryPlaceId);
+    }
+
+    return { ...updated };
   }
 
   async updateSubmissionStatus(
@@ -366,6 +411,7 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
     instagramUrl?: string | null;
     youtubeUrl?: string | null;
     isPublic: boolean;
+    isVerified?: boolean;
   }): Promise<CreatorProfile> {
     const existing = this.creatorProfiles.get(data.userId);
     const now = new Date().toISOString();
@@ -382,7 +428,7 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
       instagramUrl: data.instagramUrl || null,
       youtubeUrl: data.youtubeUrl || null,
       isPublic: data.isPublic,
-      isVerified: existing ? existing.isVerified : false,
+      isVerified: data.isVerified !== undefined ? data.isVerified : existing ? existing.isVerified : false,
       totalApprovedVideos: existing ? existing.totalApprovedVideos : 0,
       createdAt: existing ? existing.createdAt : now,
       updatedAt: now,
@@ -395,6 +441,11 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
   async listPublicCreators(): Promise<CreatorProfile[]> {
     return Array.from(this.creatorProfiles.values())
       .filter((c) => c.isPublic)
+      .sort((a, b) => b.totalApprovedVideos - a.totalApprovedVideos);
+  }
+
+  async listAllCreators(): Promise<CreatorProfile[]> {
+    return Array.from(this.creatorProfiles.values())
       .sort((a, b) => b.totalApprovedVideos - a.totalApprovedVideos);
   }
 

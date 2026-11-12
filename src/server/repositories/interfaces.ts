@@ -44,6 +44,7 @@ export interface IAuthRepository {
     avatarUrl?: string | null;
   }): Promise<User>;
   countUsers(): Promise<number>;
+  listUsers(): Promise<Omit<User, 'passwordHash'>[]>;
 }
 
 export interface ICreatorsRepository {
@@ -67,10 +68,26 @@ export interface ICreatorsRepository {
       contentType: 'PLACE' | 'ROUTE' | 'GENERAL';
       category: string;
       localityId?: string | null;
+      status?: ModerationStatus;
     },
     placeIds?: string[],
     primaryPlaceId?: string | null
   ): Promise<VideoSubmission>;
+  updateSubmission(
+    id: string,
+    data: Partial<{
+      title: string;
+      description: string | null;
+      contentType: 'PLACE' | 'ROUTE' | 'GENERAL';
+      category: string;
+      localityId: string | null;
+      thumbnailUrl: string | null;
+      creatorProfileId: string | null;
+      status: ModerationStatus;
+    }>,
+    placeIds?: string[],
+    primaryPlaceId?: string | null
+  ): Promise<VideoSubmission | null>;
   updateSubmissionStatus(
     id: string,
     status: ModerationStatus,
@@ -118,8 +135,10 @@ export interface ICreatorsRepository {
     instagramUrl?: string | null;
     youtubeUrl?: string | null;
     isPublic: boolean;
+    isVerified?: boolean;
   }): Promise<CreatorProfile>;
   listPublicCreators(): Promise<CreatorProfile[]>;
+  listAllCreators(): Promise<CreatorProfile[]>;
 
   // Metrics & Engagement
   incrementInternalViews(videoId: string): Promise<void>;

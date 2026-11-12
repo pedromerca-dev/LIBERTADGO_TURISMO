@@ -70,7 +70,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     { id: 'audit', label: 'Registro de Auditoría', icon: History },
     {
       id: 'creators',
-      label: 'Moderación Creadores',
+      label: 'Videos y Creadores',
       icon: Video,
       badge: counts?.pendingVideos,
     },

@@ -99,6 +99,15 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
     return res.rows[0]?.count || 0;
   }
 
+  async listUsers(): Promise<Omit<User, 'passwordHash'>[]> {
+    const res = await this.pool.query(`
+      SELECT id, email, name, avatar_url as "avatarUrl", role, created_at as "createdAt", updated_at as "updatedAt"
+      FROM users
+      ORDER BY created_at DESC
+    `);
+    return res.rows;
+  }
+
   // --- ICreatorsRepository ---
 
   async findSubmissionById(id: string): Promise<VideoSubmission | null> {
@@ -146,12 +155,14 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
       contentType: 'PLACE' | 'ROUTE' | 'GENERAL';
       category: string;
       localityId?: string | null;
+      status?: ModerationStatus;
     },
     placeIds: string[] = [],
     primaryPlaceId?: string | null
   ): Promise<VideoSubmission> {
     const id = `vid_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
     const client = await this.pool.connect();
+    const initialStatus = data.status || 'PENDING';
 
     try {
       await client.query('BEGIN');
@@ -161,7 +172,7 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
           id, user_id, creator_profile_id, platform, external_video_id,
           video_url, embed_url, thumbnail_url, title, description,
           content_type, category, locality_id, status
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, 'PENDING')
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
         RETURNING id, user_id as "userId", creator_profile_id as "creatorProfileId", platform, external_video_id as "externalVideoId",
                   video_url as "videoUrl", embed_url as "embedUrl", thumbnail_url as "thumbnailUrl", title, description,
                   content_type as "contentType", category, locality_id as "localityId", status, moderation_notes as "moderationNotes",
@@ -182,6 +193,7 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
           data.contentType,
           data.category,
           data.localityId || null,
+          initialStatus,
         ]
       );
 
@@ -207,6 +219,62 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
     } finally {
       client.release();
     }
+  }
+
+  async updateSubmission(
+    id: string,
+    data: Partial<{
+      title: string;
+      description: string | null;
+      contentType: 'PLACE' | 'ROUTE' | 'GENERAL';
+      category: string;
+      localityId: string | null;
+      thumbnailUrl: string | null;
+      creatorProfileId: string | null;
+      status: ModerationStatus;
+    }>,
+    placeIds?: string[],
+    primaryPlaceId?: string | null
+  ): Promise<VideoSubmission | null> {
+    const existing = await this.findSubmissionById(id);
+    if (!existing) return null;
+
+    const res = await this.pool.query(
+      `UPDATE video_submissions
+       SET title = COALESCE($1, title),
+           description = COALESCE($2, description),
+           content_type = COALESCE($3, content_type),
+           category = COALESCE($4, category),
+           locality_id = COALESCE($5, locality_id),
+           thumbnail_url = COALESCE($6, thumbnail_url),
+           creator_profile_id = COALESCE($7, creator_profile_id),
+           status = COALESCE($8, status),
+           updated_at = NOW()
+       WHERE id = $9
+       RETURNING id, user_id as "userId", creator_profile_id as "creatorProfileId", platform, external_video_id as "externalVideoId",
+                 video_url as "videoUrl", embed_url as "embedUrl", thumbnail_url as "thumbnailUrl", title, description,
+                 content_type as "contentType", category, locality_id as "localityId", status, moderation_notes as "moderationNotes",
+                 moderated_by as "moderatedBy", moderated_at as "moderatedAt", internal_views_count as "internalViewsCount",
+                 internal_saves_count as "internalSavesCount", external_metrics as "externalMetrics",
+                 created_at as "createdAt", updated_at as "updatedAt"`,
+      [
+        data.title,
+        data.description,
+        data.contentType,
+        data.category,
+        data.localityId,
+        data.thumbnailUrl,
+        data.creatorProfileId,
+        data.status,
+        id,
+      ]
+    );
+
+    if (placeIds && Array.isArray(placeIds)) {
+      await this.associatePlaces(id, placeIds, primaryPlaceId);
+    }
+
+    return res.rows[0] || null;
   }
 
   async updateSubmissionStatus(
@@ -543,6 +611,18 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
               total_approved_videos as "totalApprovedVideos", created_at as "createdAt", updated_at as "updatedAt"
        FROM creator_profiles
        WHERE is_public = TRUE
+       ORDER BY total_approved_videos DESC, created_at DESC`
+    );
+    return res.rows;
+  }
+
+  async listAllCreators(): Promise<CreatorProfile[]> {
+    const res = await this.pool.query(
+      `SELECT id, user_id as "userId", handle, display_name as "displayName", bio, avatar_url as "avatarUrl",
+              primary_platform as "primaryPlatform", tiktok_url as "tiktokUrl", instagram_url as "instagramUrl",
+              youtube_url as "youtubeUrl", is_public as "isPublic", is_verified as "isVerified",
+              total_approved_videos as "totalApprovedVideos", created_at as "createdAt", updated_at as "updatedAt"
+       FROM creator_profiles
        ORDER BY total_approved_videos DESC, created_at DESC`
     );
     return res.rows;

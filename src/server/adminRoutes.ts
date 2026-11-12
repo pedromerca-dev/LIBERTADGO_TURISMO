@@ -5,11 +5,17 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { ModerationActionSchema } from './creatorsSchemas.ts';
-import { getCreatorsRepository } from './repositories/index.ts';
+import {
+  ModerationActionSchema,
+  AdminCreateVideoSchema,
+  AdminUpdateVideoSchema,
+  AdminCreateCreatorSchema,
+} from './creatorsSchemas.ts';
+import { getCreatorsRepository, getAuthRepository } from './repositories/index.ts';
 import { requireAuth, requireAdmin } from './authService.ts';
 import { ModerationStatus } from '../types/creators.ts';
 import { INITIAL_PLACES } from '../data/initialPlaces.ts';
+import { parseAndValidateVideoUrl } from '../utils/videoUrlParser.ts';
 
 export const adminRouter = Router();
 
@@ -171,6 +177,246 @@ adminRouter.put('/moderation/:id/places', async (req: Request, res: Response) =>
   } catch (err) {
     console.error('[Admin Error] Error updating linked places:', err);
     res.status(500).json({ success: false, error: 'Error al actualizar lugares asociados' });
+  }
+});
+
+// 5a. POST /api/admin/videos - Register new video directly from Admin
+adminRouter.post('/videos', async (req: Request, res: Response) => {
+  if (!req.user) {
+    res.status(401).json({ success: false, error: 'No autorizado' });
+    return;
+  }
+
+  const parseResult = AdminCreateVideoSchema.safeParse(req.body);
+  if (!parseResult.success) {
+    const errorMsg = parseResult.error.issues.map((i) => i.message).join(', ');
+    res.status(400).json({ success: false, error: errorMsg });
+    return;
+  }
+
+  const {
+    videoUrl,
+    title,
+    description,
+    contentType,
+    category,
+    localityId,
+    thumbnailUrl,
+    creatorProfileId,
+    placeIds,
+    primaryPlaceId,
+    status,
+  } = parseResult.data;
+
+  const parsed = parseAndValidateVideoUrl(videoUrl);
+  if (!parsed.isValid || !parsed.data) {
+    res.status(400).json({ success: false, error: parsed.error || 'URL no soportada' });
+    return;
+  }
+
+  const repo = getCreatorsRepository();
+
+  try {
+    const existing = await repo.findSubmissionByPlatformAndExternalId(
+      parsed.data.platform,
+      parsed.data.externalVideoId
+    );
+
+    if (existing) {
+      res.status(409).json({
+        success: false,
+        error: `Este video ya se encuentra registrado con estado: ${existing.status}`,
+      });
+      return;
+    }
+
+    // Filter places against valid catalog
+    const validPlaceIds = placeIds.filter((pId) =>
+      INITIAL_PLACES.some((p) => p.id === pId)
+    );
+
+    const submission = await repo.createSubmission(
+      {
+        userId: req.user.userId,
+        creatorProfileId: creatorProfileId || null,
+        platform: parsed.data.platform,
+        externalVideoId: parsed.data.externalVideoId,
+        videoUrl: parsed.data.canonicalUrl,
+        embedUrl: parsed.data.embedUrl,
+        thumbnailUrl: thumbnailUrl || null,
+        title,
+        description: description || null,
+        contentType,
+        category,
+        localityId: localityId || null,
+        status: status || 'APPROVED',
+      },
+      validPlaceIds,
+      primaryPlaceId || (validPlaceIds[0] || null)
+    );
+
+    // Audit log
+    await repo.addModerationLog({
+      videoId: submission.id,
+      adminUserId: req.user.userId,
+      adminName: req.user.name,
+      previousStatus: 'PENDING',
+      newStatus: submission.status,
+      reason: 'Registro y publicación directa desde el panel de administración',
+      internalNotes: `Creado por administrador ${req.user.name}`,
+    });
+
+    res.status(201).json({
+      success: true,
+      data: submission,
+      message: 'Video registrado y catalogado exitosamente',
+    });
+  } catch (err) {
+    console.error('[Admin Error] Error creating video:', err);
+    res.status(500).json({ success: false, error: 'Error interno al registrar el video' });
+  }
+});
+
+// 5b. PUT /api/admin/videos/:id - Update existing video metadata and places
+adminRouter.put('/videos/:id', async (req: Request, res: Response) => {
+  if (!req.user) {
+    res.status(401).json({ success: false, error: 'No autorizado' });
+    return;
+  }
+
+  const parseResult = AdminUpdateVideoSchema.safeParse(req.body);
+  if (!parseResult.success) {
+    const errorMsg = parseResult.error.issues.map((i) => i.message).join(', ');
+    res.status(400).json({ success: false, error: errorMsg });
+    return;
+  }
+
+  const repo = getCreatorsRepository();
+  try {
+    const existing = await repo.findSubmissionById(req.params.id);
+    if (!existing) {
+      res.status(404).json({ success: false, error: 'Publicación de video no encontrada' });
+      return;
+    }
+
+    const { placeIds, primaryPlaceId, ...updateFields } = parseResult.data;
+
+    const validPlaceIds = placeIds
+      ? placeIds.filter((pId) => INITIAL_PLACES.some((p) => p.id === pId))
+      : undefined;
+
+    const updated = await repo.updateSubmission(
+      req.params.id,
+      updateFields,
+      validPlaceIds,
+      primaryPlaceId
+    );
+
+    // Record audit log for edit
+    await repo.addModerationLog({
+      videoId: req.params.id,
+      adminUserId: req.user.userId,
+      adminName: req.user.name,
+      previousStatus: existing.status,
+      newStatus: updated?.status || existing.status,
+      reason: 'Edición administrativa de metadatos o lugares asociados',
+      internalNotes: `Modificado por ${req.user.name}`,
+    });
+
+    res.json({
+      success: true,
+      data: updated,
+      message: 'Metadatos de video actualizados exitosamente',
+    });
+  } catch (err) {
+    console.error('[Admin Error] Error updating video:', err);
+    res.status(500).json({ success: false, error: 'Error interno al actualizar el video' });
+  }
+});
+
+// 5c. GET /api/admin/creators - List all creators for admin management
+adminRouter.get('/creators', async (_req: Request, res: Response) => {
+  const repo = getCreatorsRepository();
+  try {
+    const creators = await repo.listAllCreators();
+    res.json({
+      success: true,
+      data: creators,
+      total: creators.length,
+    });
+  } catch (err) {
+    console.error('[Admin Error] Error listing creators for admin:', err);
+    res.status(500).json({ success: false, error: 'Error al consultar directorio de creadores' });
+  }
+});
+
+// 5d. POST /api/admin/creators - Create/Register creator profile from Admin
+adminRouter.post('/creators', async (req: Request, res: Response) => {
+  if (!req.user) {
+    res.status(401).json({ success: false, error: 'No autorizado' });
+    return;
+  }
+
+  const parseResult = AdminCreateCreatorSchema.safeParse(req.body);
+  if (!parseResult.success) {
+    const errorMsg = parseResult.error.issues.map((i) => i.message).join(', ');
+    res.status(400).json({ success: false, error: errorMsg });
+    return;
+  }
+
+  const repo = getCreatorsRepository();
+  try {
+    // Check if handle is already taken
+    const existing = await repo.findCreatorProfileByHandle(parseResult.data.handle);
+    if (existing) {
+      res.status(409).json({
+        success: false,
+        error: `El identificador @${parseResult.data.handle} ya está registrado`,
+      });
+      return;
+    }
+
+    // Link to specified userId or fallback to current admin userId
+    const targetUserId = parseResult.data.userId || req.user.userId;
+
+    const profile = await repo.saveCreatorProfile({
+      userId: targetUserId,
+      handle: parseResult.data.handle,
+      displayName: parseResult.data.displayName,
+      bio: parseResult.data.bio || null,
+      avatarUrl: parseResult.data.avatarUrl || null,
+      primaryPlatform: parseResult.data.primaryPlatform,
+      tiktokUrl: parseResult.data.tiktokUrl || null,
+      instagramUrl: parseResult.data.instagramUrl || null,
+      youtubeUrl: parseResult.data.youtubeUrl || null,
+      isPublic: parseResult.data.isPublic ?? true,
+      isVerified: parseResult.data.isVerified ?? false,
+    });
+
+    res.status(201).json({
+      success: true,
+      data: profile,
+      message: 'Perfil de creador registrado exitosamente',
+    });
+  } catch (err) {
+    console.error('[Admin Error] Error registering creator profile:', err);
+    res.status(500).json({ success: false, error: 'Error interno al registrar perfil de creador' });
+  }
+});
+
+// 5e. GET /api/admin/users - List users for creator profile association
+adminRouter.get('/users', async (_req: Request, res: Response) => {
+  try {
+    const authRepo = getAuthRepository();
+    if (typeof authRepo.listUsers === 'function') {
+      const users = await authRepo.listUsers();
+      res.json({ success: true, data: users });
+      return;
+    }
+    res.json({ success: true, data: [] });
+  } catch (err) {
+    console.error('[Admin Error] Error listing users for admin:', err);
+    res.status(500).json({ success: false, error: 'Error al consultar lista de usuarios' });
   }
 });
 
