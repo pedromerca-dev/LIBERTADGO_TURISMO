@@ -28,7 +28,7 @@ import { INITIAL_PLACES } from '../../data/initialPlaces.ts';
 
 export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepository {
   private users: Map<string, User> = new Map();
-  private creatorProfiles: Map<string, CreatorProfile> = new Map(); // key: userId
+  private creatorProfiles: Map<string, CreatorProfile> = new Map(); // key: creatorProfileId
   private videoSubmissions: Map<string, VideoSubmission> = new Map();
   private videoPlaces: Map<string, VideoPlace> = new Map();
   private moderationLogs: VideoModerationLog[] = [];
@@ -103,7 +103,7 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
 
   async createSubmission(
     data: {
-      userId: string;
+      userId: string ;
       creatorProfileId?: string | null;
       platform: VideoPlatform;
       externalVideoId: string;
@@ -124,6 +124,12 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
     primaryPlaceId?: string | null,
     audit?: ModerationAuditPayload
   ): Promise<VideoSubmission> {
+    if (
+      data.creatorProfileId &&
+      !this.creatorProfiles.has(data.creatorProfileId)
+    ) {
+      throw new Error('El perfil del creador no existe');
+    }
     const id = `vid_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
     const now = new Date().toISOString();
 
@@ -204,6 +210,14 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
   ): Promise<VideoSubmission | null> {
     const sub = this.videoSubmissions.get(id);
     if (!sub) return null;
+        // Validar que el nuevo perfil del creador exista
+        if (
+          data.creatorProfileId !== undefined &&
+          data.creatorProfileId !== null &&
+          !this.creatorProfiles.has(data.creatorProfileId)
+        ) {
+          throw new Error('El perfil del creador no existe');
+        }
 
     // Validate primaryPlaceId against placeIds or existing places before mutating
     if (placeIds !== undefined) {
@@ -397,8 +411,8 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
       paginated.map(async (v) => {
         const places = await this.getPlacesForVideo(v.id);
         const creatorProfile = v.creatorProfileId
-          ? Array.from(this.creatorProfiles.values()).find((cp) => cp.id === v.creatorProfileId)
-          : (this.creatorProfiles.get(v.userId) || null);
+        ? this.creatorProfiles.get(v.creatorProfileId) || null
+        : null;
         const user = this.users.get(v.userId);
 
         return {
@@ -431,6 +445,22 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
       );
     return list.map((v) => ({ ...v }));
   }
+
+ async listSubmissionsByCreatorProfileId(
+  creatorProfileId: string
+): Promise<VideoSubmission[]> {
+  const list = Array.from(this.videoSubmissions.values())
+    .filter(
+      (video) => video.creatorProfileId === creatorProfileId
+    )
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() -
+        new Date(a.createdAt).getTime()
+    );
+
+  return list.map((video) => ({ ...video }));
+}
 
   async listModerationQueue(
     status: ModerationStatus = 'PENDING'
@@ -565,8 +595,8 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
       matching.map(async (v) => {
         const places = await this.getPlacesForVideo(v.id);
         const creatorProfile = v.creatorProfileId
-          ? Array.from(this.creatorProfiles.values()).find((cp) => cp.id === v.creatorProfileId)
-          : (this.creatorProfiles.get(v.userId) || null);
+        ? this.creatorProfiles.get(v.creatorProfileId) || null
+         : null;
         const user = this.users.get(v.userId);
 
         return {
@@ -589,20 +619,27 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
   }
 
   async findCreatorProfileByUserId(userId: string): Promise<CreatorProfile | null> {
-    const prof = this.creatorProfiles.get(userId);
-    return prof ? { ...prof } : null;
+    const profile = Array.from(this.creatorProfiles.values())
+      .find((item) => item.userId === userId);
+
+    return profile ? { ...profile } : null;
+  }
+
+  async findCreatorProfileById(id: string): Promise<CreatorProfile | null> {
+    const profile = this.creatorProfiles.get(id);
+    return profile ? { ...profile } : null;
   }
 
   async findCreatorProfileByHandle(handle: string): Promise<CreatorProfile | null> {
-    const lower = handle.toLowerCase();
-    for (const prof of this.creatorProfiles.values()) {
-      if (prof.handle.toLowerCase() === lower) {
-        return { ...prof };
-      }
-    }
-    return null;
+    const normalizedHandle = handle.toLowerCase().trim();
+
+    const profile = Array.from(this.creatorProfiles.values())
+      .find((item) => item.handle.toLowerCase() === normalizedHandle);
+
+    return profile ? { ...profile } : null;
   }
 
+  // Crear o actualizar un perfil vinculado a una cuenta de usuario.
   async saveCreatorProfile(data: {
     userId: string;
     handle: string;
@@ -620,42 +657,152 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
     isPublic: boolean;
     isVerified?: boolean;
   }): Promise<CreatorProfile> {
-    const existing = this.creatorProfiles.get(data.userId);
-    const now = new Date().toISOString();
+    const existing = Array.from(this.creatorProfiles.values())
+      .find((profile) => profile.userId === data.userId);
 
-    const profile: CreatorProfile = {
-      id: existing ? existing.id : `cp_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
-      userId: data.userId,
-      handle: data.handle.toLowerCase().trim(),
-      displayName: data.displayName,
-      bio: data.bio || null,
-      avatarUrl: data.avatarUrl || null,
-      primaryPlatform: data.primaryPlatform,
-      tiktokUrl: data.tiktokUrl || null,
-      instagramUrl: data.instagramUrl || null,
-      youtubeUrl: data.youtubeUrl || null,
-      tiktokFollowers: data.tiktokFollowers !== undefined ? data.tiktokFollowers : existing?.tiktokFollowers ?? null,
-      instagramFollowers: data.instagramFollowers !== undefined ? data.instagramFollowers : existing?.instagramFollowers ?? null,
-      youtubeSubscribers: data.youtubeSubscribers !== undefined ? data.youtubeSubscribers : existing?.youtubeSubscribers ?? null,
-      audienceUpdatedAt: data.audienceUpdatedAt !== undefined ? data.audienceUpdatedAt : existing?.audienceUpdatedAt ?? null,
-      isPublic: data.isPublic,
-      isVerified: data.isVerified !== undefined ? data.isVerified : existing ? existing.isVerified : false,
-      totalApprovedVideos: existing ? existing.totalApprovedVideos : 0,
-      createdAt: existing ? existing.createdAt : now,
-      updatedAt: now,
-    };
+    const profile = await this.createOrUpdateProfile(
+      existing?.id ?? null,
+      data
+    );
 
-    this.creatorProfiles.set(data.userId, profile);
+    return profile;
+  }
 
-    // Link any submissions belonging to this user that were created prior to profile creation
-    for (const sub of this.videoSubmissions.values()) {
-      if (sub.userId === data.userId && !sub.creatorProfileId) {
-        sub.creatorProfileId = profile.id;
+  // Crear un perfil independiente, sin exigir una cuenta de usuario.
+  async createCreatorProfile(data: {
+    userId?: string | null;
+    handle: string;
+    displayName: string;
+    bio?: string | null;
+    avatarUrl?: string | null;
+    primaryPlatform: VideoPlatform;
+    tiktokUrl?: string | null;
+    instagramUrl?: string | null;
+    youtubeUrl?: string | null;
+    tiktokFollowers?: number | null;
+    instagramFollowers?: number | null;
+    youtubeSubscribers?: number | null;
+    audienceUpdatedAt?: string | null;
+    isPublic: boolean;
+    isVerified?: boolean;
+  }): Promise<CreatorProfile> {
+    return this.createOrUpdateProfile(null, data);
+  }
+
+  // Actualizar un perfil existente mediante su ID.
+  async updateCreatorProfile(
+    id: string,
+    data: Partial<{
+      userId: string | null;
+      handle: string;
+      displayName: string;
+      bio: string | null;
+      avatarUrl: string | null;
+      primaryPlatform: VideoPlatform;
+      tiktokUrl: string | null;
+      instagramUrl: string | null;
+      youtubeUrl: string | null;
+      tiktokFollowers: number | null;
+      instagramFollowers: number | null;
+      youtubeSubscribers: number | null;
+      audienceUpdatedAt: string | null;
+      isPublic: boolean;
+      isVerified: boolean;
+    }>
+  ): Promise<CreatorProfile | null> {
+    const existing = this.creatorProfiles.get(id);
+
+    if (!existing) return null;
+
+    return this.createOrUpdateProfile(id, {
+      ...existing,
+      ...data,
+    });
+  }
+
+  // Método interno para centralizar validaciones y persistencia.
+  private async createOrUpdateProfile(
+    existingId: string | null,
+    data: {
+      userId?: string | null;
+      handle: string;
+      displayName: string;
+      bio?: string | null;
+      avatarUrl?: string | null;
+      primaryPlatform: VideoPlatform;
+      tiktokUrl?: string | null;
+      instagramUrl?: string | null;
+      youtubeUrl?: string | null;
+      tiktokFollowers?: number | null;
+      instagramFollowers?: number | null;
+      youtubeSubscribers?: number | null;
+      audienceUpdatedAt?: string | null;
+      isPublic: boolean;
+      isVerified?: boolean;
+    }
+  ): Promise<CreatorProfile> {
+    const normalizedHandle = data.handle.toLowerCase().trim();
+
+    if (!normalizedHandle) {
+      throw new Error('El handle del creador es obligatorio');
+    }
+
+    const duplicateHandle = Array.from(this.creatorProfiles.values())
+      .find((profile) =>
+        profile.handle.toLowerCase() === normalizedHandle &&
+        profile.id !== existingId
+      );
+
+    if (duplicateHandle) {
+      throw new Error('Ya existe un creador con ese handle');
+    }
+
+    if (data.userId) {
+      const duplicateUser = Array.from(this.creatorProfiles.values())
+        .find((profile) =>
+          profile.userId === data.userId &&
+          profile.id !== existingId
+        );
+
+      if (duplicateUser) {
+        throw new Error('Este usuario ya tiene un perfil de creador');
       }
     }
 
+    const existing = existingId
+      ? this.creatorProfiles.get(existingId)
+      : undefined;
+
+    const now = new Date().toISOString();
+
+    const profile: CreatorProfile = {
+      id: existing?.id ??
+        `cp_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
+      userId: data.userId ?? null,
+      handle: normalizedHandle,
+      displayName: data.displayName,
+      bio: data.bio ?? null,
+      avatarUrl: data.avatarUrl ?? null,
+      primaryPlatform: data.primaryPlatform,
+      tiktokUrl: data.tiktokUrl ?? null,
+      instagramUrl: data.instagramUrl ?? null,
+      youtubeUrl: data.youtubeUrl ?? null,
+      tiktokFollowers: data.tiktokFollowers ?? null,
+      instagramFollowers: data.instagramFollowers ?? null,
+      youtubeSubscribers: data.youtubeSubscribers ?? null,
+      audienceUpdatedAt: data.audienceUpdatedAt ?? null,
+      isPublic: data.isPublic,
+      isVerified: data.isVerified ?? existing?.isVerified ?? false,
+      totalApprovedVideos: existing?.totalApprovedVideos ?? 0,
+      createdAt: existing?.createdAt ?? now,
+      updatedAt: now,
+    };
+
+    this.creatorProfiles.set(profile.id, profile);
+
     return { ...profile };
   }
+
 
   async listPublicCreators(): Promise<CreatorProfile[]> {
     return Array.from(this.creatorProfiles.values())
@@ -721,8 +868,8 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
       if (sub && sub.status === 'APPROVED') {
         const places = await this.getPlacesForVideo(sub.id);
         const creatorProfile = sub.creatorProfileId
-          ? Array.from(this.creatorProfiles.values()).find((cp) => cp.id === sub.creatorProfileId)
-          : (this.creatorProfiles.get(sub.userId) || null);
+         ? this.creatorProfiles.get(sub.creatorProfileId) || null
+         : null;
 
         result.push({
           ...sub,
@@ -756,6 +903,7 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
 
   async close(): Promise<void> {
     this.users.clear();
+    this.creatorProfiles.clear();
     this.videoSubmissions.clear();
     this.videoPlaces.clear();
     this.savedVideos.clear();

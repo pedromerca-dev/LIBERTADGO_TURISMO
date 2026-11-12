@@ -316,7 +316,7 @@ creatorsRouter.get('/profiles/:handle', async (req: Request, res: Response) => {
       return;
     }
 
-    const videos = await repo.listSubmissionsByUser(profile.userId);
+    const videos = await repo.listSubmissionsByCreatorProfileId(profile.id);
     const approvedVideos = videos.filter((v) => v.status === 'APPROVED');
 
     res.json({

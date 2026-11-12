@@ -10,6 +10,7 @@ import {
   AdminCreateVideoSchema,
   AdminUpdateVideoSchema,
   AdminCreateCreatorSchema,
+  AdminUpdateCreatorSchema,
   AdminUpdateVideoPlacesSchema,
 } from './creatorsSchemas.ts';
 import { getCreatorsRepository, getAuthRepository } from './repositories/index.ts';
@@ -468,13 +469,15 @@ adminRouter.post('/creators', async (req: Request, res: Response) => {
   }
 
   const repo = getCreatorsRepository();
-  try {
-    // Link to specified userId or fallback to current admin userId
-    const targetUserId = parseResult.data.userId || req.user.userId;
 
-    // Check if handle is already taken by a different user
+  try {
+    // Los creadores pueden existir sin una cuenta de usuario propia.
+    const targetUserId = parseResult.data.userId ?? null;
+
+    // Un handle debe ser único entre todos los perfiles.
     const existing = await repo.findCreatorProfileByHandle(parseResult.data.handle);
-    if (existing && existing.userId !== targetUserId) {
+
+    if (existing) {
       res.status(409).json({
         success: false,
         error: `El identificador @${parseResult.data.handle} ya está registrado`,
@@ -491,7 +494,7 @@ adminRouter.post('/creators', async (req: Request, res: Response) => {
       parseResult.data.audienceUpdatedAt ||
       (hasAudienceData ? new Date().toISOString() : null);
 
-    const profile = await repo.saveCreatorProfile({
+    const profile = await repo.createCreatorProfile({
       userId: targetUserId,
       handle: parseResult.data.handle,
       displayName: parseResult.data.displayName,
@@ -516,7 +519,83 @@ adminRouter.post('/creators', async (req: Request, res: Response) => {
     });
   } catch (err) {
     console.error('[Admin Error] Error registering creator profile:', err);
-    res.status(500).json({ success: false, error: 'Error interno al registrar perfil de creador' });
+    res.status(500).json({
+      success: false,
+      error: 'Error interno al registrar perfil de creador',
+    });
+  }
+});
+
+// 5e. PUT /api/admin/creators/:id - Update creator profile
+adminRouter.put('/creators/:id', async (req: Request, res: Response) => {
+  if (!req.user) {
+    res.status(401).json({ success: false, error: 'No autorizado' });
+    return;
+  }
+
+  const parseResult = AdminUpdateCreatorSchema.safeParse(req.body);
+
+  if (!parseResult.success) {
+    const errorMsg = parseResult.error.issues.map((i) => i.message).join(', ');
+    res.status(400).json({ success: false, error: errorMsg });
+    return;
+  }
+
+  const repo = getCreatorsRepository();
+
+  try {
+    const existing = await repo.findCreatorProfileById(req.params.id);
+
+    if (!existing) {
+      res.status(404).json({
+        success: false,
+        error: 'Perfil de creador no encontrado',
+      });
+      return;
+    }
+
+    // Evitar que el handle actualizado pertenezca a otro creador.
+    if (
+      parseResult.data.handle &&
+      parseResult.data.handle !== existing.handle
+    ) {
+      const handleOwner = await repo.findCreatorProfileByHandle(
+        parseResult.data.handle
+      );
+
+      if (handleOwner && handleOwner.id !== existing.id) {
+        res.status(409).json({
+          success: false,
+          error: `El identificador @${parseResult.data.handle} ya está registrado`,
+        });
+        return;
+      }
+    }
+
+    const updatedProfile = await repo.updateCreatorProfile(
+      req.params.id,
+      parseResult.data
+    );
+
+    if (!updatedProfile) {
+      res.status(404).json({
+        success: false,
+        error: 'No se pudo actualizar el perfil de creador',
+      });
+      return;
+    }
+
+    res.json({
+      success: true,
+      data: updatedProfile,
+      message: 'Perfil de creador actualizado exitosamente',
+    });
+  } catch (err) {
+    console.error('[Admin Error] Error updating creator profile:', err);
+    res.status(500).json({
+      success: false,
+      error: 'Error interno al actualizar perfil de creador',
+    });
   }
 });
 
