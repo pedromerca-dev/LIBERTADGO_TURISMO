@@ -135,9 +135,25 @@ creatorsRouter.post('/submissions', requireAuth, async (req: Request, res: Respo
     }
 
     // Verify places exist in tourist directory
-    const validPlaceIds = placeIds.filter((pId) =>
-      INITIAL_PLACES.some((p) => p.id === pId)
+    const invalidPlaceIds = placeIds.filter((pId) =>
+      !INITIAL_PLACES.some((p) => p.id === pId)
     );
+    if (invalidPlaceIds.length > 0) {
+      res.status(400).json({
+        success: false,
+        error: `Los siguientes lugares no existen en el catálogo turístico: ${invalidPlaceIds.join(', ')}`,
+      });
+      return;
+    }
+
+    const uniquePlaceIds = Array.from(new Set(placeIds));
+    if (primaryPlaceId && uniquePlaceIds.length > 0 && !uniquePlaceIds.includes(primaryPlaceId)) {
+      res.status(400).json({
+        success: false,
+        error: 'El lugar principal debe pertenecer a la lista de lugares asociados',
+      });
+      return;
+    }
 
     // Get creator profile if user has one
     const profile = await repo.findCreatorProfileByUserId(req.user.userId);
@@ -158,8 +174,8 @@ creatorsRouter.post('/submissions', requireAuth, async (req: Request, res: Respo
         localityId: localityId || null,
         externalCreatorHandle: (!profile && parsed.data.authorHandle) ? parsed.data.authorHandle : null,
       },
-      validPlaceIds,
-      primaryPlaceId || (validPlaceIds[0] || null)
+      uniquePlaceIds,
+      primaryPlaceId || (uniquePlaceIds[0] || null)
     );
 
     res.status(201).json({

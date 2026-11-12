@@ -27,6 +27,7 @@ export interface TikTokVideo {
   platform?: string;
   embedUrl?: string;
   places?: Array<{ id: string; name: string; locality?: string }>;
+  rawDate?: string;
 }
 
 interface TikTokVideoGalleryProps {
@@ -92,10 +93,11 @@ export function TikTokVideoGallery({
             const viewsA = a.internalViews ?? 0;
             return viewsB - viewsA;
           }
-          case 'recent':
-            return (
-              new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime()
-            );
+          case 'recent': {
+            const timeB = b.rawDate ? new Date(b.rawDate).getTime() : new Date(b.updatedAt || 0).getTime();
+            const timeA = a.rawDate ? new Date(a.rawDate).getTime() : new Date(a.updatedAt || 0).getTime();
+            return (isNaN(timeB) ? 0 : timeB) - (isNaN(timeA) ? 0 : timeA);
+          }
           case 'popular':
           default: {
             const viewsB = b.externalViews ?? b.views ?? 0;

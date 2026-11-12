@@ -12,6 +12,7 @@ import {
   ModerationStatus,
   ModerationActionType,
   ModerationAuditPayload,
+  VideoExternalMetrics,
 } from '../../types/creators.ts';
 import { Place } from '../../types/catalog.ts';
 
@@ -93,6 +94,7 @@ export interface ICreatorsRepository {
       externalCreatorHandle: string | null;
       externalCreatorDisplayName: string | null;
       externalCreatorAvatarUrl: string | null;
+      externalMetrics?: VideoExternalMetrics | null;
     }>,
     placeIds?: string[],
     primaryPlaceId?: string | null,

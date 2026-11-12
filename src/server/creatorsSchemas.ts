@@ -113,7 +113,18 @@ export const SubmitVideoSchema = z.object({
     .trim()
     .optional()
     .nullable(),
-});
+}).refine(
+  (data) => {
+    if (data.primaryPlaceId && data.placeIds) {
+      return data.placeIds.includes(data.primaryPlaceId);
+    }
+    return true;
+  },
+  {
+    message: 'El lugar principal (primaryPlaceId) debe pertenecer a la lista de lugares asociados (placeIds)',
+    path: ['primaryPlaceId'],
+  }
+);
 
 export const ModerationActionSchema = z.object({
   action: z.enum(['APPROVE', 'REJECT', 'OBSERVE', 'HIDE']),
@@ -206,7 +217,18 @@ export const AdminCreateVideoSchema = z.object({
     .url('La URL del avatar no es válida')
     .optional()
     .nullable(),
-});
+}).refine(
+  (data) => {
+    if (data.primaryPlaceId && data.placeIds) {
+      return data.placeIds.includes(data.primaryPlaceId);
+    }
+    return true;
+  },
+  {
+    message: 'El lugar principal (primaryPlaceId) debe pertenecer a la lista de lugares asociados (placeIds)',
+    path: ['primaryPlaceId'],
+  }
+);
 
 export const AdminUpdateVideoSchema = z.object({
   title: z
@@ -275,7 +297,18 @@ export const AdminUpdateVideoSchema = z.object({
     .url('La URL del avatar no es válida')
     .optional()
     .nullable(),
-});
+}).refine(
+  (data) => {
+    if (data.primaryPlaceId && data.placeIds) {
+      return data.placeIds.includes(data.primaryPlaceId);
+    }
+    return true;
+  },
+  {
+    message: 'El lugar principal (primaryPlaceId) debe pertenecer a la lista de lugares asociados (placeIds)',
+    path: ['primaryPlaceId'],
+  }
+);
 
 export const AdminCreateCreatorSchema = z.object({
   userId: z.string().trim().optional(),

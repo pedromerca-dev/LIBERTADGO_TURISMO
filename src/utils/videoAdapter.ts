@@ -140,6 +140,7 @@ export function adaptVideoSubmissionToTikTokVideo(
     likes: externalLikes ?? internalSaves,
     rating: 0, // No fake ratings
     updatedAt: formatVideoDate(submission.createdAt),
+    rawDate: submission.createdAt || submission.updatedAt,
     demo: false,
     locality,
     department: 'La Libertad',

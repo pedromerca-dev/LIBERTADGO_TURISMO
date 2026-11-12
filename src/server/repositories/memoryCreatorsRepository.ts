@@ -21,6 +21,7 @@ import {
   ModerationAuditPayload,
   VideoPlace,
   SavedVideo,
+  VideoExternalMetrics,
 } from '../../types/creators.ts';
 import { Place } from '../../types/catalog.ts';
 import { INITIAL_PLACES } from '../../data/initialPlaces.ts';
@@ -151,11 +152,17 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
       updatedAt: now,
     };
 
+    // Validate primaryPlaceId upfront before mutating state
+    const uniquePlaceIds = Array.from(new Set(placeIds || []));
+    if (primaryPlaceId && uniquePlaceIds.length > 0 && !uniquePlaceIds.includes(primaryPlaceId)) {
+      throw new Error('primaryPlaceId must be one of the associated placeIds');
+    }
+
     this.videoSubmissions.set(id, submission);
 
     // Associate places
-    if (placeIds && placeIds.length > 0) {
-      await this.associatePlaces(id, placeIds, primaryPlaceId);
+    if (uniquePlaceIds.length > 0) {
+      await this.associatePlaces(id, uniquePlaceIds, primaryPlaceId);
     }
 
     if (audit) {
@@ -189,6 +196,7 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
       externalCreatorHandle: string | null;
       externalCreatorDisplayName: string | null;
       externalCreatorAvatarUrl: string | null;
+      externalMetrics?: VideoExternalMetrics | null;
     }>,
     placeIds?: string[],
     primaryPlaceId?: string | null,
@@ -196,6 +204,21 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
   ): Promise<VideoSubmission | null> {
     const sub = this.videoSubmissions.get(id);
     if (!sub) return null;
+
+    // Validate primaryPlaceId against placeIds or existing places before mutating
+    if (placeIds !== undefined) {
+      const uniqueIds = Array.from(new Set(placeIds));
+      if (primaryPlaceId !== undefined && primaryPlaceId !== null) {
+        if (uniqueIds.length > 0 && !uniqueIds.includes(primaryPlaceId)) {
+          throw new Error('primaryPlaceId must be one of the associated placeIds');
+        }
+      }
+    } else if (primaryPlaceId !== undefined && primaryPlaceId !== null) {
+      const currentPlaces = await this.getPlacesForVideo(id);
+      if (!currentPlaces.some((p) => p.id === primaryPlaceId)) {
+        throw new Error('primaryPlaceId must be one of the associated placeIds');
+      }
+    }
 
     const updated: VideoSubmission = {
       ...sub,
@@ -213,9 +236,11 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
       externalMetrics:
         data.externalCreatorHandle !== undefined ||
         data.externalCreatorDisplayName !== undefined ||
-        data.externalCreatorAvatarUrl !== undefined
+        data.externalCreatorAvatarUrl !== undefined ||
+        data.externalMetrics !== undefined
           ? {
               ...(sub.externalMetrics || {}),
+              ...(data.externalMetrics !== undefined ? data.externalMetrics : {}),
               ...(data.externalCreatorHandle !== undefined ? { creatorHandle: data.externalCreatorHandle } : {}),
               ...(data.externalCreatorDisplayName !== undefined ? { creatorDisplayName: data.externalCreatorDisplayName } : {}),
               ...(data.externalCreatorAvatarUrl !== undefined ? { creatorAvatarUrl: data.externalCreatorAvatarUrl } : {}),
@@ -226,8 +251,30 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
 
     this.videoSubmissions.set(id, updated);
 
-    if (placeIds && Array.isArray(placeIds)) {
-      await this.associatePlaces(id, placeIds, primaryPlaceId);
+    if (placeIds !== undefined && Array.isArray(placeIds)) {
+      const uniquePlaceIds = Array.from(new Set(placeIds));
+      let effectivePrimaryId: string | null = null;
+
+      if (primaryPlaceId !== undefined && primaryPlaceId !== null) {
+        effectivePrimaryId = primaryPlaceId;
+      } else {
+        // Find existing primary place
+        const currentPlaces = Array.from(this.videoPlaces.values()).filter((vp) => vp.videoId === id);
+        const existingPrimary = currentPlaces.find((vp) => vp.isPrimary)?.placeId;
+        if (existingPrimary && uniquePlaceIds.includes(existingPrimary)) {
+          effectivePrimaryId = existingPrimary;
+        } else {
+          effectivePrimaryId = uniquePlaceIds.length > 0 ? uniquePlaceIds[0] : null;
+        }
+      }
+
+      await this.associatePlaces(id, uniquePlaceIds, effectivePrimaryId);
+    } else if (primaryPlaceId !== undefined && primaryPlaceId !== null) {
+      for (const vp of this.videoPlaces.values()) {
+        if (vp.videoId === id) {
+          vp.isPrimary = vp.placeId === primaryPlaceId;
+        }
+      }
     }
 
     if (audit) {
@@ -451,6 +498,12 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
     placeIds: string[],
     primaryPlaceId?: string | null
   ): Promise<void> {
+    const uniquePlaceIds = Array.from(new Set(placeIds || []));
+    if (primaryPlaceId && uniquePlaceIds.length > 0 && !uniquePlaceIds.includes(primaryPlaceId)) {
+      throw new Error('primaryPlaceId must be one of the associated placeIds');
+    }
+    const effectivePrimaryId = primaryPlaceId || (uniquePlaceIds.length > 0 ? uniquePlaceIds[0] : null);
+
     // Remove previous associations
     for (const [k, vp] of this.videoPlaces.entries()) {
       if (vp.videoId === videoId) {
@@ -458,8 +511,8 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
       }
     }
 
-    placeIds.forEach((pId, idx) => {
-      const isPrimary = primaryPlaceId ? primaryPlaceId === pId : idx === 0;
+    uniquePlaceIds.forEach((pId) => {
+      const isPrimary = effectivePrimaryId === pId;
       const id = `vp_${videoId}_${pId}`;
       this.videoPlaces.set(id, {
         id,
@@ -477,7 +530,9 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
       .sort((a, b) => (b.isPrimary ? 1 : 0) - (a.isPrimary ? 1 : 0))
       .map((vp) => vp.placeId);
 
-    return INITIAL_PLACES.filter((p) => pIds.includes(p.id));
+    return pIds
+      .map((id) => INITIAL_PLACES.find((p) => p.id === id))
+      .filter((p): p is Place => p !== undefined);
   }
 
   async getVideosForPlace(placeId: string): Promise<VideoSubmission[]> {

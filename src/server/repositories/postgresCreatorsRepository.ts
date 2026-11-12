@@ -20,6 +20,7 @@ import {
   ModerationStatus,
   ModerationActionType,
   ModerationAuditPayload,
+  VideoExternalMetrics,
 } from '../../types/creators.ts';
 import { Place } from '../../types/catalog.ts';
 import { INITIAL_PLACES } from '../../data/initialPlaces.ts';
@@ -303,9 +304,16 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
 
       const submission: VideoSubmission = mapVideoSubmissionRow(res.rows[0]);
 
+      // Deduplicate placeIds and validate primaryPlaceId
+      const uniquePlaceIds = Array.from(new Set(placeIds || []));
+      if (primaryPlaceId && uniquePlaceIds.length > 0 && !uniquePlaceIds.includes(primaryPlaceId)) {
+        throw new Error('primaryPlaceId must be one of the associated placeIds');
+      }
+      const effectivePrimaryId = primaryPlaceId || (uniquePlaceIds.length > 0 ? uniquePlaceIds[0] : null);
+
       // Associate places
-      for (const pId of placeIds) {
-        const isPrimary = primaryPlaceId ? primaryPlaceId === pId : placeIds[0] === pId;
+      for (const pId of uniquePlaceIds) {
+        const isPrimary = effectivePrimaryId === pId;
         const vpId = `vp_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
         await client.query(
           `INSERT INTO video_places (id, video_id, place_id, is_primary)
@@ -351,6 +359,7 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
       externalCreatorHandle: string | null;
       externalCreatorDisplayName: string | null;
       externalCreatorAvatarUrl: string | null;
+      externalMetrics?: VideoExternalMetrics | null;
     }>,
     placeIds?: string[],
     primaryPlaceId?: string | null,
@@ -382,10 +391,12 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
       if (
         data.externalCreatorHandle !== undefined ||
         data.externalCreatorDisplayName !== undefined ||
-        data.externalCreatorAvatarUrl !== undefined
+        data.externalCreatorAvatarUrl !== undefined ||
+        data.externalMetrics !== undefined
       ) {
         const mergedMetrics = {
           ...(existing.externalMetrics || {}),
+          ...(data.externalMetrics !== undefined ? data.externalMetrics : {}),
           ...(data.externalCreatorHandle !== undefined ? { creatorHandle: data.externalCreatorHandle } : {}),
           ...(data.externalCreatorDisplayName !== undefined ? { creatorDisplayName: data.externalCreatorDisplayName } : {}),
           ...(data.externalCreatorAvatarUrl !== undefined ? { creatorAvatarUrl: data.externalCreatorAvatarUrl } : {}),
@@ -393,44 +404,91 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
         metricsJson = JSON.stringify(mergedMetrics);
       }
 
+      const setClauses: string[] = [];
+      const params: any[] = [];
+
+      if (data.title !== undefined) {
+        params.push(data.title);
+        setClauses.push(`title = $${params.length}`);
+      }
+      if (data.description !== undefined) {
+        params.push(data.description);
+        setClauses.push(`description = $${params.length}`);
+      }
+      if (data.contentType !== undefined) {
+        params.push(data.contentType);
+        setClauses.push(`content_type = $${params.length}`);
+      }
+      if (data.category !== undefined) {
+        params.push(data.category);
+        setClauses.push(`category = $${params.length}`);
+      }
+      if (data.localityId !== undefined) {
+        params.push(data.localityId);
+        setClauses.push(`locality_id = $${params.length}`);
+      }
+      if (data.thumbnailUrl !== undefined) {
+        params.push(data.thumbnailUrl);
+        setClauses.push(`thumbnail_url = $${params.length}`);
+      }
+      if (data.creatorProfileId !== undefined) {
+        params.push(data.creatorProfileId);
+        setClauses.push(`creator_profile_id = $${params.length}`);
+      }
+      if (data.status !== undefined) {
+        params.push(data.status);
+        setClauses.push(`status = $${params.length}`);
+      }
+      if (metricsJson !== null) {
+        params.push(metricsJson);
+        setClauses.push(`external_metrics = $${params.length}::jsonb`);
+      }
+
+      setClauses.push('updated_at = NOW()');
+
+      params.push(id);
+      const idParamIndex = params.length;
+
       const res = await client.query(
         `UPDATE video_submissions
-         SET title = COALESCE($1, title),
-             description = COALESCE($2, description),
-             content_type = COALESCE($3, content_type),
-             category = COALESCE($4, category),
-             locality_id = COALESCE($5, locality_id),
-             thumbnail_url = COALESCE($6, thumbnail_url),
-             creator_profile_id = COALESCE($7, creator_profile_id),
-             status = COALESCE($8, status),
-             external_metrics = CASE WHEN $9::text IS NOT NULL THEN $9::jsonb ELSE external_metrics END,
-             updated_at = NOW()
-         WHERE id = $10
+         SET ${setClauses.join(', ')}
+         WHERE id = $${idParamIndex}
          RETURNING id, user_id as "userId", creator_profile_id as "creatorProfileId", platform, external_video_id as "externalVideoId",
                    video_url as "videoUrl", embed_url as "embedUrl", thumbnail_url as "thumbnailUrl", title, description,
                    content_type as "contentType", category, locality_id as "localityId", status, moderation_notes as "moderationNotes",
                    moderated_by as "moderatedBy", moderated_at as "moderatedAt", internal_views_count as "internalViewsCount",
                    internal_saves_count as "internalSavesCount", external_metrics as "externalMetrics",
                    created_at as "createdAt", updated_at as "updatedAt"`,
-        [
-          data.title,
-          data.description,
-          data.contentType,
-          data.category,
-          data.localityId,
-          data.thumbnailUrl,
-          data.creatorProfileId,
-          data.status,
-          metricsJson,
-          id,
-        ]
+        params
       );
 
-      // Associate places in the same transaction
-      if (placeIds && Array.isArray(placeIds)) {
+      // Handle places association within the same atomic transaction
+      if (placeIds !== undefined && Array.isArray(placeIds)) {
+        const uniquePlaceIds = Array.from(new Set(placeIds));
+        let effectivePrimaryId: string | null = null;
+
+        if (primaryPlaceId !== undefined && primaryPlaceId !== null) {
+          if (uniquePlaceIds.length > 0 && !uniquePlaceIds.includes(primaryPlaceId)) {
+            throw new Error('primaryPlaceId must be one of the associated placeIds');
+          }
+          effectivePrimaryId = primaryPlaceId;
+        } else {
+          // Check if previous primary place is still among the new uniquePlaceIds
+          const currentPrimaryRes = await client.query(
+            `SELECT place_id FROM video_places WHERE video_id = $1 AND is_primary = true LIMIT 1`,
+            [id]
+          );
+          const currentPrimaryId = currentPrimaryRes.rows[0]?.place_id;
+          if (currentPrimaryId && uniquePlaceIds.includes(currentPrimaryId)) {
+            effectivePrimaryId = currentPrimaryId;
+          } else {
+            effectivePrimaryId = uniquePlaceIds.length > 0 ? uniquePlaceIds[0] : null;
+          }
+        }
+
         await client.query(`DELETE FROM video_places WHERE video_id = $1`, [id]);
-        for (const pId of placeIds) {
-          const isPrimary = primaryPlaceId ? primaryPlaceId === pId : placeIds[0] === pId;
+        for (const pId of uniquePlaceIds) {
+          const isPrimary = effectivePrimaryId === pId;
           const vpId = `vp_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
           await client.query(
             `INSERT INTO video_places (id, video_id, place_id, is_primary)
@@ -439,6 +497,20 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
             [vpId, id, pId, isPrimary]
           );
         }
+      } else if (primaryPlaceId !== undefined && primaryPlaceId !== null) {
+        // Only primaryPlaceId changed without changing placeIds
+        const existingPlacesRes = await client.query(
+          `SELECT place_id FROM video_places WHERE video_id = $1`,
+          [id]
+        );
+        const existingPlaceIds = existingPlacesRes.rows.map((r: { place_id: string }) => r.place_id);
+        if (!existingPlaceIds.includes(primaryPlaceId)) {
+          throw new Error('primaryPlaceId must be one of the associated placeIds');
+        }
+        await client.query(
+          `UPDATE video_places SET is_primary = (place_id = $1) WHERE video_id = $2`,
+          [primaryPlaceId, id]
+        );
       }
 
       // Record audit log within the SAME atomic transaction
@@ -741,12 +813,18 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
     placeIds: string[],
     primaryPlaceId?: string | null
   ): Promise<void> {
+    const uniquePlaceIds = Array.from(new Set(placeIds || []));
+    if (primaryPlaceId && uniquePlaceIds.length > 0 && !uniquePlaceIds.includes(primaryPlaceId)) {
+      throw new Error('primaryPlaceId must be one of the associated placeIds');
+    }
+    const effectivePrimaryId = primaryPlaceId || (uniquePlaceIds.length > 0 ? uniquePlaceIds[0] : null);
+
     const client = await this.pool.connect();
     try {
       await client.query('BEGIN');
       await client.query(`DELETE FROM video_places WHERE video_id = $1`, [videoId]);
-      for (const pId of placeIds) {
-        const isPrimary = primaryPlaceId ? primaryPlaceId === pId : placeIds[0] === pId;
+      for (const pId of uniquePlaceIds) {
+        const isPrimary = effectivePrimaryId === pId;
         const vpId = `vp_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
         await client.query(
           `INSERT INTO video_places (id, video_id, place_id, is_primary)
@@ -766,11 +844,13 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
 
   async getPlacesForVideo(videoId: string): Promise<Place[]> {
     const res = await this.pool.query(
-      `SELECT place_id as "placeId" FROM video_places WHERE video_id = $1 ORDER BY is_primary DESC`,
+      `SELECT place_id as "placeId" FROM video_places WHERE video_id = $1 ORDER BY is_primary DESC, created_at ASC`,
       [videoId]
     );
     const placeIds = res.rows.map((r: { placeId: string }) => r.placeId);
-    return INITIAL_PLACES.filter((p) => placeIds.includes(p.id));
+    return placeIds
+      .map((id) => INITIAL_PLACES.find((p) => p.id === id))
+      .filter((p): p is Place => p !== undefined);
   }
 
   async getVideosForPlace(placeId: string): Promise<VideoSubmission[]> {

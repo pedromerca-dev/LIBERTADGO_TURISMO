@@ -161,13 +161,29 @@ adminRouter.put('/moderation/:id/places', async (req: Request, res: Response) =>
     return;
   }
 
+  const invalidPlaceIds = placeIds.filter((pId) =>
+    !INITIAL_PLACES.some((p) => p.id === pId)
+  );
+  if (invalidPlaceIds.length > 0) {
+    res.status(400).json({
+      success: false,
+      error: `Los siguientes lugares no existen en el catálogo turístico: ${invalidPlaceIds.join(', ')}`,
+    });
+    return;
+  }
+
+  const uniquePlaceIds = Array.from(new Set(placeIds));
+  if (primaryPlaceId && uniquePlaceIds.length > 0 && !uniquePlaceIds.includes(primaryPlaceId)) {
+    res.status(400).json({
+      success: false,
+      error: 'El lugar principal debe pertenecer a la lista de lugares asociados',
+    });
+    return;
+  }
+
   const repo = getCreatorsRepository();
   try {
-    const validIds = placeIds.filter((pId) =>
-      INITIAL_PLACES.some((p) => p.id === pId)
-    );
-
-    await repo.associatePlaces(req.params.id, validIds, primaryPlaceId);
+    await repo.associatePlaces(req.params.id, uniquePlaceIds, primaryPlaceId);
     const updatedPlaces = await repo.getPlacesForVideo(req.params.id);
 
     res.json({
@@ -234,10 +250,26 @@ adminRouter.post('/videos', async (req: Request, res: Response) => {
       return;
     }
 
-    // Filter places against valid catalog
-    const validPlaceIds = placeIds.filter((pId) =>
-      INITIAL_PLACES.some((p) => p.id === pId)
+    // Verify places against valid tourist catalog
+    const invalidPlaceIds = placeIds.filter((pId) =>
+      !INITIAL_PLACES.some((p) => p.id === pId)
     );
+    if (invalidPlaceIds.length > 0) {
+      res.status(400).json({
+        success: false,
+        error: `Los siguientes lugares no existen en el catálogo turístico: ${invalidPlaceIds.join(', ')}`,
+      });
+      return;
+    }
+
+    const uniquePlaceIds = Array.from(new Set(placeIds));
+    if (primaryPlaceId && uniquePlaceIds.length > 0 && !uniquePlaceIds.includes(primaryPlaceId)) {
+      res.status(400).json({
+        success: false,
+        error: 'El lugar principal debe pertenecer a la lista de lugares asociados',
+      });
+      return;
+    }
 
     const resultingStatus = status || 'APPROVED';
     const auditPayload: ModerationAuditPayload = {
@@ -269,8 +301,8 @@ adminRouter.post('/videos', async (req: Request, res: Response) => {
         externalCreatorDisplayName: externalCreatorDisplayName || null,
         externalCreatorAvatarUrl: externalCreatorAvatarUrl || null,
       },
-      validPlaceIds,
-      primaryPlaceId || (validPlaceIds[0] || null),
+      uniquePlaceIds,
+      primaryPlaceId || (uniquePlaceIds[0] || null),
       auditPayload
     );
 
@@ -309,9 +341,39 @@ adminRouter.put('/videos/:id', async (req: Request, res: Response) => {
 
     const { placeIds, primaryPlaceId, ...updateFields } = parseResult.data;
 
-    const validPlaceIds = placeIds
-      ? placeIds.filter((pId) => INITIAL_PLACES.some((p) => p.id === pId))
-      : undefined;
+    if (placeIds !== undefined) {
+      const invalidPlaceIds = placeIds.filter((pId) =>
+        !INITIAL_PLACES.some((p) => p.id === pId)
+      );
+      if (invalidPlaceIds.length > 0) {
+        res.status(400).json({
+          success: false,
+          error: `Los siguientes lugares no existen en el catálogo turístico: ${invalidPlaceIds.join(', ')}`,
+        });
+        return;
+      }
+    }
+
+    const uniquePlaceIds = placeIds !== undefined ? Array.from(new Set(placeIds)) : undefined;
+
+    if (uniquePlaceIds !== undefined && primaryPlaceId) {
+      if (!uniquePlaceIds.includes(primaryPlaceId)) {
+        res.status(400).json({
+          success: false,
+          error: 'El lugar principal debe pertenecer a la lista de lugares asociados',
+        });
+        return;
+      }
+    } else if (uniquePlaceIds === undefined && primaryPlaceId) {
+      const currentPlaces = await repo.getPlacesForVideo(req.params.id);
+      if (!currentPlaces.some((p) => p.id === primaryPlaceId)) {
+        res.status(400).json({
+          success: false,
+          error: 'El lugar principal debe pertenecer a los lugares actualmente asociados al video',
+        });
+        return;
+      }
+    }
 
     // Detect changed fields for precise traceability
     const changedFields: string[] = [];
@@ -320,7 +382,7 @@ adminRouter.put('/videos/:id', async (req: Request, res: Response) => {
         changedFields.push(key);
       }
     }
-    if (validPlaceIds !== undefined) {
+    if (uniquePlaceIds !== undefined) {
       changedFields.push('placeIds');
     }
     if (primaryPlaceId !== undefined) {
@@ -342,7 +404,7 @@ adminRouter.put('/videos/:id', async (req: Request, res: Response) => {
     const updated = await repo.updateSubmission(
       req.params.id,
       updateFields,
-      validPlaceIds,
+      uniquePlaceIds,
       primaryPlaceId,
       auditPayload
     );
