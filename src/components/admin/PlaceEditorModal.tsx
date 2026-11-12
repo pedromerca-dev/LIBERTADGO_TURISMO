@@ -129,7 +129,7 @@ export const PlaceEditorModal: React.FC<PlaceEditorModalProps> = ({
       setStatus('PUBLISHED');
       setIsVerified(true);
       setVerificationLevel('partner_verified');
-      setVerificationNotes('Verificado por administración LibertadGO');
+      setVerificationNotes('Verificado por administración RIYMO');
       setSafetyScore(85);
       setTagsInput('turismo, la-libertad');
       setImages([
@@ -760,7 +760,7 @@ export const PlaceEditorModal: React.FC<PlaceEditorModalProps> = ({
                     className="w-full text-xs p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-[#E85B49]"
                   >
                     <option value="official_mincetur">Oficial MINCETUR / Directorio Regional</option>
-                    <option value="partner_verified">Verificado por Administrador LibertadGO</option>
+                    <option value="partner_verified">Verificado por Administrador RIYMO</option>
                     <option value="community">Aportado por Comunidad / Creadores</option>
                     <option value="unverified">Sin Verificar</option>
                   </select>

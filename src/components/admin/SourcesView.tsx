@@ -37,8 +37,8 @@ const SOURCES_INFO: Record<string, { title: string; provider: string; license: s
   },
   panel_admin_libertadgo: {
     title: 'Carga & Verificación Panel Administrador',
-    provider: 'Equipo Editorial LibertadGO',
-    license: 'Propiedad Editorial LibertadGO',
+    provider: 'Equipo Editorial RIYMO',
+    license: 'Propiedad Editorial RIYMO',
     desc: 'Lugares incorporados, editados o validados manualmente por los administradores de la plataforma.',
   },
 };
@@ -88,7 +88,7 @@ export const SourcesView: React.FC = () => {
         <div className="text-xs space-y-1">
           <div className="font-bold text-white">Política de Calidad y Cero Alucinación</div>
           <p className="text-slate-300">
-            Cada establecimiento registrado en LibertadGO cuenta con un identificador de origen verificable,
+            Cada establecimiento registrado en RIYMO cuenta con un identificador de origen verificable,
             ya sea MINCETUR, OpenStreetMap o el directorio verificado por administradores. No se admiten lugares con datos ficticios o ubicaciones simuladas.
           </p>
         </div>

@@ -250,7 +250,7 @@ export const CampaignsPanel: React.FC<CampaignsPanelProps> = ({
             <div>
               <div className="text-xs uppercase font-bold tracking-wider text-amber-300">1º Puesto — Oro</div>
               <div className="text-base font-extrabold text-white">S/ 1,500 en Efectivo</div>
-              <p className="text-xs text-slate-300 mt-1">Trofeo Oficial LibertadGO + Difusión destacada regional.</p>
+              <p className="text-xs text-slate-300 mt-1">Trofeo Oficial RIYMO + Difusión destacada regional.</p>
             </div>
           </div>
 

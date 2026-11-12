@@ -48,14 +48,14 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
     {
       id: 'welcome_1',
       role: 'assistant',
-      content: `¡Hola! Soy tu **Asistente Inteligente LibertadGO** impulsado por IA.
+      content: `¡Hola! Soy tu asistente de exploración y viaje de **RIYMO**.
 
-Cuentas con **10 mensajes gratuitos** para:
-* 🎬 **Generar guiones virales de video** (TikTok / Reels) para tu negocio local o concurso de creadores con premios a los 3 primeros puestos.
-* 🗺️ **Diseñar itinerarios personalizados** para tu destino y rango de fechas en La Libertad.
-* 🍲 **Recomendar gastronomía auténtica** (Ceviche con ají mochero, Shambar, Cabrito).
+Cuentas con **10 consultas gratuitas** para:
+* 🗺️ **Diseñar itinerarios personalizados** para tu destino y fechas en La Libertad y el Perú.
+* 🍲 **Recomendar gastronomía auténtica** (Ceviche con ají mochero, Shambar, Cabrito a la norteña).
+* 🎬 **Generar ideas y guiones** para creadores turísticos y negocios locales.
 
-¿En qué puedo ayudarte hoy?`,
+¿Qué te gustaría explorar hoy?`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
@@ -206,7 +206,7 @@ Cuentas con **10 mensajes gratuitos** para:
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="font-extrabold text-sm sm:text-base tracking-tight text-white font-['Outfit']">
-                  Asistente IA LibertadGO
+                  Planificar con RIYMO
                 </h3>
                 <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#E05A47]/30 text-[#FF8573] border border-[#E05A47]/40">
                   Gemini 3.8 Flash

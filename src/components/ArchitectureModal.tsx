@@ -26,7 +26,7 @@ export const ArchitectureModal: React.FC<ArchitectureModalProps> = ({ isOpen, on
             </div>
             <div>
               <h2 id="arch-modal-title" className="text-lg font-bold font-display text-slate-900 leading-tight">
-                Arquitectura Técnica & Plan Maestro · LibertadGO
+                Arquitectura Técnica & Plan Maestro · RIYMO
               </h2>
               <p className="text-xs text-slate-500">
                 MVP Funcional enfocado exclusivamente en la región La Libertad, Perú

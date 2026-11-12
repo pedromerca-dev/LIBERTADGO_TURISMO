@@ -28,6 +28,57 @@ import { AdminLayout } from './components/admin/AdminLayout.tsx';
 const STORAGE_TRIPS_KEY = 'libertadgo_trips_v2';
 const STORAGE_ACTIVE_ID_KEY = 'libertadgo_active_trip_id_v2';
 
+const DEFAULT_INITIAL_TRIP: TripItinerary = {
+  id: 'trip_default_riymo',
+  title: 'Exploración La Libertad',
+  destinationId: 'trujillo',
+  destinationName: 'Trujillo',
+  startDate: new Date().toISOString().split('T')[0],
+  endDate: new Date(Date.now() + 3 * 86400000).toISOString().split('T')[0],
+  totalDays: 4,
+  totalNights: 3,
+  coverImage: 'https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?auto=format&fit=crop&w=1200&q=80',
+  notes: 'Planifica tus rutas, actividades y descubre los tesoros de La Libertad con RIYMO.',
+  savedPlaceIds: ['place_chan_chan', 'place_huacas_sol_luna', 'place_muelle_huanchaco'],
+  activities: [
+    {
+      id: 'act_chan_chan',
+      tripId: 'trip_default_riymo',
+      placeId: 'place_chan_chan',
+      dayNumber: 1,
+      order: 1,
+      timeSlot: '09:00 - 11:30',
+      notes: 'Visita guiada por el Palacio Nik An.',
+      isVisited: false,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'act_huanchaco',
+      tripId: 'trip_default_riymo',
+      placeId: 'place_muelle_huanchaco',
+      dayNumber: 1,
+      order: 2,
+      timeSlot: '12:30 - 15:00',
+      notes: 'Almuerzo tradicional y paseo en caballitos de totora.',
+      isVisited: false,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'act_huacas',
+      tripId: 'trip_default_riymo',
+      placeId: 'place_huacas_sol_luna',
+      dayNumber: 2,
+      order: 1,
+      timeSlot: '10:00 - 13:00',
+      notes: 'Murales policromados Moche y Museo Huacas de Moche.',
+      isVisited: false,
+      createdAt: new Date().toISOString(),
+    },
+  ],
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+};
+
 function MainAppContent() {
   const { isAdmin, isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const [currentRoute, setCurrentRoute] = useState<'public' | 'admin' | 'login'>(() => {
@@ -138,10 +189,10 @@ function MainAppContent() {
     } catch {
       // ignore
     }
-    return [];
+    return [DEFAULT_INITIAL_TRIP];
   });
 
-  // Current active trip
+  // Current active trip - defaults to DEFAULT_INITIAL_TRIP for immediate Map-First interaction
   const [currentTrip, setCurrentTrip] = useState<TripItinerary | null>(() => {
     try {
       const activeId = localStorage.getItem(STORAGE_ACTIVE_ID_KEY);
@@ -154,7 +205,7 @@ function MainAppContent() {
     } catch {
       // ignore
     }
-    return null;
+    return DEFAULT_INITIAL_TRIP;
   });
 
   // Persist trips to localStorage
@@ -449,7 +500,7 @@ function MainAppContent() {
   }
 
   return (
-    <div className="h-dvh flex flex-col overflow-hidden bg-[#F8F9FA] text-[#17243A] antialiased">
+    <div className="h-dvh flex flex-col overflow-hidden bg-[#F7F2E8]/40 text-[#263B35] antialiased">
       {/* 
         Single Unified Header Bar:
         Always visible, fixed height (h-14 shrink-0), consistent across all views.

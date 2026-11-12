@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { TripItinerary } from '../types/catalog.ts';
 import { formatDateRange } from '../utils/dateUtils.ts';
+import { RiyMoLogo } from './common/RiyMoLogo.tsx';
 
 interface HeaderProps {
   currentTrip: TripItinerary | null;
@@ -83,19 +84,14 @@ export const Header: React.FC<HeaderProps> = ({
         <header className="flex flex-col lg:hidden w-full bg-white border-b border-[#E9EEF4] shrink-0 select-none z-30 min-w-0">
           {/* Fila 1: Logo + Selector compacto de viaje + Botón Crear Viaje */}
           <div className="h-12 px-3 flex items-center justify-between gap-2 border-b border-[#F1F5F9] min-w-0">
-            {/* Logo compacto */}
+            {/* Logo compacto RIYMO */}
             <button
               type="button"
               onClick={() => setActiveView('workspace')}
-              className="flex items-center gap-1.5 shrink-0 group cursor-pointer text-left focus:outline-none"
-              title="LibertadGO - Inicio"
+              className="flex items-center shrink-0 group cursor-pointer text-left focus:outline-none"
+              title="RIYMO - Inicio"
             >
-              <div className="w-7 h-7 rounded-lg bg-[#17243A] text-white flex items-center justify-center shadow-2xs group-hover:bg-[#1E293B] transition-colors">
-                <Compass className="w-4 h-4 stroke-[2.2]" />
-              </div>
-              <span className="text-sm font-bold font-display tracking-tight text-[#17243A] leading-none">
-                Libertad<span className="text-[#E85B49]">GO</span>
-              </span>
+              <RiyMoLogo variant="compact" size="sm" showSubtitle={false} />
             </button>
 
             {/* Selector compacto y legible del viaje activo */}
@@ -229,24 +225,14 @@ export const Header: React.FC<HeaderProps> = ({
         {/* 1. ZONA IZQUIERDA: Logo + Contexto del Viaje Activo           */}
         {/* ============================================================ */}
         <div className="flex items-center gap-2 sm:gap-3.5 min-w-0">
-          {/* Logo LibertadGO */}
+          {/* Logo RIYMO */}
           <button
             type="button"
             onClick={() => setActiveView('workspace')}
-            className="flex items-center gap-1.5 sm:gap-2 shrink-0 group cursor-pointer text-left focus:outline-none"
-            title="LibertadGO - Inicio"
+            className="flex items-center shrink-0 group cursor-pointer text-left focus:outline-none"
+            title="RIYMO - Inicio"
           >
-            <div className="w-8 h-8 rounded-lg bg-[#17243A] text-white flex items-center justify-center group-hover:bg-[#1E293B] transition-colors shadow-2xs">
-              <Compass className="w-5 h-5 stroke-[2.2]" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-base font-bold font-display tracking-tight text-[#17243A] leading-none">
-                Libertad<span className="text-[#E85B49]">GO</span>
-              </span>
-              <span className="text-[10px] text-[#64748B] tracking-wider uppercase mt-0.5 hidden sm:inline font-medium">
-                La Libertad · Perú
-              </span>
-            </div>
+            <RiyMoLogo variant="full" size="md" />
           </button>
 
           {/* Datos contextuales del viaje activo (Desktop) */}

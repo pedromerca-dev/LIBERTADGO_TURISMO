@@ -73,15 +73,15 @@ interface MapPanelProps {
   onSearchChange?: (query: string) => void;
 }
 
-// Categorías del catálogo con iconos y colores representativos
+// Categorías del catálogo con iconos y colores de la paleta oficial RIYMO
 const CATEGORY_STYLES: Record<string, { bg: string; icon: string; label: string }> = {
-  restaurantes: { bg: '#D97706', icon: '🍴', label: 'Gastronomía' },
-  gastronomia: { bg: '#D97706', icon: '🍴', label: 'Gastronomía' },
-  arqueologia: { bg: '#9A3412', icon: '🏛️', label: 'Arqueología' },
-  playas: { bg: '#0284C7', icon: '🌊', label: 'Playas' },
-  museos: { bg: '#7C3AED', icon: '🎨', label: 'Museos' },
-  atractivos: { bg: '#059669', icon: '⭐', label: 'Atractivos' },
-  hoteles: { bg: '#4338CA', icon: '🏨', label: 'Hoteles' },
+  restaurantes: { bg: '#E85B49', icon: '🍴', label: 'Gastronomía' },
+  gastronomia: { bg: '#E85B49', icon: '🍴', label: 'Gastronomía' },
+  arqueologia: { bg: '#D9B66F', icon: '🏛️', label: 'Arqueología' },
+  playas: { bg: '#71958B', icon: '🌊', label: 'Playas' },
+  museos: { bg: '#263B35', icon: '🎨', label: 'Museos' },
+  atractivos: { bg: '#263B35', icon: '⭐', label: 'Atractivos' },
+  hoteles: { bg: '#17243A', icon: '🏨', label: 'Hoteles' },
 };
 
 export const MapPanel: React.FC<MapPanelProps> = ({
@@ -348,7 +348,7 @@ export const MapPanel: React.FC<MapPanelProps> = ({
               ],
               tileSize: 256,
               attribution:
-                '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> | LibertadGO',
+                '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> | RIYMO',
             },
           },
           layers: [
@@ -414,7 +414,7 @@ export const MapPanel: React.FC<MapPanelProps> = ({
             },
           });
 
-          // Route line (Coral #E85B49)
+          // Route line (Nature Green #71958B with Coral highlight)
           map.addLayer({
             id: 'itinerary-route-line',
             type: 'line',
@@ -424,7 +424,7 @@ export const MapPanel: React.FC<MapPanelProps> = ({
               'line-cap': 'round',
             },
             paint: {
-              'line-color': ['coalesce', ['get', 'color'], '#E85B49'],
+              'line-color': ['coalesce', ['get', 'color'], '#71958B'],
               'line-width': 3.5,
               'line-dasharray': [1, 0],
             },
@@ -709,7 +709,7 @@ export const MapPanel: React.FC<MapPanelProps> = ({
         const dayColor = getDayColor(act.dayNumber);
 
         const el = document.createElement('div');
-        el.className = 'libertadgo-map-marker-hitbox';
+        el.className = 'riymo-map-marker-hitbox';
         el.style.width = '44px';
         el.style.height = '44px';
         el.style.display = 'flex';
@@ -724,7 +724,7 @@ export const MapPanel: React.FC<MapPanelProps> = ({
         el.setAttribute('aria-label', `${place.name} · Día ${act.dayNumber} · #${act.order}`);
 
         const inner = document.createElement('div');
-        inner.className = 'libertadgo-map-marker-badge';
+        inner.className = 'riymo-map-marker-badge';
         inner.style.transition = 'transform 160ms cubic-bezier(0.16, 1, 0.3, 1), filter 160ms ease';
         inner.style.display = 'flex';
         inner.style.alignItems = 'center';
@@ -819,7 +819,7 @@ export const MapPanel: React.FC<MapPanelProps> = ({
         const inTrip = trip.activities.find((a) => a.placeId === place.id);
 
         const el = document.createElement('div');
-        el.className = 'libertadgo-map-marker-hitbox';
+        el.className = 'riymo-map-marker-hitbox';
         el.style.width = '44px';
         el.style.height = '44px';
         el.style.display = 'flex';
@@ -831,7 +831,7 @@ export const MapPanel: React.FC<MapPanelProps> = ({
         el.style.zIndex = isSelected ? '20' : '10';
 
         const inner = document.createElement('div');
-        inner.className = 'libertadgo-map-marker-badge';
+        inner.className = 'riymo-map-marker-badge';
         inner.style.transition = 'transform 160ms cubic-bezier(0.16, 1, 0.3, 1), filter 160ms ease';
 
         if (isSaved) {
@@ -998,7 +998,7 @@ export const MapPanel: React.FC<MapPanelProps> = ({
           }
 
           const el = document.createElement('div');
-          el.className = 'libertadgo-user-pulse-marker';
+          el.className = 'riymo-user-pulse-marker';
           el.innerHTML = `
             <div style="position: relative; width: 22px; height: 22px; pointer-events: none;">
               <div style="position: absolute; inset: -4px; border-radius: 50%; background: rgba(37, 99, 235, 0.35); animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>

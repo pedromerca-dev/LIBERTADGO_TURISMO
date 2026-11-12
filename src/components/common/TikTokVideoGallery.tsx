@@ -274,7 +274,7 @@ export function TikTokVideoGallery({
                 {((video.internalViews ?? 0) > 0 || (video.internalSaves ?? 0) > 0) && (
                   <div className="flex flex-wrap items-center gap-x-2 text-[9px] text-slate-400">
                     {(video.internalViews ?? 0) > 0 && (
-                      <span className="flex items-center gap-0.5" title="Reproducciones en LibertadGO">
+                      <span className="flex items-center gap-0.5" title="Reproducciones en RIYMO">
                         <Play className="h-2.5 w-2.5 text-slate-400" />
                         {video.internalViews?.toLocaleString('es-PE')} en app
                       </span>

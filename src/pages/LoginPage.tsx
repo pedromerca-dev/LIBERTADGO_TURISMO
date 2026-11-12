@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext.tsx';
 import { Shield, Lock, Mail, ArrowRight, ArrowLeft, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { RiyMoLogo } from '../components/common/RiyMoLogo.tsx';
 
 interface LoginPageProps {
   onBackToApp: () => void;
@@ -52,12 +53,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onBackToApp, onLoginSucces
         </button>
 
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded bg-[#E85B49] flex items-center justify-center text-white font-bold text-xs tracking-wider">
-            GO
-          </div>
-          <span className="font-bold text-slate-100 tracking-tight text-sm">
-            Libertad<span className="text-[#E85B49]">GO</span>
-          </span>
+          <RiyMoLogo variant="full" theme="dark" size="sm" showSubtitle={false} />
           <span className="ml-2 text-xs font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
             ADMIN PORTAL
           </span>
@@ -104,7 +100,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onBackToApp, onLoginSucces
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@libertadgo.pe"
+                  placeholder="admin@riymo.pe"
                   required
                   className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-9 pr-3.5 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#E85B49] focus:ring-1 focus:ring-[#E85B49]"
                 />
@@ -141,7 +137,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onBackToApp, onLoginSucces
       </main>
 
       <footer className="py-4 border-t border-slate-800 text-center text-xs text-slate-500">
-        LibertadGO — Sistema Turístico Regional de La Libertad, Perú.
+        RIYMO — Exploración y Planificación Turística del Perú
       </footer>
     </div>
   );

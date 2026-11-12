@@ -13,6 +13,7 @@ import {
   LogOut,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.tsx';
+import { RiyMoLogo } from '../common/RiyMoLogo.tsx';
 
 export type AdminSection =
   | 'dashboard'
@@ -81,17 +82,10 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       {/* Brand logo & header */}
       <div className="h-16 px-5 flex items-center justify-between border-b border-slate-800">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-[#E85B49] flex items-center justify-center text-white font-bold text-sm tracking-wider shadow-sm">
-            GO
-          </div>
-          <div>
-            <div className="font-bold text-white text-sm tracking-tight leading-none">
-              Libertad<span className="text-[#E85B49]">GO</span>
-            </div>
-            <div className="text-[10px] text-slate-400 font-mono tracking-wide uppercase mt-0.5">
-              Administración
-            </div>
-          </div>
+          <RiyMoLogo variant="full" theme="dark" size="sm" showSubtitle={false} />
+          <span className="text-[10px] text-slate-400 font-mono tracking-wide uppercase px-1.5 py-0.5 rounded bg-slate-800">
+            Admin
+          </span>
         </div>
       </div>
 
@@ -163,7 +157,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 {user?.name || 'Administrador'}
               </div>
               <div className="text-[10px] text-slate-400 truncate">
-                {user?.email || 'admin@libertadgo.pe'}
+                {user?.email || 'admin@riymo.pe'}
               </div>
             </div>
           </div>
