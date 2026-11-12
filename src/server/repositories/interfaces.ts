@@ -112,6 +112,9 @@ export interface ICreatorsRepository {
     filters?: VideoFilterOptions
   ): Promise<{ videos: (VideoSubmission & { places: Place[] })[]; total: number }>;
   listSubmissionsByUser(userId: string): Promise<VideoSubmission[]>;
+  listSubmissionsByCreatorProfileId(
+    creatorProfileId: string
+  ): Promise<VideoSubmission[]>;
   listModerationQueue(status?: ModerationStatus): Promise<VideoSubmission[]>;
 
   // Moderation & Audit
@@ -138,11 +141,34 @@ export interface ICreatorsRepository {
   getPlacesForVideos?(videoIds: string[]): Promise<Record<string, Place[]>>;
   getVideosForPlace(placeId: string): Promise<VideoSubmission[]>;
 
+ 
   // Creator Profiles
+
   findCreatorProfileByUserId(userId: string): Promise<CreatorProfile | null>;
+  findCreatorProfileById(id: string): Promise<CreatorProfile | null>;
   findCreatorProfileByHandle(handle: string): Promise<CreatorProfile | null>;
-  saveCreatorProfile(data: {
-    userId: string;
+  // Crear o actualizar un perfil vinculado a una cuenta de usuario.
+saveCreatorProfile(data: {
+  userId: string;
+  handle: string;
+  displayName: string;
+  bio?: string | null;
+  avatarUrl?: string | null;
+  primaryPlatform: VideoPlatform;
+  tiktokUrl?: string | null;
+  instagramUrl?: string | null;
+  youtubeUrl?: string | null;
+  tiktokFollowers?: number | null;
+  instagramFollowers?: number | null;
+  youtubeSubscribers?: number | null;
+  audienceUpdatedAt?: string | null;
+  isPublic: boolean;
+  isVerified?: boolean;
+}): Promise<CreatorProfile>;
+
+  // Crear un perfil independiente, sin exigir una cuenta de usuario.
+  createCreatorProfile(data: {
+    userId?: string | null;
     handle: string;
     displayName: string;
     bio?: string | null;
@@ -158,8 +184,32 @@ export interface ICreatorsRepository {
     isPublic: boolean;
     isVerified?: boolean;
   }): Promise<CreatorProfile>;
+
+  // Actualizar un perfil existente mediante su ID.
+  updateCreatorProfile(
+    id: string,
+    data: Partial<{
+      userId: string | null;
+      handle: string;
+      displayName: string;
+      bio: string | null;
+      avatarUrl: string | null;
+      primaryPlatform: VideoPlatform;
+      tiktokUrl: string | null;
+      instagramUrl: string | null;
+      youtubeUrl: string | null;
+      tiktokFollowers: number | null;
+      instagramFollowers: number | null;
+      youtubeSubscribers: number | null;
+      audienceUpdatedAt: string | null;
+      isPublic: boolean;
+      isVerified: boolean;
+    }>
+  ): Promise<CreatorProfile | null>;
+
   listPublicCreators(): Promise<CreatorProfile[]>;
   listAllCreators(): Promise<CreatorProfile[]>;
+
 
   // Metrics & Engagement
   incrementInternalViews(videoId: string): Promise<void>;

@@ -27,7 +27,7 @@ export type ModerationStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'OBSERVED' 
 
 export interface CreatorProfile {
   id: string;
-  userId: string;
+  userId: string | null;
   handle: string;                       // Unique handle, e.g. "trujillofoodie"
   displayName: string;
   bio?: string | null;

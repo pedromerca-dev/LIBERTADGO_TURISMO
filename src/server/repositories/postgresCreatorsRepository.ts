@@ -736,6 +736,25 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
     return res.rows.map(mapVideoSubmissionRow);
   }
 
+  async listSubmissionsByCreatorProfileId(
+    creatorProfileId: string
+  ): Promise<VideoSubmission[]> {
+    const res = await this.pool.query(
+      `SELECT id, user_id as "userId", creator_profile_id as "creatorProfileId", platform, external_video_id as "externalVideoId",
+              video_url as "videoUrl", embed_url as "embedUrl", thumbnail_url as "thumbnailUrl", title, description,
+              content_type as "contentType", category, locality_id as "localityId", status, moderation_notes as "moderationNotes",
+              moderated_by as "moderatedBy", moderated_at as "moderatedAt", internal_views_count as "internalViewsCount",
+              internal_saves_count as "internalSavesCount", external_metrics as "externalMetrics",
+              created_at as "createdAt", updated_at as "updatedAt"
+       FROM video_submissions
+       WHERE creator_profile_id = $1
+       ORDER BY created_at DESC`,
+      [creatorProfileId]
+    );
+  
+    return res.rows.map(mapVideoSubmissionRow);
+  }
+
   async listModerationQueue(status: ModerationStatus = 'PENDING'): Promise<VideoSubmission[]> {
     const res = await this.pool.query(
       `SELECT id, user_id as "userId", creator_profile_id as "creatorProfileId", platform, external_video_id as "externalVideoId",
@@ -896,30 +915,74 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
     return res.rows.map(mapVideoSubmissionRow);
   }
 
+ 
   async findCreatorProfileByUserId(userId: string): Promise<CreatorProfile | null> {
     const res = await this.pool.query(
-      `SELECT id, user_id as "userId", handle, display_name as "displayName", bio, avatar_url as "avatarUrl",
-              primary_platform as "primaryPlatform", tiktok_url as "tiktokUrl", instagram_url as "instagramUrl",
-              youtube_url as "youtubeUrl", is_public as "isPublic", is_verified as "isVerified",
-              total_approved_videos as "totalApprovedVideos", created_at as "createdAt", updated_at as "updatedAt"
-       FROM creator_profiles WHERE user_id = $1 LIMIT 1`,
+      `SELECT id, user_id as "userId", handle, display_name as "displayName",
+              bio, avatar_url as "avatarUrl",
+              primary_platform as "primaryPlatform",
+              tiktok_url as "tiktokUrl",
+              instagram_url as "instagramUrl",
+              youtube_url as "youtubeUrl",
+              is_public as "isPublic",
+              is_verified as "isVerified",
+              total_approved_videos as "totalApprovedVideos",
+              created_at as "createdAt",
+              updated_at as "updatedAt"
+       FROM creator_profiles
+       WHERE user_id = $1
+       LIMIT 1`,
       [userId]
     );
+
+    return res.rows[0] || null;
+  }
+
+  async findCreatorProfileById(id: string): Promise<CreatorProfile | null> {
+    const res = await this.pool.query(
+      `SELECT id, user_id as "userId", handle, display_name as "displayName",
+              bio, avatar_url as "avatarUrl",
+              primary_platform as "primaryPlatform",
+              tiktok_url as "tiktokUrl",
+              instagram_url as "instagramUrl",
+              youtube_url as "youtubeUrl",
+              is_public as "isPublic",
+              is_verified as "isVerified",
+              total_approved_videos as "totalApprovedVideos",
+              created_at as "createdAt",
+              updated_at as "updatedAt"
+       FROM creator_profiles
+       WHERE id = $1
+       LIMIT 1`,
+      [id]
+    );
+
     return res.rows[0] || null;
   }
 
   async findCreatorProfileByHandle(handle: string): Promise<CreatorProfile | null> {
     const res = await this.pool.query(
-      `SELECT id, user_id as "userId", handle, display_name as "displayName", bio, avatar_url as "avatarUrl",
-              primary_platform as "primaryPlatform", tiktok_url as "tiktokUrl", instagram_url as "instagramUrl",
-              youtube_url as "youtubeUrl", is_public as "isPublic", is_verified as "isVerified",
-              total_approved_videos as "totalApprovedVideos", created_at as "createdAt", updated_at as "updatedAt"
-       FROM creator_profiles WHERE LOWER(handle) = LOWER($1) LIMIT 1`,
+      `SELECT id, user_id as "userId", handle, display_name as "displayName",
+              bio, avatar_url as "avatarUrl",
+              primary_platform as "primaryPlatform",
+              tiktok_url as "tiktokUrl",
+              instagram_url as "instagramUrl",
+              youtube_url as "youtubeUrl",
+              is_public as "isPublic",
+              is_verified as "isVerified",
+              total_approved_videos as "totalApprovedVideos",
+              created_at as "createdAt",
+              updated_at as "updatedAt"
+       FROM creator_profiles
+       WHERE LOWER(handle) = LOWER($1)
+       LIMIT 1`,
       [handle]
     );
+
     return res.rows[0] || null;
   }
 
+  // Mantiene la compatibilidad con perfiles vinculados a una cuenta.
   async saveCreatorProfile(data: {
     userId: string;
     handle: string;
@@ -930,20 +993,20 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
     tiktokUrl?: string | null;
     instagramUrl?: string | null;
     youtubeUrl?: string | null;
-    tiktokFollowers?: number | null;
-    instagramFollowers?: number | null;
-    youtubeSubscribers?: number | null;
-    audienceUpdatedAt?: string | null;
     isPublic: boolean;
     isVerified?: boolean;
   }): Promise<CreatorProfile> {
-    const id = `cp_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+    const id = `cp_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+
     const res = await this.pool.query(
       `INSERT INTO creator_profiles (
-        id, user_id, handle, display_name, bio, avatar_url, primary_platform,
-        tiktok_url, instagram_url, youtube_url, is_public
-      ) VALUES ($1, $2, LOWER($3), $4, $5, $6, $7, $8, $9, $10, $11)
-      ON CONFLICT (user_id) DO UPDATE SET
+        id, user_id, handle, display_name, bio, avatar_url,
+        primary_platform, tiktok_url, instagram_url, youtube_url,
+        is_public, is_verified
+      )
+      VALUES ($1, $2, LOWER($3), $4, $5, $6, $7, $8, $9, $10, $11, $12)
+      ON CONFLICT (user_id) WHERE user_id IS NOT NULL
+      DO UPDATE SET
         handle = EXCLUDED.handle,
         display_name = EXCLUDED.display_name,
         bio = EXCLUDED.bio,
@@ -953,27 +1016,171 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
         instagram_url = EXCLUDED.instagram_url,
         youtube_url = EXCLUDED.youtube_url,
         is_public = EXCLUDED.is_public,
+        is_verified = EXCLUDED.is_verified,
         updated_at = NOW()
-      RETURNING id, user_id as "userId", handle, display_name as "displayName", bio, avatar_url as "avatarUrl",
-                primary_platform as "primaryPlatform", tiktok_url as "tiktokUrl", instagram_url as "instagramUrl",
-                youtube_url as "youtubeUrl", is_public as "isPublic", is_verified as "isVerified",
-                total_approved_videos as "totalApprovedVideos", created_at as "createdAt", updated_at as "updatedAt"`,
+      RETURNING id, user_id as "userId", handle,
+                display_name as "displayName", bio,
+                avatar_url as "avatarUrl",
+                primary_platform as "primaryPlatform",
+                tiktok_url as "tiktokUrl",
+                instagram_url as "instagramUrl",
+                youtube_url as "youtubeUrl",
+                is_public as "isPublic",
+                is_verified as "isVerified",
+                total_approved_videos as "totalApprovedVideos",
+                created_at as "createdAt",
+                updated_at as "updatedAt"`,
       [
         id,
         data.userId,
-        data.handle,
+        data.handle.trim(),
         data.displayName,
-        data.bio || null,
-        data.avatarUrl || null,
+        data.bio ?? null,
+        data.avatarUrl ?? null,
         data.primaryPlatform,
-        data.tiktokUrl || null,
-        data.instagramUrl || null,
-        data.youtubeUrl || null,
+        data.tiktokUrl ?? null,
+        data.instagramUrl ?? null,
+        data.youtubeUrl ?? null,
         data.isPublic,
+        data.isVerified ?? false
       ]
     );
+
     return res.rows[0];
   }
+
+  // Crea un creador independiente, sin cuenta de usuario obligatoria.
+  async createCreatorProfile(data: {
+    userId?: string | null;
+    handle: string;
+    displayName: string;
+    bio?: string | null;
+    avatarUrl?: string | null;
+    primaryPlatform: VideoPlatform;
+    tiktokUrl?: string | null;
+    instagramUrl?: string | null;
+    youtubeUrl?: string | null;
+    isPublic: boolean;
+    isVerified?: boolean;
+  }): Promise<CreatorProfile> {
+    const id = `cp_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+
+    const res = await this.pool.query(
+      `INSERT INTO creator_profiles (
+        id, user_id, handle, display_name, bio, avatar_url,
+        primary_platform, tiktok_url, instagram_url, youtube_url,
+        is_public, is_verified
+      )
+      VALUES ($1, $2, LOWER($3), $4, $5, $6, $7, $8, $9, $10, $11, $12)
+      RETURNING id, user_id as "userId", handle,
+                display_name as "displayName", bio,
+                avatar_url as "avatarUrl",
+                primary_platform as "primaryPlatform",
+                tiktok_url as "tiktokUrl",
+                instagram_url as "instagramUrl",
+                youtube_url as "youtubeUrl",
+                is_public as "isPublic",
+                is_verified as "isVerified",
+                total_approved_videos as "totalApprovedVideos",
+                created_at as "createdAt",
+                updated_at as "updatedAt"`,
+      [
+        id,
+        data.userId ?? null,
+        data.handle.trim(),
+        data.displayName,
+        data.bio ?? null,
+        data.avatarUrl ?? null,
+        data.primaryPlatform,
+        data.tiktokUrl ?? null,
+        data.instagramUrl ?? null,
+        data.youtubeUrl ?? null,
+        data.isPublic,
+        data.isVerified ?? false
+      ]
+    );
+
+    return res.rows[0];
+  }
+
+  // Actualiza un creador por su ID, nunca por el usuario administrador.
+  async updateCreatorProfile(
+    id: string,
+    data: Partial<{
+      userId: string | null;
+      handle: string;
+      displayName: string;
+      bio: string | null;
+      avatarUrl: string | null;
+      primaryPlatform: VideoPlatform;
+      tiktokUrl: string | null;
+      instagramUrl: string | null;
+      youtubeUrl: string | null;
+      isPublic: boolean;
+      isVerified: boolean;
+    }>
+  ): Promise<CreatorProfile | null> {
+    const columnMap: Record<string, string> = {
+      userId: 'user_id',
+      handle: 'handle',
+      displayName: 'display_name',
+      bio: 'bio',
+      avatarUrl: 'avatar_url',
+      primaryPlatform: 'primary_platform',
+      tiktokUrl: 'tiktok_url',
+      instagramUrl: 'instagram_url',
+      youtubeUrl: 'youtube_url',
+      isPublic: 'is_public',
+      isVerified: 'is_verified'
+    };
+
+    const params: unknown[] = [];
+    const setClauses: string[] = [];
+
+    for (const [key, value] of Object.entries(data)) {
+      if (value === undefined) continue;
+
+      const column = columnMap[key];
+      if (!column) continue;
+
+      params.push(key === 'handle' && typeof value === 'string'
+        ? value.trim().toLowerCase()
+        : value
+      );
+
+      setClauses.push(`${column} = $${params.length}`);
+    }
+
+    if (setClauses.length === 0) {
+      return this.findCreatorProfileById(id);
+    }
+
+    setClauses.push('updated_at = NOW()');
+
+    params.push(id);
+
+    const res = await this.pool.query(
+      `UPDATE creator_profiles
+       SET ${setClauses.join(', ')}
+       WHERE id = $${params.length}
+       RETURNING id, user_id as "userId", handle,
+                 display_name as "displayName", bio,
+                 avatar_url as "avatarUrl",
+                 primary_platform as "primaryPlatform",
+                 tiktok_url as "tiktokUrl",
+                 instagram_url as "instagramUrl",
+                 youtube_url as "youtubeUrl",
+                 is_public as "isPublic",
+                 is_verified as "isVerified",
+                 total_approved_videos as "totalApprovedVideos",
+                 created_at as "createdAt",
+                 updated_at as "updatedAt"`,
+      params
+    );
+
+    return res.rows[0] || null;
+  }
+
 
   async listPublicCreators(): Promise<CreatorProfile[]> {
     const res = await this.pool.query(
