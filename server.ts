@@ -73,7 +73,7 @@ async function startServer() {
 
   // AI Studio and development dev-server port handling
   let cliPort: number | null = null;
-  let cliHost: string | null = null;
+  let cliHost: string = '0.0.0.0';
 
   for (let i = 2; i < process.argv.length; i++) {
     const arg = process.argv[i];
@@ -87,10 +87,6 @@ async function startServer() {
       i++;
     } else if (arg.startsWith('--host=')) {
       cliHost = arg.split('=')[1];
-    } else if (!isNaN(Number(arg)) && Number(arg) > 0 && !cliPort) {
-      cliPort = Number(arg);
-    } else if (arg.includes('.') && !cliHost) {
-      cliHost = arg;
     }
   }
 
