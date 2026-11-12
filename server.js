@@ -47500,13 +47500,6 @@ var init_geoBoundary = __esm({
 });
 
 // src/server/repositories/placeRepository.ts
-var placeRepository_exports = {};
-__export(placeRepository_exports, {
-  PlaceRepository: () => PlaceRepository,
-  getPlaceRepository: () => getPlaceRepository,
-  resetPlaceRepositoryForTesting: () => resetPlaceRepositoryForTesting,
-  setPlaceRepositoryInstance: () => setPlaceRepositoryInstance
-});
 import crypto from "crypto";
 function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
   const R = 6371e3;
@@ -47566,9 +47559,6 @@ function getPlaceRepository() {
 }
 function setPlaceRepositoryInstance(repo) {
   placeRepositoryInstance = repo;
-}
-function resetPlaceRepositoryForTesting() {
-  placeRepositoryInstance = new PlaceRepository();
 }
 var PlaceRepository, placeRepositoryInstance;
 var init_placeRepository = __esm({
@@ -48210,7 +48200,16 @@ var init_memoryCreatorsRepository = __esm({
         const videosWithPlaces = await Promise.all(
           paginated.map(async (v) => {
             const places = await this.getPlacesForVideo(v.id);
-            return { ...v, places };
+            const creatorProfile = v.creatorProfileId ? Array.from(this.creatorProfiles.values()).find((cp) => cp.id === v.creatorProfileId) : this.creatorProfiles.get(v.userId);
+            const user = this.users.get(v.userId);
+            return {
+              ...v,
+              creatorDisplayName: creatorProfile?.displayName || null,
+              creatorHandle: creatorProfile?.handle || null,
+              creatorAvatarUrl: creatorProfile?.avatarUrl || null,
+              userName: user?.name || null,
+              places
+            };
           })
         );
         return { videos: videosWithPlaces, total };
@@ -48374,7 +48373,8 @@ var init_postgresCreatorsRepository = __esm({
       constructor(connectionString) {
         this.pool = new Pool({
           connectionString,
-          ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : void 0
+          ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : void 0,
+          connectionTimeoutMillis: process.env.NODE_ENV === "production" ? 1e4 : 2e3
         });
         this.pool.on("error", (err) => {
           console.error("[Neon Pool Idle Error]", err?.message || err);
@@ -48572,19 +48572,44 @@ var init_postgresCreatorsRepository = __esm({
               vs.category, vs.locality_id as "localityId", vs.status, vs.moderation_notes as "moderationNotes",
               vs.moderated_by as "moderatedBy", vs.moderated_at as "moderatedAt", vs.internal_views_count as "internalViewsCount",
               vs.internal_saves_count as "internalSavesCount", vs.external_metrics as "externalMetrics",
-              vs.created_at as "createdAt", vs.updated_at as "updatedAt"
+              vs.created_at as "createdAt", vs.updated_at as "updatedAt",
+              cp.display_name as "creatorDisplayName",
+              cp.handle as "creatorHandle",
+              cp.avatar_url as "creatorAvatarUrl",
+              u.name as "userName"
        FROM video_submissions vs
+       LEFT JOIN creator_profiles cp ON cp.id = vs.creator_profile_id
+       LEFT JOIN users u ON u.id = vs.user_id
        ${whereClause}
        ORDER BY vs.created_at DESC
        LIMIT $${limitIndex} OFFSET $${offsetIndex}`,
           queryParams
         );
-        const videosWithPlaces = await Promise.all(
-          res.rows.map(async (v) => {
-            const places = await this.getPlacesForVideo(v.id);
-            return { ...v, places };
-          })
+        if (res.rows.length === 0) {
+          return { videos: [], total };
+        }
+        const videoIds = res.rows.map((r) => r.id);
+        const placesRes = await this.pool.query(
+          `SELECT video_id as "videoId", place_id as "placeId", is_primary as "isPrimary"
+       FROM video_places
+       WHERE video_id = ANY($1)
+       ORDER BY is_primary DESC`,
+          [videoIds]
         );
+        const placesByVideoId = {};
+        for (const row of placesRes.rows) {
+          const place = INITIAL_PLACES.find((p) => p.id === row.placeId);
+          if (place) {
+            if (!placesByVideoId[row.videoId]) {
+              placesByVideoId[row.videoId] = [];
+            }
+            placesByVideoId[row.videoId].push(place);
+          }
+        }
+        const videosWithPlaces = res.rows.map((v) => ({
+          ...v,
+          places: placesByVideoId[v.id] || []
+        }));
         return { videos: videosWithPlaces, total };
       }
       async listSubmissionsByUser(userId) {
@@ -49907,6 +49932,7 @@ __export(repositories_exports, {
   closeDatabaseConnections: () => closeDatabaseConnections,
   getAuthRepository: () => getAuthRepository,
   getCreatorsRepository: () => getCreatorsRepository,
+  isPlaceholderPostgresUrl: () => isPlaceholderPostgresUrl,
   isValidPostgresUrl: () => isValidPostgresUrl,
   resetRepositoriesForTesting: () => resetRepositoriesForTesting,
   setActiveDatabaseAdapterForTesting: () => setActiveDatabaseAdapterForTesting,
@@ -49933,6 +49959,10 @@ function getSanitizedHost(databaseUrl) {
     return "PostgreSQL Endpoint";
   }
 }
+function isPlaceholderPostgresUrl(rawUrl) {
+  const lower = rawUrl.toLowerCase();
+  return lower.includes("tu_password_seguro") || lower.includes("your_password") || lower.includes("ep-xyz") || lower.includes("user:pass@") || lower.includes("user:password@") || lower.includes("user:secret@ep-demo");
+}
 function validateDatabaseConfig() {
   const databaseUrl = process.env.DATABASE_URL?.trim();
   const isProduction2 = process.env.NODE_ENV === "production";
@@ -49949,8 +49979,8 @@ function validateDatabaseConfig() {
     }
   } else {
     if (databaseUrl && !isValidPostgresUrl(databaseUrl)) {
-      console.warn(
-        `[Storage Architecture] WARNING: DATABASE_URL provided is not a valid PostgreSQL URL (${databaseUrl.slice(0, 12)}...). Falling back to development In-Memory Adapter.`
+      console.log(
+        `[Storage Architecture] Note: DATABASE_URL provided is not a valid PostgreSQL URL (${databaseUrl.slice(0, 12)}...). Operating with development In-Memory Adapter.`
       );
     }
   }
@@ -49966,9 +49996,20 @@ function initializeRepositories() {
           "[Storage Architecture] FATAL: DATABASE_URL has an invalid PostgreSQL format in production environment."
         );
       }
-      console.warn(
-        "[Storage Architecture] WARNING: DATABASE_URL provided is not a valid PostgreSQL URL. Falling back to development In-Memory Adapter."
+      console.log(
+        "[Storage Architecture] Note: DATABASE_URL provided is not a valid PostgreSQL URL. Falling back to development In-Memory Adapter."
       );
+    } else if (!isProduction2 && isPlaceholderPostgresUrl(databaseUrl)) {
+      console.log(
+        "[Storage Architecture] Local placeholder DATABASE_URL detected in development. Operating with In-Memory Adapter (297 verified places)."
+      );
+      setPlaceRepositoryInstance(new PlaceRepository());
+      const memoryAdapter2 = new MemoryCreatorsRepository();
+      return {
+        auth: memoryAdapter2,
+        creators: memoryAdapter2,
+        adapter: memoryAdapter2
+      };
     } else {
       const sanitized = getSanitizedHost(databaseUrl);
       console.log(`[Storage Architecture] Activating PostgreSQL RDBMS adapter (${sanitized}).`);
@@ -49977,9 +50018,11 @@ function initializeRepositories() {
         const pool = getDbPool(databaseUrl);
         setPlaceRepositoryInstance(new PostgresPlaceRepository(pool));
       } catch (placeErr) {
-        console.error("[Storage Architecture] Failed to initialize Postgres place repository:", placeErr);
         if (isProduction2) {
+          console.error("[Storage Architecture] Failed to initialize Postgres place repository:", placeErr);
           throw placeErr;
+        } else {
+          console.log("[Storage Architecture] Note: Postgres place repository deferred to connectivity check.");
         }
       }
       return {
@@ -50037,28 +50080,58 @@ async function verifyDatabaseConnectivity() {
     try {
       await activeDatabaseAdapter.testConnection();
       console.log("[Storage Architecture] Database connectivity verified successfully with PostgreSQL.");
+      if (activeDatabaseAdapter instanceof PostgresCreatorsRepository) {
+        try {
+          const pool = getDbPool();
+          const tableCheck = await pool.query(`
+            SELECT table_name FROM information_schema.tables 
+            WHERE table_schema = 'public' AND table_name = 'places'
+          `);
+          if (tableCheck.rows.length > 0) {
+            console.log('[Storage Architecture] PostgreSQL "places" catalog schema detected. Activating persistent PostgresPlaceRepository.');
+            setPlaceRepositoryInstance(new PostgresPlaceRepository(pool));
+          } else {
+            if (isProduction2) {
+              throw new Error(
+                '[Storage Architecture] FATAL: Table "places" does not exist in PostgreSQL. Migration 0002_places_catalog_schema.sql must be executed in Neon.'
+              );
+            } else {
+              console.log(
+                '[Storage Architecture] Note: Table "places" does not exist in PostgreSQL yet. Catalog operating with in-memory adapter (297 verified places).'
+              );
+              setPlaceRepositoryInstance(new PlaceRepository());
+            }
+          }
+        } catch (schemaErr) {
+          if (isProduction2) {
+            throw schemaErr;
+          } else {
+            console.log(
+              "[Storage Architecture] Catalog table check skipped in development:",
+              schemaErr instanceof Error ? schemaErr.message : String(schemaErr)
+            );
+            setPlaceRepositoryInstance(new PlaceRepository());
+          }
+        }
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
-      console.error(
-        `[Storage Architecture] Database connectivity test failed: ${message}`
-      );
       if (isProduction2) {
+        console.error(
+          `[Storage Architecture] Database connectivity test failed: ${message}`
+        );
         throw new Error(
           `[Storage Architecture] FATAL: Unable to establish PostgreSQL connection in production (${message}). Server startup aborted.`
         );
       } else {
-        console.warn(
-          `[Storage Architecture] WARNING: Database connection failed in development (${message}). Operating with in-memory adapter.`
+        console.log(
+          `[Storage Architecture] Note: PostgreSQL unavailable in development (${message}). Operating with in-memory adapter (297 verified places).`
         );
         const memoryAdapter = new MemoryCreatorsRepository();
         authRepoInstance = memoryAdapter;
         creatorsRepoInstance = memoryAdapter;
         activeDatabaseAdapter = memoryAdapter;
-        try {
-          const { setPlaceRepositoryInstance: setPlaceRepositoryInstance2 } = await Promise.resolve().then(() => (init_placeRepository(), placeRepository_exports));
-          setPlaceRepositoryInstance2(null);
-        } catch {
-        }
+        setPlaceRepositoryInstance(new PlaceRepository());
       }
     }
   } else if (isProduction2) {
@@ -52726,6 +52799,8 @@ async function startServer() {
   const cliHost = hostArgIndex !== -1 && process.argv[hostArgIndex + 1] ? process.argv[hostArgIndex + 1] : null;
   const PORT = cliPort && !isNaN(cliPort) ? cliPort : process.env.NODE_ENV === "production" && process.env.PORT ? Number(process.env.PORT) : 3e3;
   const HOST = cliHost || "0.0.0.0";
+  const distPath = path.resolve(__dirname, "dist");
+  const isProduction2 = process.env.NODE_ENV === "production" && fs.existsSync(path.join(distPath, "index.html"));
   let configError = null;
   try {
     validateSecurityConfig();
@@ -52734,22 +52809,24 @@ async function startServer() {
     await bootstrapAdminFromEnv();
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message : String(err);
-    configError = errorMsg;
-    console.error(`[LibertadGO Configuration Alert] ${errorMsg}`);
-    console.warn(
-      `[LibertadGO] The server will listen on ${HOST}:${PORT} to maintain Cloud Run service health. Database-dependent endpoints will return 503 until configuration is set.`
-    );
+    if (isProduction2) {
+      configError = errorMsg;
+      console.error(`[LibertadGO Configuration Alert] ${errorMsg}`);
+      console.warn(
+        `[LibertadGO] The server will listen on ${HOST}:${PORT} to maintain Cloud Run service health. Database-dependent endpoints will return 503 until configuration is set.`
+      );
+    } else {
+      console.log(`[LibertadGO Dev Startup Note] ${errorMsg}`);
+    }
   }
-  const distPath = path.resolve(__dirname, "dist");
-  const isProduction2 = process.env.NODE_ENV === "production" && fs.existsSync(path.join(distPath, "index.html"));
   app.use(express.json());
   app.use(csrfProtectionMiddleware);
   const handleHealthCheck = async (_req, res) => {
     res.setHeader("Content-Type", "application/json");
     const dbHealth = await checkDatabaseHealth();
     res.json({
-      status: dbHealth.connected ? "healthy" : "degraded",
-      database: dbHealth.connected ? "connected" : "not_configured",
+      status: dbHealth.connected || !isProduction2 ? "healthy" : "degraded",
+      database: dbHealth.connected ? "connected" : isProduction2 ? "not_configured" : "in_memory",
       environment: isProduction2 ? "production" : "development",
       timestamp: (/* @__PURE__ */ new Date()).toISOString()
     });

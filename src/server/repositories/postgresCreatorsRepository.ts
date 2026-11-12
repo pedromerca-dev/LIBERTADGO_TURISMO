@@ -29,6 +29,7 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
     this.pool = new Pool({
       connectionString,
       ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
+      connectionTimeoutMillis: process.env.NODE_ENV === 'production' ? 10000 : 2000,
     });
 
     // Handle idle client errors without leaking sensitive connection details

@@ -82,6 +82,11 @@ async function startServer() {
     : (process.env.NODE_ENV === 'production' && process.env.PORT ? Number(process.env.PORT) : 3000);
   const HOST = cliHost || '0.0.0.0';
 
+  const distPath = path.resolve(__dirname, 'dist');
+  const isProduction =
+    process.env.NODE_ENV === 'production' &&
+    fs.existsSync(path.join(distPath, 'index.html'));
+
   let configError: string | null = null;
 
   try {
@@ -96,17 +101,16 @@ async function startServer() {
     await bootstrapAdminFromEnv();
   } catch (err: unknown) {
     const errorMsg = err instanceof Error ? err.message : String(err);
-    configError = errorMsg;
-    console.error(`[LibertadGO Configuration Alert] ${errorMsg}`);
-    console.warn(
-      `[LibertadGO] The server will listen on ${HOST}:${PORT} to maintain Cloud Run service health. Database-dependent endpoints will return 503 until configuration is set.`
-    );
+    if (isProduction) {
+      configError = errorMsg;
+      console.error(`[LibertadGO Configuration Alert] ${errorMsg}`);
+      console.warn(
+        `[LibertadGO] The server will listen on ${HOST}:${PORT} to maintain Cloud Run service health. Database-dependent endpoints will return 503 until configuration is set.`
+      );
+    } else {
+      console.log(`[LibertadGO Dev Startup Note] ${errorMsg}`);
+    }
   }
-
-  const distPath = path.resolve(__dirname, 'dist');
-  const isProduction =
-    process.env.NODE_ENV === 'production' &&
-    fs.existsSync(path.join(distPath, 'index.html'));
 
   app.use(express.json());
   app.use(csrfProtectionMiddleware);
@@ -116,8 +120,8 @@ async function startServer() {
     res.setHeader('Content-Type', 'application/json');
     const dbHealth = await checkDatabaseHealth();
     res.json({
-      status: dbHealth.connected ? 'healthy' : 'degraded',
-      database: dbHealth.connected ? 'connected' : 'not_configured',
+      status: dbHealth.connected || !isProduction ? 'healthy' : 'degraded',
+      database: dbHealth.connected ? 'connected' : (isProduction ? 'not_configured' : 'in_memory'),
       environment: isProduction ? 'production' : 'development',
       timestamp: new Date().toISOString(),
     });
