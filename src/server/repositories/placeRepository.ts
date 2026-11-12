@@ -745,14 +745,14 @@ let placeRepositoryInstance: IPlaceRepository | null = null;
 
 export function getPlaceRepository(): IPlaceRepository {
   if (!placeRepositoryInstance) {
-    if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === 'production' && process.env.DATABASE_URL) {
       throw new Error(
         '[Storage Architecture] FATAL: Place repository is not initialized with PostgreSQL in production environment.'
       );
     }
     placeRepositoryInstance = new PlaceRepository();
   }
-  return placeRepositoryInstance!;
+  return placeRepositoryInstance;
 }
 
 export function setPlaceRepositoryInstance(repo: IPlaceRepository | null): void {

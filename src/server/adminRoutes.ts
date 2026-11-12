@@ -10,6 +10,7 @@ import {
   AdminCreateVideoSchema,
   AdminUpdateVideoSchema,
   AdminCreateCreatorSchema,
+  AdminUpdateVideoPlacesSchema,
 } from './creatorsSchemas.ts';
 import { getCreatorsRepository, getAuthRepository } from './repositories/index.ts';
 import { requireAuth, requireAdmin } from './authService.ts';
@@ -42,7 +43,7 @@ adminRouter.get('/metrics', async (_req: Request, res: Response) => {
   }
 });
 
-// 2. GET /api/admin/moderation/queue - Moderation queue
+// 2. GET /api/admin/moderation/queue - Moderation queue (batch place lookup)
 adminRouter.get('/moderation/queue', async (req: Request, res: Response) => {
   const repo = getCreatorsRepository();
   const statusFilter = (req.query.status as ModerationStatus) || 'PENDING';
@@ -50,10 +51,15 @@ adminRouter.get('/moderation/queue', async (req: Request, res: Response) => {
   try {
     const queue = await repo.listModerationQueue(statusFilter);
 
-    // Enrich with place names for quick admin inspection
+    // Batch enrich with place names for quick admin inspection without N+1 queries
+    const videoIds = queue.map((v) => v.id);
+    const placesMap = typeof repo.getPlacesForVideos === 'function'
+      ? await repo.getPlacesForVideos(videoIds)
+      : null;
+
     const enriched = await Promise.all(
       queue.map(async (v) => {
-        const places = await repo.getPlacesForVideo(v.id);
+        const places = placesMap ? (placesMap[v.id] || []) : await repo.getPlacesForVideo(v.id);
         return {
           ...v,
           places,
@@ -155,11 +161,14 @@ adminRouter.get('/moderation/:id/history', async (req: Request, res: Response) =
 
 // 5. PUT /api/admin/moderation/:id/places - Link/unlink tourist directory places
 adminRouter.put('/moderation/:id/places', async (req: Request, res: Response) => {
-  const { placeIds, primaryPlaceId } = req.body;
-  if (!Array.isArray(placeIds)) {
-    res.status(400).json({ success: false, error: 'placeIds debe ser un array de identificadores' });
+  const parseResult = AdminUpdateVideoPlacesSchema.safeParse(req.body);
+  if (!parseResult.success) {
+    const errorMsg = parseResult.error.issues.map((i) => i.message).join(', ');
+    res.status(400).json({ success: false, error: errorMsg });
     return;
   }
+
+  const { placeIds, primaryPlaceId } = parseResult.data;
 
   const invalidPlaceIds = placeIds.filter((pId) =>
     !INITIAL_PLACES.some((p) => p.id === pId)

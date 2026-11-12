@@ -48121,7 +48121,7 @@ var init_memoryCreatorsRepository = __esm({
         }
         return null;
       }
-      async createSubmission(data, placeIds = [], primaryPlaceId) {
+      async createSubmission(data, placeIds = [], primaryPlaceId, audit) {
         const id = `vid_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
         const now = (/* @__PURE__ */ new Date()).toISOString();
         const submission = {
@@ -48132,24 +48132,61 @@ var init_memoryCreatorsRepository = __esm({
           description: data.description || null,
           localityId: data.localityId || null,
           status: data.status || "PENDING",
+          externalCreatorHandle: data.externalCreatorHandle || null,
+          externalCreatorDisplayName: data.externalCreatorDisplayName || null,
+          externalCreatorAvatarUrl: data.externalCreatorAvatarUrl || null,
           moderationNotes: null,
-          moderatedBy: null,
-          moderatedAt: null,
+          moderatedBy: data.status === "APPROVED" ? data.userId : null,
+          moderatedAt: data.status === "APPROVED" ? now : null,
           internalViewsCount: 0,
           internalSavesCount: 0,
-          externalMetrics: null,
+          externalMetrics: data.externalCreatorHandle || data.externalCreatorDisplayName ? {
+            creatorHandle: data.externalCreatorHandle,
+            creatorDisplayName: data.externalCreatorDisplayName,
+            creatorAvatarUrl: data.externalCreatorAvatarUrl
+          } : null,
           createdAt: now,
           updatedAt: now
         };
+        const uniquePlaceIds = Array.from(new Set(placeIds || []));
+        if (primaryPlaceId && uniquePlaceIds.length > 0 && !uniquePlaceIds.includes(primaryPlaceId)) {
+          throw new Error("primaryPlaceId must be one of the associated placeIds");
+        }
         this.videoSubmissions.set(id, submission);
-        if (placeIds && placeIds.length > 0) {
-          await this.associatePlaces(id, placeIds, primaryPlaceId);
+        if (uniquePlaceIds.length > 0) {
+          await this.associatePlaces(id, uniquePlaceIds, primaryPlaceId);
+        }
+        if (audit) {
+          await this.addModerationLog({
+            videoId: id,
+            adminUserId: audit.adminUserId,
+            adminName: audit.adminName,
+            action: audit.action || "CREATE",
+            previousStatus: audit.previousStatus ?? null,
+            newStatus: audit.newStatus,
+            reason: audit.reason || null,
+            internalNotes: audit.internalNotes || null,
+            changedFields: audit.changedFields || null
+          });
         }
         return { ...submission };
       }
-      async updateSubmission(id, data, placeIds, primaryPlaceId) {
+      async updateSubmission(id, data, placeIds, primaryPlaceId, audit) {
         const sub = this.videoSubmissions.get(id);
         if (!sub) return null;
+        if (placeIds !== void 0) {
+          const uniqueIds = Array.from(new Set(placeIds));
+          if (primaryPlaceId !== void 0 && primaryPlaceId !== null) {
+            if (uniqueIds.length > 0 && !uniqueIds.includes(primaryPlaceId)) {
+              throw new Error("primaryPlaceId must be one of the associated placeIds");
+            }
+          }
+        } else if (primaryPlaceId !== void 0 && primaryPlaceId !== null) {
+          const currentPlaces = await this.getPlacesForVideo(id);
+          if (!currentPlaces.some((p) => p.id === primaryPlaceId)) {
+            throw new Error("primaryPlaceId must be one of the associated placeIds");
+          }
+        }
         const updated = {
           ...sub,
           title: data.title ?? sub.title,
@@ -48160,17 +48197,60 @@ var init_memoryCreatorsRepository = __esm({
           thumbnailUrl: data.thumbnailUrl !== void 0 ? data.thumbnailUrl : sub.thumbnailUrl,
           creatorProfileId: data.creatorProfileId !== void 0 ? data.creatorProfileId : sub.creatorProfileId,
           status: data.status ?? sub.status,
+          externalCreatorHandle: data.externalCreatorHandle !== void 0 ? data.externalCreatorHandle : sub.externalCreatorHandle,
+          externalCreatorDisplayName: data.externalCreatorDisplayName !== void 0 ? data.externalCreatorDisplayName : sub.externalCreatorDisplayName,
+          externalCreatorAvatarUrl: data.externalCreatorAvatarUrl !== void 0 ? data.externalCreatorAvatarUrl : sub.externalCreatorAvatarUrl,
+          externalMetrics: data.externalCreatorHandle !== void 0 || data.externalCreatorDisplayName !== void 0 || data.externalCreatorAvatarUrl !== void 0 || data.externalMetrics !== void 0 ? {
+            ...sub.externalMetrics || {},
+            ...data.externalMetrics !== void 0 ? data.externalMetrics : {},
+            ...data.externalCreatorHandle !== void 0 ? { creatorHandle: data.externalCreatorHandle } : {},
+            ...data.externalCreatorDisplayName !== void 0 ? { creatorDisplayName: data.externalCreatorDisplayName } : {},
+            ...data.externalCreatorAvatarUrl !== void 0 ? { creatorAvatarUrl: data.externalCreatorAvatarUrl } : {}
+          } : sub.externalMetrics,
           updatedAt: (/* @__PURE__ */ new Date()).toISOString()
         };
         this.videoSubmissions.set(id, updated);
-        if (placeIds && Array.isArray(placeIds)) {
-          await this.associatePlaces(id, placeIds, primaryPlaceId);
+        if (placeIds !== void 0 && Array.isArray(placeIds)) {
+          const uniquePlaceIds = Array.from(new Set(placeIds));
+          let effectivePrimaryId = null;
+          if (primaryPlaceId !== void 0 && primaryPlaceId !== null) {
+            effectivePrimaryId = primaryPlaceId;
+          } else {
+            const currentPlaces = Array.from(this.videoPlaces.values()).filter((vp) => vp.videoId === id);
+            const existingPrimary = currentPlaces.find((vp) => vp.isPrimary)?.placeId;
+            if (existingPrimary && uniquePlaceIds.includes(existingPrimary)) {
+              effectivePrimaryId = existingPrimary;
+            } else {
+              effectivePrimaryId = uniquePlaceIds.length > 0 ? uniquePlaceIds[0] : null;
+            }
+          }
+          await this.associatePlaces(id, uniquePlaceIds, effectivePrimaryId);
+        } else if (primaryPlaceId !== void 0 && primaryPlaceId !== null) {
+          for (const vp of this.videoPlaces.values()) {
+            if (vp.videoId === id) {
+              vp.isPrimary = vp.placeId === primaryPlaceId;
+            }
+          }
+        }
+        if (audit) {
+          await this.addModerationLog({
+            videoId: id,
+            adminUserId: audit.adminUserId,
+            adminName: audit.adminName,
+            action: audit.action || "UPDATE",
+            previousStatus: audit.previousStatus ?? sub.status,
+            newStatus: audit.newStatus ?? (data.status ?? sub.status),
+            reason: audit.reason || null,
+            internalNotes: audit.internalNotes || null,
+            changedFields: audit.changedFields || null
+          });
         }
         return { ...updated };
       }
-      async updateSubmissionStatus(id, status, notes, adminUserId) {
+      async updateSubmissionStatus(id, status, notes, adminUserId, audit, placeIds) {
         const sub = this.videoSubmissions.get(id);
         if (!sub) return null;
+        const prevStatus = sub.status;
         const updated = {
           ...sub,
           status,
@@ -48180,6 +48260,22 @@ var init_memoryCreatorsRepository = __esm({
           updatedAt: (/* @__PURE__ */ new Date()).toISOString()
         };
         this.videoSubmissions.set(id, updated);
+        if (placeIds && Array.isArray(placeIds)) {
+          await this.associatePlaces(id, placeIds);
+        }
+        if (audit) {
+          await this.addModerationLog({
+            videoId: id,
+            adminUserId: audit.adminUserId,
+            adminName: audit.adminName,
+            action: audit.action || (status === "APPROVED" ? "APPROVE" : status === "REJECTED" ? "REJECT" : status === "OBSERVED" ? "OBSERVE" : status === "HIDDEN" ? "HIDE" : "UPDATE"),
+            previousStatus: audit.previousStatus ?? prevStatus,
+            newStatus: audit.newStatus ?? status,
+            reason: audit.reason || null,
+            internalNotes: audit.internalNotes || notes || null,
+            changedFields: audit.changedFields || null
+          });
+        }
         return { ...updated };
       }
       async listApprovedVideos(filters = {}) {
@@ -48224,13 +48320,16 @@ var init_memoryCreatorsRepository = __esm({
         const videosWithPlaces = await Promise.all(
           paginated.map(async (v) => {
             const places = await this.getPlacesForVideo(v.id);
-            const creatorProfile = v.creatorProfileId ? Array.from(this.creatorProfiles.values()).find((cp) => cp.id === v.creatorProfileId) : this.creatorProfiles.get(v.userId);
+            const creatorProfile = v.creatorProfileId ? Array.from(this.creatorProfiles.values()).find((cp) => cp.id === v.creatorProfileId) : this.creatorProfiles.get(v.userId) || null;
             const user = this.users.get(v.userId);
             return {
               ...v,
               creatorDisplayName: creatorProfile?.displayName || null,
               creatorHandle: creatorProfile?.handle || null,
               creatorAvatarUrl: creatorProfile?.avatarUrl || null,
+              externalCreatorHandle: v.externalCreatorHandle || v.externalMetrics?.creatorHandle || null,
+              externalCreatorDisplayName: v.externalCreatorDisplayName || v.externalMetrics?.creatorDisplayName || null,
+              externalCreatorAvatarUrl: v.externalCreatorAvatarUrl || v.externalMetrics?.creatorAvatarUrl || null,
               userName: user?.name || null,
               places
             };
@@ -48252,11 +48351,35 @@ var init_memoryCreatorsRepository = __esm({
       }
       async addModerationLog(log) {
         const id = `mod_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+        let action = log.action;
+        if (!action) {
+          if (log.previousStatus === null || log.previousStatus === void 0) {
+            action = "CREATE";
+          } else if (log.previousStatus === log.newStatus) {
+            action = "UPDATE";
+          } else if (log.newStatus === "APPROVED") {
+            action = "APPROVE";
+          } else if (log.newStatus === "REJECTED") {
+            action = "REJECT";
+          } else if (log.newStatus === "OBSERVED") {
+            action = "OBSERVE";
+          } else if (log.newStatus === "HIDDEN") {
+            action = "HIDE";
+          } else {
+            action = "UPDATE";
+          }
+        }
         const newLog = {
-          ...log,
           id,
+          videoId: log.videoId,
+          adminUserId: log.adminUserId,
+          adminName: log.adminName,
+          action,
+          previousStatus: log.previousStatus === void 0 ? null : log.previousStatus,
+          newStatus: log.newStatus,
           reason: log.reason || null,
           internalNotes: log.internalNotes || null,
+          changedFields: log.changedFields || null,
           createdAt: (/* @__PURE__ */ new Date()).toISOString()
         };
         this.moderationLogs.unshift(newLog);
@@ -48266,13 +48389,18 @@ var init_memoryCreatorsRepository = __esm({
         return this.moderationLogs.filter((l) => l.videoId === videoId).map((l) => ({ ...l }));
       }
       async associatePlaces(videoId, placeIds, primaryPlaceId) {
+        const uniquePlaceIds = Array.from(new Set(placeIds || []));
+        if (primaryPlaceId && uniquePlaceIds.length > 0 && !uniquePlaceIds.includes(primaryPlaceId)) {
+          throw new Error("primaryPlaceId must be one of the associated placeIds");
+        }
+        const effectivePrimaryId = primaryPlaceId || (uniquePlaceIds.length > 0 ? uniquePlaceIds[0] : null);
         for (const [k, vp] of this.videoPlaces.entries()) {
           if (vp.videoId === videoId) {
             this.videoPlaces.delete(k);
           }
         }
-        placeIds.forEach((pId, idx) => {
-          const isPrimary = primaryPlaceId ? primaryPlaceId === pId : idx === 0;
+        uniquePlaceIds.forEach((pId) => {
+          const isPrimary = effectivePrimaryId === pId;
           const id = `vp_${videoId}_${pId}`;
           this.videoPlaces.set(id, {
             id,
@@ -48285,7 +48413,7 @@ var init_memoryCreatorsRepository = __esm({
       }
       async getPlacesForVideo(videoId) {
         const pIds = Array.from(this.videoPlaces.values()).filter((vp) => vp.videoId === videoId).sort((a, b) => (b.isPrimary ? 1 : 0) - (a.isPrimary ? 1 : 0)).map((vp) => vp.placeId);
-        return INITIAL_PLACES.filter((p) => pIds.includes(p.id));
+        return pIds.map((id) => INITIAL_PLACES.find((p) => p.id === id)).filter((p) => p !== void 0);
       }
       async getVideosForPlace(placeId) {
         const videoIds = new Set(
@@ -48329,6 +48457,11 @@ var init_memoryCreatorsRepository = __esm({
           updatedAt: now
         };
         this.creatorProfiles.set(data.userId, profile);
+        for (const sub of this.videoSubmissions.values()) {
+          if (sub.userId === data.userId && !sub.creatorProfileId) {
+            sub.creatorProfileId = profile.id;
+          }
+        }
         return { ...profile };
       }
       async listPublicCreators() {
@@ -48392,10 +48525,87 @@ var init_memoryCreatorsRepository = __esm({
 
 // src/server/repositories/postgresCreatorsRepository.ts
 import { Pool } from "pg";
-var PostgresCreatorsRepository;
+function serializeInternalNotes(action, changedFields, internalNotes) {
+  const meta = {
+    action,
+    changedFields: changedFields || null
+  };
+  const metaStr = `${AUDIT_META_PREFIX}${JSON.stringify(meta)}${AUDIT_META_SUFFIX}`;
+  return internalNotes ? `${metaStr} ${internalNotes}` : metaStr;
+}
+function parseModerationLogRow(row) {
+  let action = "UPDATE";
+  let changedFields = null;
+  let cleanNotes = row.internalNotes;
+  if (row.action) {
+    action = row.action;
+    changedFields = row.changedFields || null;
+  } else if (typeof row.internalNotes === "string" && row.internalNotes.includes(AUDIT_META_PREFIX)) {
+    try {
+      const start = row.internalNotes.indexOf(AUDIT_META_PREFIX);
+      const end = row.internalNotes.indexOf(AUDIT_META_SUFFIX, start);
+      if (start !== -1 && end !== -1) {
+        const jsonStr = row.internalNotes.substring(start + AUDIT_META_PREFIX.length, end);
+        const meta = JSON.parse(jsonStr);
+        if (meta.action) action = meta.action;
+        if (meta.changedFields) changedFields = meta.changedFields;
+        cleanNotes = (row.internalNotes.substring(0, start) + row.internalNotes.substring(end + AUDIT_META_SUFFIX.length)).trim() || null;
+      }
+    } catch {
+    }
+  } else {
+    if (row.previousStatus === "NONE" || !row.previousStatus) {
+      action = "CREATE";
+    } else if (row.previousStatus === row.newStatus) {
+      action = "UPDATE";
+    } else if (row.newStatus === "APPROVED") {
+      action = "APPROVE";
+    } else if (row.newStatus === "REJECTED") {
+      action = "REJECT";
+    } else if (row.newStatus === "OBSERVED") {
+      action = "OBSERVE";
+    } else if (row.newStatus === "HIDDEN") {
+      action = "HIDE";
+    }
+  }
+  return {
+    id: row.id,
+    videoId: row.videoId,
+    adminUserId: row.adminUserId,
+    adminName: row.adminName,
+    action,
+    previousStatus: row.previousStatus === "NONE" || !row.previousStatus ? null : row.previousStatus,
+    newStatus: row.newStatus,
+    reason: row.reason || null,
+    internalNotes: cleanNotes,
+    changedFields,
+    createdAt: row.createdAt instanceof Date ? row.createdAt.toISOString() : String(row.createdAt)
+  };
+}
+function mapVideoSubmissionRow(row) {
+  if (!row) return row;
+  let metrics = row.externalMetrics;
+  if (typeof metrics === "string") {
+    try {
+      metrics = JSON.parse(metrics);
+    } catch {
+      metrics = null;
+    }
+  }
+  return {
+    ...row,
+    externalMetrics: metrics || null,
+    externalCreatorHandle: row.externalCreatorHandle || metrics?.creatorHandle || null,
+    externalCreatorDisplayName: row.externalCreatorDisplayName || metrics?.creatorDisplayName || null,
+    externalCreatorAvatarUrl: row.externalCreatorAvatarUrl || metrics?.creatorAvatarUrl || null
+  };
+}
+var AUDIT_META_PREFIX, AUDIT_META_SUFFIX, PostgresCreatorsRepository;
 var init_postgresCreatorsRepository = __esm({
   "src/server/repositories/postgresCreatorsRepository.ts"() {
     init_initialPlaces();
+    AUDIT_META_PREFIX = "__AUDIT_META__:";
+    AUDIT_META_SUFFIX = ":__AUDIT_END__";
     PostgresCreatorsRepository = class {
       constructor(connectionString) {
         this.pool = new Pool({
@@ -48474,7 +48684,7 @@ var init_postgresCreatorsRepository = __esm({
        FROM video_submissions WHERE id = $1 LIMIT 1`,
           [id]
         );
-        return res.rows[0] || null;
+        return res.rows[0] ? mapVideoSubmissionRow(res.rows[0]) : null;
       }
       async findSubmissionByPlatformAndExternalId(platform, externalVideoId) {
         const res = await this.pool.query(
@@ -48487,20 +48697,26 @@ var init_postgresCreatorsRepository = __esm({
        FROM video_submissions WHERE platform = $1 AND external_video_id = $2 LIMIT 1`,
           [platform, externalVideoId]
         );
-        return res.rows[0] || null;
+        return res.rows[0] ? mapVideoSubmissionRow(res.rows[0]) : null;
       }
-      async createSubmission(data, placeIds = [], primaryPlaceId) {
+      async createSubmission(data, placeIds = [], primaryPlaceId, audit) {
         const id = `vid_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
         const client = await this.pool.connect();
         const initialStatus = data.status || "PENDING";
+        const externalMetrics = {
+          ...data.externalCreatorHandle ? { creatorHandle: data.externalCreatorHandle } : {},
+          ...data.externalCreatorDisplayName ? { creatorDisplayName: data.externalCreatorDisplayName } : {},
+          ...data.externalCreatorAvatarUrl ? { creatorAvatarUrl: data.externalCreatorAvatarUrl } : {}
+        };
+        const metricsParam = Object.keys(externalMetrics).length > 0 ? JSON.stringify(externalMetrics) : null;
         try {
           await client.query("BEGIN");
           const res = await client.query(
             `INSERT INTO video_submissions (
           id, user_id, creator_profile_id, platform, external_video_id,
           video_url, embed_url, thumbnail_url, title, description,
-          content_type, category, locality_id, status
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+          content_type, category, locality_id, status, external_metrics
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15::jsonb)
         RETURNING id, user_id as "userId", creator_profile_id as "creatorProfileId", platform, external_video_id as "externalVideoId",
                   video_url as "videoUrl", embed_url as "embedUrl", thumbnail_url as "thumbnailUrl", title, description,
                   content_type as "contentType", category, locality_id as "localityId", status, moderation_notes as "moderationNotes",
@@ -48521,18 +48737,34 @@ var init_postgresCreatorsRepository = __esm({
               data.contentType,
               data.category,
               data.localityId || null,
-              initialStatus
+              initialStatus,
+              metricsParam
             ]
           );
-          const submission = res.rows[0];
-          for (const pId of placeIds) {
-            const isPrimary = primaryPlaceId ? primaryPlaceId === pId : placeIds[0] === pId;
+          const submission = mapVideoSubmissionRow(res.rows[0]);
+          const uniquePlaceIds = Array.from(new Set(placeIds || []));
+          if (primaryPlaceId && uniquePlaceIds.length > 0 && !uniquePlaceIds.includes(primaryPlaceId)) {
+            throw new Error("primaryPlaceId must be one of the associated placeIds");
+          }
+          const effectivePrimaryId = primaryPlaceId || (uniquePlaceIds.length > 0 ? uniquePlaceIds[0] : null);
+          for (const pId of uniquePlaceIds) {
+            const isPrimary = effectivePrimaryId === pId;
             const vpId = `vp_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
             await client.query(
               `INSERT INTO video_places (id, video_id, place_id, is_primary)
            VALUES ($1, $2, $3, $4)
            ON CONFLICT (video_id, place_id) DO NOTHING`,
               [vpId, id, pId, isPrimary]
+            );
+          }
+          if (audit) {
+            const logId = `mod_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+            const encodedNotes = serializeInternalNotes(audit.action, audit.changedFields, audit.internalNotes);
+            const dbPrevStatus = audit.previousStatus || "NONE";
+            await client.query(
+              `INSERT INTO video_moderation_logs (id, video_id, admin_user_id, admin_name, previous_status, new_status, reason, internal_notes)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+              [logId, id, audit.adminUserId, audit.adminName, dbPrevStatus, audit.newStatus, audit.reason || null, encodedNotes]
             );
           }
           await client.query("COMMIT");
@@ -48544,62 +48776,214 @@ var init_postgresCreatorsRepository = __esm({
           client.release();
         }
       }
-      async updateSubmission(id, data, placeIds, primaryPlaceId) {
-        const existing = await this.findSubmissionById(id);
-        if (!existing) return null;
-        const res = await this.pool.query(
-          `UPDATE video_submissions
-       SET title = COALESCE($1, title),
-           description = COALESCE($2, description),
-           content_type = COALESCE($3, content_type),
-           category = COALESCE($4, category),
-           locality_id = COALESCE($5, locality_id),
-           thumbnail_url = COALESCE($6, thumbnail_url),
-           creator_profile_id = COALESCE($7, creator_profile_id),
-           status = COALESCE($8, status),
-           updated_at = NOW()
-       WHERE id = $9
-       RETURNING id, user_id as "userId", creator_profile_id as "creatorProfileId", platform, external_video_id as "externalVideoId",
-                 video_url as "videoUrl", embed_url as "embedUrl", thumbnail_url as "thumbnailUrl", title, description,
-                 content_type as "contentType", category, locality_id as "localityId", status, moderation_notes as "moderationNotes",
-                 moderated_by as "moderatedBy", moderated_at as "moderatedAt", internal_views_count as "internalViewsCount",
-                 internal_saves_count as "internalSavesCount", external_metrics as "externalMetrics",
-                 created_at as "createdAt", updated_at as "updatedAt"`,
-          [
-            data.title,
-            data.description,
-            data.contentType,
-            data.category,
-            data.localityId,
-            data.thumbnailUrl,
-            data.creatorProfileId,
-            data.status,
-            id
-          ]
-        );
-        if (placeIds && Array.isArray(placeIds)) {
-          await this.associatePlaces(id, placeIds, primaryPlaceId);
+      async updateSubmission(id, data, placeIds, primaryPlaceId, audit) {
+        const client = await this.pool.connect();
+        try {
+          await client.query("BEGIN");
+          const existingRes = await client.query(
+            `SELECT id, user_id as "userId", creator_profile_id as "creatorProfileId", platform, external_video_id as "externalVideoId",
+                video_url as "videoUrl", embed_url as "embedUrl", thumbnail_url as "thumbnailUrl", title, description,
+                content_type as "contentType", category, locality_id as "localityId", status, moderation_notes as "moderationNotes",
+                moderated_by as "moderatedBy", moderated_at as "moderatedAt", internal_views_count as "internalViewsCount",
+                internal_saves_count as "internalSavesCount", external_metrics as "externalMetrics",
+                created_at as "createdAt", updated_at as "updatedAt"
+         FROM video_submissions WHERE id = $1 FOR UPDATE`,
+            [id]
+          );
+          if (existingRes.rows.length === 0) {
+            await client.query("ROLLBACK");
+            return null;
+          }
+          const existing = mapVideoSubmissionRow(existingRes.rows[0]);
+          let metricsJson = null;
+          if (data.externalCreatorHandle !== void 0 || data.externalCreatorDisplayName !== void 0 || data.externalCreatorAvatarUrl !== void 0 || data.externalMetrics !== void 0) {
+            const mergedMetrics = {
+              ...existing.externalMetrics || {},
+              ...data.externalMetrics !== void 0 ? data.externalMetrics : {},
+              ...data.externalCreatorHandle !== void 0 ? { creatorHandle: data.externalCreatorHandle } : {},
+              ...data.externalCreatorDisplayName !== void 0 ? { creatorDisplayName: data.externalCreatorDisplayName } : {},
+              ...data.externalCreatorAvatarUrl !== void 0 ? { creatorAvatarUrl: data.externalCreatorAvatarUrl } : {}
+            };
+            metricsJson = JSON.stringify(mergedMetrics);
+          }
+          const setClauses = [];
+          const params = [];
+          if (data.title !== void 0) {
+            params.push(data.title);
+            setClauses.push(`title = $${params.length}`);
+          }
+          if (data.description !== void 0) {
+            params.push(data.description);
+            setClauses.push(`description = $${params.length}`);
+          }
+          if (data.contentType !== void 0) {
+            params.push(data.contentType);
+            setClauses.push(`content_type = $${params.length}`);
+          }
+          if (data.category !== void 0) {
+            params.push(data.category);
+            setClauses.push(`category = $${params.length}`);
+          }
+          if (data.localityId !== void 0) {
+            params.push(data.localityId);
+            setClauses.push(`locality_id = $${params.length}`);
+          }
+          if (data.thumbnailUrl !== void 0) {
+            params.push(data.thumbnailUrl);
+            setClauses.push(`thumbnail_url = $${params.length}`);
+          }
+          if (data.creatorProfileId !== void 0) {
+            params.push(data.creatorProfileId);
+            setClauses.push(`creator_profile_id = $${params.length}`);
+          }
+          if (data.status !== void 0) {
+            params.push(data.status);
+            setClauses.push(`status = $${params.length}`);
+          }
+          if (metricsJson !== null) {
+            params.push(metricsJson);
+            setClauses.push(`external_metrics = $${params.length}::jsonb`);
+          }
+          setClauses.push("updated_at = NOW()");
+          params.push(id);
+          const idParamIndex = params.length;
+          const res = await client.query(
+            `UPDATE video_submissions
+         SET ${setClauses.join(", ")}
+         WHERE id = $${idParamIndex}
+         RETURNING id, user_id as "userId", creator_profile_id as "creatorProfileId", platform, external_video_id as "externalVideoId",
+                   video_url as "videoUrl", embed_url as "embedUrl", thumbnail_url as "thumbnailUrl", title, description,
+                   content_type as "contentType", category, locality_id as "localityId", status, moderation_notes as "moderationNotes",
+                   moderated_by as "moderatedBy", moderated_at as "moderatedAt", internal_views_count as "internalViewsCount",
+                   internal_saves_count as "internalSavesCount", external_metrics as "externalMetrics",
+                   created_at as "createdAt", updated_at as "updatedAt"`,
+            params
+          );
+          if (placeIds !== void 0 && Array.isArray(placeIds)) {
+            const uniquePlaceIds = Array.from(new Set(placeIds));
+            let effectivePrimaryId = null;
+            if (primaryPlaceId !== void 0 && primaryPlaceId !== null) {
+              if (uniquePlaceIds.length > 0 && !uniquePlaceIds.includes(primaryPlaceId)) {
+                throw new Error("primaryPlaceId must be one of the associated placeIds");
+              }
+              effectivePrimaryId = primaryPlaceId;
+            } else {
+              const currentPrimaryRes = await client.query(
+                `SELECT place_id FROM video_places WHERE video_id = $1 AND is_primary = true LIMIT 1`,
+                [id]
+              );
+              const currentPrimaryId = currentPrimaryRes.rows[0]?.place_id;
+              if (currentPrimaryId && uniquePlaceIds.includes(currentPrimaryId)) {
+                effectivePrimaryId = currentPrimaryId;
+              } else {
+                effectivePrimaryId = uniquePlaceIds.length > 0 ? uniquePlaceIds[0] : null;
+              }
+            }
+            await client.query(`DELETE FROM video_places WHERE video_id = $1`, [id]);
+            for (const pId of uniquePlaceIds) {
+              const isPrimary = effectivePrimaryId === pId;
+              const vpId = `vp_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+              await client.query(
+                `INSERT INTO video_places (id, video_id, place_id, is_primary)
+             VALUES ($1, $2, $3, $4)
+             ON CONFLICT (video_id, place_id) DO NOTHING`,
+                [vpId, id, pId, isPrimary]
+              );
+            }
+          } else if (primaryPlaceId !== void 0 && primaryPlaceId !== null) {
+            const existingPlacesRes = await client.query(
+              `SELECT place_id FROM video_places WHERE video_id = $1`,
+              [id]
+            );
+            const existingPlaceIds = existingPlacesRes.rows.map((r) => r.place_id);
+            if (!existingPlaceIds.includes(primaryPlaceId)) {
+              throw new Error("primaryPlaceId must be one of the associated placeIds");
+            }
+            await client.query(
+              `UPDATE video_places SET is_primary = (place_id = $1) WHERE video_id = $2`,
+              [primaryPlaceId, id]
+            );
+          }
+          if (audit) {
+            const logId = `mod_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+            const encodedNotes = serializeInternalNotes(audit.action, audit.changedFields, audit.internalNotes);
+            const dbPrevStatus = audit.previousStatus || existing.status || "NONE";
+            await client.query(
+              `INSERT INTO video_moderation_logs (id, video_id, admin_user_id, admin_name, previous_status, new_status, reason, internal_notes)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+              [logId, id, audit.adminUserId, audit.adminName, dbPrevStatus, audit.newStatus, audit.reason || null, encodedNotes]
+            );
+          }
+          await client.query("COMMIT");
+          return res.rows[0] ? mapVideoSubmissionRow(res.rows[0]) : null;
+        } catch (err) {
+          await client.query("ROLLBACK");
+          throw err;
+        } finally {
+          client.release();
         }
-        return res.rows[0] || null;
       }
-      async updateSubmissionStatus(id, status, notes, adminUserId) {
-        const res = await this.pool.query(
-          `UPDATE video_submissions
-       SET status = $1,
-           moderation_notes = $2,
-           moderated_by = $3,
-           moderated_at = NOW(),
-           updated_at = NOW()
-       WHERE id = $4
-       RETURNING id, user_id as "userId", creator_profile_id as "creatorProfileId", platform, external_video_id as "externalVideoId",
-                 video_url as "videoUrl", embed_url as "embedUrl", thumbnail_url as "thumbnailUrl", title, description,
-                 content_type as "contentType", category, locality_id as "localityId", status, moderation_notes as "moderationNotes",
-                 moderated_by as "moderatedBy", moderated_at as "moderatedAt", internal_views_count as "internalViewsCount",
-                 internal_saves_count as "internalSavesCount", external_metrics as "externalMetrics",
-                 created_at as "createdAt", updated_at as "updatedAt"`,
-          [status, notes || null, adminUserId || null, id]
-        );
-        return res.rows[0] || null;
+      async updateSubmissionStatus(id, status, notes, adminUserId, audit, placeIds) {
+        const client = await this.pool.connect();
+        try {
+          await client.query("BEGIN");
+          const existingRes = await client.query(
+            `SELECT id, status FROM video_submissions WHERE id = $1 FOR UPDATE`,
+            [id]
+          );
+          if (existingRes.rows.length === 0) {
+            await client.query("ROLLBACK");
+            return null;
+          }
+          const prevStatus = existingRes.rows[0].status;
+          const res = await client.query(
+            `UPDATE video_submissions
+         SET status = $1,
+             moderation_notes = $2,
+             moderated_by = $3,
+             moderated_at = NOW(),
+             updated_at = NOW()
+         WHERE id = $4
+         RETURNING id, user_id as "userId", creator_profile_id as "creatorProfileId", platform, external_video_id as "externalVideoId",
+                   video_url as "videoUrl", embed_url as "embedUrl", thumbnail_url as "thumbnailUrl", title, description,
+                   content_type as "contentType", category, locality_id as "localityId", status, moderation_notes as "moderationNotes",
+                   moderated_by as "moderatedBy", moderated_at as "moderatedAt", internal_views_count as "internalViewsCount",
+                   internal_saves_count as "internalSavesCount", external_metrics as "externalMetrics",
+                   created_at as "createdAt", updated_at as "updatedAt"`,
+            [status, notes || null, adminUserId || null, id]
+          );
+          if (placeIds && Array.isArray(placeIds)) {
+            await client.query(`DELETE FROM video_places WHERE video_id = $1`, [id]);
+            for (let i = 0; i < placeIds.length; i++) {
+              const pId = placeIds[i];
+              const isPrimary = i === 0;
+              const vpId = `vp_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+              await client.query(
+                `INSERT INTO video_places (id, video_id, place_id, is_primary)
+             VALUES ($1, $2, $3, $4)
+             ON CONFLICT (video_id, place_id) DO NOTHING`,
+                [vpId, id, pId, isPrimary]
+              );
+            }
+          }
+          if (audit) {
+            const logId = `mod_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+            const encodedNotes = serializeInternalNotes(audit.action, audit.changedFields, audit.internalNotes || notes);
+            const dbPrevStatus = audit.previousStatus || prevStatus || "NONE";
+            await client.query(
+              `INSERT INTO video_moderation_logs (id, video_id, admin_user_id, admin_name, previous_status, new_status, reason, internal_notes)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+              [logId, id, audit.adminUserId, audit.adminName, dbPrevStatus, audit.newStatus, audit.reason || null, encodedNotes]
+            );
+          }
+          await client.query("COMMIT");
+          return res.rows[0] ? mapVideoSubmissionRow(res.rows[0]) : null;
+        } catch (err) {
+          await client.query("ROLLBACK");
+          throw err;
+        } finally {
+          client.release();
+        }
       }
       async listApprovedVideos(filters = {}) {
         const page = Math.max(1, filters.page || 1);
@@ -48682,7 +49066,7 @@ var init_postgresCreatorsRepository = __esm({
           }
         }
         const videosWithPlaces = res.rows.map((v) => ({
-          ...v,
+          ...mapVideoSubmissionRow(v),
           places: placesByVideoId[v.id] || []
         }));
         return { videos: videosWithPlaces, total };
@@ -48700,7 +49084,7 @@ var init_postgresCreatorsRepository = __esm({
        ORDER BY created_at DESC`,
           [userId]
         );
-        return res.rows;
+        return res.rows.map(mapVideoSubmissionRow);
       }
       async listModerationQueue(status = "PENDING") {
         const res = await this.pool.query(
@@ -48715,19 +49099,39 @@ var init_postgresCreatorsRepository = __esm({
        ORDER BY created_at ASC`,
           [status]
         );
-        return res.rows;
+        return res.rows.map(mapVideoSubmissionRow);
       }
       async addModerationLog(log) {
         const id = `mod_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+        let action = log.action;
+        if (!action) {
+          if (log.previousStatus === null || log.previousStatus === void 0) {
+            action = "CREATE";
+          } else if (log.previousStatus === log.newStatus) {
+            action = "UPDATE";
+          } else if (log.newStatus === "APPROVED") {
+            action = "APPROVE";
+          } else if (log.newStatus === "REJECTED") {
+            action = "REJECT";
+          } else if (log.newStatus === "OBSERVED") {
+            action = "OBSERVE";
+          } else if (log.newStatus === "HIDDEN") {
+            action = "HIDE";
+          } else {
+            action = "UPDATE";
+          }
+        }
+        const encodedNotes = serializeInternalNotes(action, log.changedFields, log.internalNotes);
+        const dbPrevStatus = log.previousStatus || "NONE";
         const res = await this.pool.query(
           `INSERT INTO video_moderation_logs (id, video_id, admin_user_id, admin_name, previous_status, new_status, reason, internal_notes)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
        RETURNING id, video_id as "videoId", admin_user_id as "adminUserId", admin_name as "adminName",
                  previous_status as "previousStatus", new_status as "newStatus", reason, internal_notes as "internalNotes",
                  created_at as "createdAt"`,
-          [id, log.videoId, log.adminUserId, log.adminName, log.previousStatus, log.newStatus, log.reason || null, log.internalNotes || null]
+          [id, log.videoId, log.adminUserId, log.adminName, dbPrevStatus, log.newStatus, log.reason || null, encodedNotes]
         );
-        return res.rows[0];
+        return parseModerationLogRow(res.rows[0]);
       }
       async getModerationLogs(videoId) {
         const res = await this.pool.query(
@@ -48739,15 +49143,20 @@ var init_postgresCreatorsRepository = __esm({
        ORDER BY created_at DESC`,
           [videoId]
         );
-        return res.rows;
+        return res.rows.map(parseModerationLogRow);
       }
       async associatePlaces(videoId, placeIds, primaryPlaceId) {
+        const uniquePlaceIds = Array.from(new Set(placeIds || []));
+        if (primaryPlaceId && uniquePlaceIds.length > 0 && !uniquePlaceIds.includes(primaryPlaceId)) {
+          throw new Error("primaryPlaceId must be one of the associated placeIds");
+        }
+        const effectivePrimaryId = primaryPlaceId || (uniquePlaceIds.length > 0 ? uniquePlaceIds[0] : null);
         const client = await this.pool.connect();
         try {
           await client.query("BEGIN");
           await client.query(`DELETE FROM video_places WHERE video_id = $1`, [videoId]);
-          for (const pId of placeIds) {
-            const isPrimary = primaryPlaceId ? primaryPlaceId === pId : placeIds[0] === pId;
+          for (const pId of uniquePlaceIds) {
+            const isPrimary = effectivePrimaryId === pId;
             const vpId = `vp_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
             await client.query(
               `INSERT INTO video_places (id, video_id, place_id, is_primary)
@@ -48766,11 +49175,11 @@ var init_postgresCreatorsRepository = __esm({
       }
       async getPlacesForVideo(videoId) {
         const res = await this.pool.query(
-          `SELECT place_id as "placeId" FROM video_places WHERE video_id = $1 ORDER BY is_primary DESC`,
+          `SELECT place_id as "placeId" FROM video_places WHERE video_id = $1 ORDER BY is_primary DESC, created_at ASC`,
           [videoId]
         );
         const placeIds = res.rows.map((r) => r.placeId);
-        return INITIAL_PLACES.filter((p) => placeIds.includes(p.id));
+        return placeIds.map((id) => INITIAL_PLACES.find((p) => p.id === id)).filter((p) => p !== void 0);
       }
       async getVideosForPlace(placeId) {
         const res = await this.pool.query(
@@ -48787,7 +49196,7 @@ var init_postgresCreatorsRepository = __esm({
        ORDER BY vs.created_at DESC`,
           [placeId]
         );
-        return res.rows;
+        return res.rows.map(mapVideoSubmissionRow);
       }
       async findCreatorProfileByUserId(userId) {
         const res = await this.pool.query(
@@ -51119,13 +51528,18 @@ function parseAndValidateVideoUrl(rawUrl) {
   const pathname = parsedUrl.pathname;
   if (hostname === "youtube.com" || hostname === "m.youtube.com" || hostname === "youtu.be") {
     let videoId = null;
+    let authorHandle = void 0;
+    const ytAuthorMatch = pathname.match(/\/@([a-zA-Z0-9_.-]+)/);
+    if (ytAuthorMatch && ytAuthorMatch[1]) {
+      authorHandle = ytAuthorMatch[1];
+    }
     if (hostname === "youtu.be") {
       videoId = pathname.slice(1).split("/")[0].split("?")[0];
     } else if (pathname.startsWith("/watch")) {
       videoId = parsedUrl.searchParams.get("v");
-    } else if (pathname.startsWith("/shorts/")) {
-      const parts = pathname.split("/");
-      videoId = parts[2] || null;
+    } else if (pathname.includes("/shorts/")) {
+      const parts = pathname.split("/shorts/");
+      videoId = parts[1]?.split("/")[0]?.split("?")[0] || null;
     } else if (pathname.startsWith("/embed/")) {
       const parts = pathname.split("/");
       videoId = parts[2] || null;
@@ -51142,11 +51556,14 @@ function parseAndValidateVideoUrl(rawUrl) {
         platform: "youtube",
         externalVideoId: videoId,
         canonicalUrl: `https://www.youtube.com/watch?v=${videoId}`,
-        embedUrl: `https://www.youtube-nocookie.com/embed/${videoId}`
+        embedUrl: `https://www.youtube-nocookie.com/embed/${videoId}`,
+        authorHandle
       }
     };
   }
   if (hostname === "tiktok.com" || hostname === "m.tiktok.com" || hostname === "vt.tiktok.com" || hostname === "vm.tiktok.com") {
+    const tiktokAuthorMatch = pathname.match(/\/@([a-zA-Z0-9_.-]+)/);
+    const authorHandle = tiktokAuthorMatch ? tiktokAuthorMatch[1] : void 0;
     const videoMatch = pathname.match(/\/video\/(\d{15,25})/);
     if (videoMatch && videoMatch[1]) {
       const videoId = videoMatch[1];
@@ -51156,7 +51573,8 @@ function parseAndValidateVideoUrl(rawUrl) {
           platform: "tiktok",
           externalVideoId: videoId,
           canonicalUrl: `https://www.tiktok.com${pathname.split("?")[0]}`,
-          embedUrl: `https://www.tiktok.com/embed/v2/${videoId}`
+          embedUrl: `https://www.tiktok.com/embed/v2/${videoId}`,
+          authorHandle
         }
       };
     }
@@ -51240,7 +51658,18 @@ var SubmitVideoSchema = z2.object({
   thumbnailUrl: z2.string().trim().url("La URL de la miniatura debe ser v\xE1lida").optional().nullable(),
   placeIds: z2.array(z2.string().trim()).max(10, "No puedes vincular m\xE1s de 10 lugares por video").default([]),
   primaryPlaceId: z2.string().trim().optional().nullable()
-});
+}).refine(
+  (data) => {
+    if (data.primaryPlaceId && data.placeIds) {
+      return data.placeIds.includes(data.primaryPlaceId);
+    }
+    return true;
+  },
+  {
+    message: "El lugar principal (primaryPlaceId) debe pertenecer a la lista de lugares asociados (placeIds)",
+    path: ["primaryPlaceId"]
+  }
+);
 var ModerationActionSchema = z2.object({
   action: z2.enum(["APPROVE", "REJECT", "OBSERVE", "HIDE"]),
   reason: z2.string().trim().max(500, "El motivo no puede exceder 500 caracteres").optional().nullable(),
@@ -51262,8 +51691,22 @@ var AdminCreateVideoSchema = z2.object({
   creatorProfileId: z2.string().trim().optional().nullable(),
   placeIds: z2.array(z2.string().trim()).max(10, "No puedes vincular m\xE1s de 10 lugares por video").default([]),
   primaryPlaceId: z2.string().trim().optional().nullable(),
-  status: z2.enum(["PENDING", "APPROVED"]).default("APPROVED")
-});
+  status: z2.enum(["PENDING", "APPROVED"]).default("APPROVED"),
+  externalCreatorHandle: z2.string().trim().max(100, "El handle no puede exceder 100 caracteres").optional().nullable(),
+  externalCreatorDisplayName: z2.string().trim().max(150, "El nombre no puede exceder 150 caracteres").optional().nullable(),
+  externalCreatorAvatarUrl: z2.string().trim().url("La URL del avatar no es v\xE1lida").optional().nullable()
+}).refine(
+  (data) => {
+    if (data.primaryPlaceId && data.placeIds) {
+      return data.placeIds.includes(data.primaryPlaceId);
+    }
+    return true;
+  },
+  {
+    message: "El lugar principal (primaryPlaceId) debe pertenecer a la lista de lugares asociados (placeIds)",
+    path: ["primaryPlaceId"]
+  }
+);
 var AdminUpdateVideoSchema = z2.object({
   title: z2.string().trim().min(5, "El t\xEDtulo debe tener al menos 5 caracteres").max(140, "El t\xEDtulo no puede exceder 140 caracteres").optional(),
   description: z2.string().trim().max(1e3, "La descripci\xF3n no puede exceder 1000 caracteres").optional().nullable(),
@@ -51276,8 +51719,22 @@ var AdminUpdateVideoSchema = z2.object({
   creatorProfileId: z2.string().trim().optional().nullable(),
   placeIds: z2.array(z2.string().trim()).max(10, "No puedes vincular m\xE1s de 10 lugares por video").optional(),
   primaryPlaceId: z2.string().trim().optional().nullable(),
-  status: z2.enum(["PENDING", "APPROVED", "OBSERVED", "REJECTED", "HIDDEN"]).optional()
-});
+  status: z2.enum(["PENDING", "APPROVED", "OBSERVED", "REJECTED", "HIDDEN"]).optional(),
+  externalCreatorHandle: z2.string().trim().max(100, "El handle no puede exceder 100 caracteres").optional().nullable(),
+  externalCreatorDisplayName: z2.string().trim().max(150, "El nombre no puede exceder 150 caracteres").optional().nullable(),
+  externalCreatorAvatarUrl: z2.string().trim().url("La URL del avatar no es v\xE1lida").optional().nullable()
+}).refine(
+  (data) => {
+    if (data.primaryPlaceId && data.placeIds) {
+      return data.placeIds.includes(data.primaryPlaceId);
+    }
+    return true;
+  },
+  {
+    message: "El lugar principal (primaryPlaceId) debe pertenecer a la lista de lugares asociados (placeIds)",
+    path: ["primaryPlaceId"]
+  }
+);
 var AdminCreateCreatorSchema = z2.object({
   userId: z2.string().trim().optional(),
   handle: z2.string().trim().toLowerCase().regex(/^[a-z0-9_]{3,30}$/, "El handle solo puede contener min\xFAsculas, n\xFAmeros y guiones bajos (3-30 caracteres)"),
@@ -51828,9 +52285,24 @@ creatorsRouter.post("/submissions", requireAuth, async (req, res) => {
         return;
       }
     }
-    const validPlaceIds = placeIds.filter(
-      (pId) => INITIAL_PLACES.some((p) => p.id === pId)
+    const invalidPlaceIds = placeIds.filter(
+      (pId) => !INITIAL_PLACES.some((p) => p.id === pId)
     );
+    if (invalidPlaceIds.length > 0) {
+      res.status(400).json({
+        success: false,
+        error: `Los siguientes lugares no existen en el cat\xE1logo tur\xEDstico: ${invalidPlaceIds.join(", ")}`
+      });
+      return;
+    }
+    const uniquePlaceIds = Array.from(new Set(placeIds));
+    if (primaryPlaceId && uniquePlaceIds.length > 0 && !uniquePlaceIds.includes(primaryPlaceId)) {
+      res.status(400).json({
+        success: false,
+        error: "El lugar principal debe pertenecer a la lista de lugares asociados"
+      });
+      return;
+    }
     const profile = await repo.findCreatorProfileByUserId(req.user.userId);
     const submission = await repo.createSubmission(
       {
@@ -51845,10 +52317,11 @@ creatorsRouter.post("/submissions", requireAuth, async (req, res) => {
         description: description || null,
         contentType,
         category,
-        localityId: localityId || null
+        localityId: localityId || null,
+        externalCreatorHandle: !profile && parsed.data.authorHandle ? parsed.data.authorHandle : null
       },
-      validPlaceIds,
-      primaryPlaceId || (validPlaceIds[0] || null)
+      uniquePlaceIds,
+      primaryPlaceId || (uniquePlaceIds[0] || null)
     );
     res.status(201).json({
       success: true,
@@ -52134,27 +52607,24 @@ adminRouter.post("/moderation/:id/action", async (req, res) => {
       HIDE: "HIDDEN"
     };
     const newStatus = actionToStatusMap[action];
-    if (verifiedPlaceIds && Array.isArray(verifiedPlaceIds)) {
-      const validIds = verifiedPlaceIds.filter(
-        (pId) => INITIAL_PLACES.some((p) => p.id === pId)
-      );
-      await repo.associatePlaces(submission.id, validIds);
-    }
-    const updated = await repo.updateSubmissionStatus(
-      submission.id,
-      newStatus,
-      reason || null,
-      req.user.userId
-    );
-    await repo.addModerationLog({
-      videoId: submission.id,
+    const validPlaceIds = verifiedPlaceIds && Array.isArray(verifiedPlaceIds) ? verifiedPlaceIds.filter((pId) => INITIAL_PLACES.some((p) => p.id === pId)) : void 0;
+    const auditPayload = {
       adminUserId: req.user.userId,
       adminName: req.user.name,
+      action,
       previousStatus,
       newStatus,
       reason: reason || null,
       internalNotes: internalNotes || null
-    });
+    };
+    const updated = await repo.updateSubmissionStatus(
+      submission.id,
+      newStatus,
+      reason || null,
+      req.user.userId,
+      auditPayload,
+      validPlaceIds
+    );
     res.json({
       success: true,
       data: updated,
@@ -52181,12 +52651,27 @@ adminRouter.put("/moderation/:id/places", async (req, res) => {
     res.status(400).json({ success: false, error: "placeIds debe ser un array de identificadores" });
     return;
   }
+  const invalidPlaceIds = placeIds.filter(
+    (pId) => !INITIAL_PLACES.some((p) => p.id === pId)
+  );
+  if (invalidPlaceIds.length > 0) {
+    res.status(400).json({
+      success: false,
+      error: `Los siguientes lugares no existen en el cat\xE1logo tur\xEDstico: ${invalidPlaceIds.join(", ")}`
+    });
+    return;
+  }
+  const uniquePlaceIds = Array.from(new Set(placeIds));
+  if (primaryPlaceId && uniquePlaceIds.length > 0 && !uniquePlaceIds.includes(primaryPlaceId)) {
+    res.status(400).json({
+      success: false,
+      error: "El lugar principal debe pertenecer a la lista de lugares asociados"
+    });
+    return;
+  }
   const repo = getCreatorsRepository();
   try {
-    const validIds = placeIds.filter(
-      (pId) => INITIAL_PLACES.some((p) => p.id === pId)
-    );
-    await repo.associatePlaces(req.params.id, validIds, primaryPlaceId);
+    await repo.associatePlaces(req.params.id, uniquePlaceIds, primaryPlaceId);
     const updatedPlaces = await repo.getPlacesForVideo(req.params.id);
     res.json({
       success: true,
@@ -52220,7 +52705,10 @@ adminRouter.post("/videos", async (req, res) => {
     creatorProfileId,
     placeIds,
     primaryPlaceId,
-    status
+    status,
+    externalCreatorHandle,
+    externalCreatorDisplayName,
+    externalCreatorAvatarUrl
   } = parseResult.data;
   const parsed = parseAndValidateVideoUrl(videoUrl);
   if (!parsed.isValid || !parsed.data) {
@@ -52240,9 +52728,34 @@ adminRouter.post("/videos", async (req, res) => {
       });
       return;
     }
-    const validPlaceIds = placeIds.filter(
-      (pId) => INITIAL_PLACES.some((p) => p.id === pId)
+    const invalidPlaceIds = placeIds.filter(
+      (pId) => !INITIAL_PLACES.some((p) => p.id === pId)
     );
+    if (invalidPlaceIds.length > 0) {
+      res.status(400).json({
+        success: false,
+        error: `Los siguientes lugares no existen en el cat\xE1logo tur\xEDstico: ${invalidPlaceIds.join(", ")}`
+      });
+      return;
+    }
+    const uniquePlaceIds = Array.from(new Set(placeIds));
+    if (primaryPlaceId && uniquePlaceIds.length > 0 && !uniquePlaceIds.includes(primaryPlaceId)) {
+      res.status(400).json({
+        success: false,
+        error: "El lugar principal debe pertenecer a la lista de lugares asociados"
+      });
+      return;
+    }
+    const resultingStatus = status || "APPROVED";
+    const auditPayload = {
+      adminUserId: req.user.userId,
+      adminName: req.user.name,
+      action: "CREATE",
+      previousStatus: null,
+      newStatus: resultingStatus,
+      reason: "Registro y publicaci\xF3n directa desde el panel de administraci\xF3n",
+      internalNotes: `Creado por administrador ${req.user.name}`
+    };
     const submission = await repo.createSubmission(
       {
         userId: req.user.userId,
@@ -52257,20 +52770,15 @@ adminRouter.post("/videos", async (req, res) => {
         contentType,
         category,
         localityId: localityId || null,
-        status: status || "APPROVED"
+        status: resultingStatus,
+        externalCreatorHandle: externalCreatorHandle || (!creatorProfileId ? parsed.data.authorHandle || null : null),
+        externalCreatorDisplayName: externalCreatorDisplayName || null,
+        externalCreatorAvatarUrl: externalCreatorAvatarUrl || null
       },
-      validPlaceIds,
-      primaryPlaceId || (validPlaceIds[0] || null)
+      uniquePlaceIds,
+      primaryPlaceId || (uniquePlaceIds[0] || null),
+      auditPayload
     );
-    await repo.addModerationLog({
-      videoId: submission.id,
-      adminUserId: req.user.userId,
-      adminName: req.user.name,
-      previousStatus: "PENDING",
-      newStatus: submission.status,
-      reason: "Registro y publicaci\xF3n directa desde el panel de administraci\xF3n",
-      internalNotes: `Creado por administrador ${req.user.name}`
-    });
     res.status(201).json({
       success: true,
       data: submission,
@@ -52300,22 +52808,67 @@ adminRouter.put("/videos/:id", async (req, res) => {
       return;
     }
     const { placeIds, primaryPlaceId, ...updateFields } = parseResult.data;
-    const validPlaceIds = placeIds ? placeIds.filter((pId) => INITIAL_PLACES.some((p) => p.id === pId)) : void 0;
+    if (placeIds !== void 0) {
+      const invalidPlaceIds = placeIds.filter(
+        (pId) => !INITIAL_PLACES.some((p) => p.id === pId)
+      );
+      if (invalidPlaceIds.length > 0) {
+        res.status(400).json({
+          success: false,
+          error: `Los siguientes lugares no existen en el cat\xE1logo tur\xEDstico: ${invalidPlaceIds.join(", ")}`
+        });
+        return;
+      }
+    }
+    const uniquePlaceIds = placeIds !== void 0 ? Array.from(new Set(placeIds)) : void 0;
+    if (uniquePlaceIds !== void 0 && primaryPlaceId) {
+      if (!uniquePlaceIds.includes(primaryPlaceId)) {
+        res.status(400).json({
+          success: false,
+          error: "El lugar principal debe pertenecer a la lista de lugares asociados"
+        });
+        return;
+      }
+    } else if (uniquePlaceIds === void 0 && primaryPlaceId) {
+      const currentPlaces = await repo.getPlacesForVideo(req.params.id);
+      if (!currentPlaces.some((p) => p.id === primaryPlaceId)) {
+        res.status(400).json({
+          success: false,
+          error: "El lugar principal debe pertenecer a los lugares actualmente asociados al video"
+        });
+        return;
+      }
+    }
+    const changedFields = [];
+    for (const [key, val] of Object.entries(updateFields)) {
+      if (val !== void 0 && existing[key] !== val) {
+        changedFields.push(key);
+      }
+    }
+    if (uniquePlaceIds !== void 0) {
+      changedFields.push("placeIds");
+    }
+    if (primaryPlaceId !== void 0) {
+      changedFields.push("primaryPlaceId");
+    }
+    const resultingStatus = updateFields.status || existing.status;
+    const auditPayload = {
+      adminUserId: req.user.userId,
+      adminName: req.user.name,
+      action: "UPDATE",
+      previousStatus: existing.status,
+      newStatus: resultingStatus,
+      reason: "Edici\xF3n administrativa de metadatos o lugares asociados",
+      internalNotes: `Modificado por ${req.user.name}`,
+      changedFields: changedFields.length > 0 ? changedFields : null
+    };
     const updated = await repo.updateSubmission(
       req.params.id,
       updateFields,
-      validPlaceIds,
-      primaryPlaceId
+      uniquePlaceIds,
+      primaryPlaceId,
+      auditPayload
     );
-    await repo.addModerationLog({
-      videoId: req.params.id,
-      adminUserId: req.user.userId,
-      adminName: req.user.name,
-      previousStatus: existing.status,
-      newStatus: updated?.status || existing.status,
-      reason: "Edici\xF3n administrativa de metadatos o lugares asociados",
-      internalNotes: `Modificado por ${req.user.name}`
-    });
     res.json({
       success: true,
       data: updated,

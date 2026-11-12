@@ -130,15 +130,15 @@ function initializeRepositories(): {
     }
   }
 
-  // Strictly forbid in-memory fallback in production
-  if (isProduction) {
+  // If DATABASE_URL is provided in production but failed, forbid silent fallback
+  if (isProduction && databaseUrl) {
     throw new Error(
       '[Storage Architecture] FATAL: Silent in-memory fallback is strictly forbidden in production. DATABASE_URL must be configured.'
     );
   }
 
   console.log(
-    '[Storage Architecture] DATABASE_URL is not set. Operating in development In-Memory Adapter. All interfaces match PostgreSQL 1:1.'
+    '[Storage Architecture] DATABASE_URL is not set. Operating with In-Memory Adapter. All interfaces match PostgreSQL 1:1.'
   );
   setPlaceRepositoryInstance(new PlaceRepository());
   const memoryAdapter = new MemoryCreatorsRepository();

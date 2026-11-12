@@ -1,3 +1,4 @@
+process.env.DISABLE_HMR = 'true';
 import 'dotenv/config';
 import fs from 'fs';
 import express from 'express';
@@ -71,10 +72,27 @@ async function startServer() {
   const app = express();
 
   // AI Studio and development dev-server port handling
-  const portArgIndex = process.argv.indexOf('--port');
-  const cliPort = portArgIndex !== -1 && process.argv[portArgIndex + 1] ? Number(process.argv[portArgIndex + 1]) : null;
-  const hostArgIndex = process.argv.indexOf('--host');
-  const cliHost = hostArgIndex !== -1 && process.argv[hostArgIndex + 1] ? process.argv[hostArgIndex + 1] : null;
+  let cliPort: number | null = null;
+  let cliHost: string | null = null;
+
+  for (let i = 2; i < process.argv.length; i++) {
+    const arg = process.argv[i];
+    if (arg === '--port' && process.argv[i + 1]) {
+      cliPort = Number(process.argv[i + 1]);
+      i++;
+    } else if (arg.startsWith('--port=')) {
+      cliPort = Number(arg.split('=')[1]);
+    } else if (arg === '--host' && process.argv[i + 1]) {
+      cliHost = process.argv[i + 1];
+      i++;
+    } else if (arg.startsWith('--host=')) {
+      cliHost = arg.split('=')[1];
+    } else if (!isNaN(Number(arg)) && Number(arg) > 0 && !cliPort) {
+      cliPort = Number(arg);
+    } else if (arg.includes('.') && !cliHost) {
+      cliHost = arg;
+    }
+  }
 
   // In AI Studio or development, use port 3000. In production (Cloud Run), honor process.env.PORT (8080).
   const PORT = (cliPort && !isNaN(cliPort))
@@ -112,7 +130,7 @@ async function startServer() {
     }
   }
 
-  app.use(express.json());
+  app.use(express.json({ limit: '200kb' }));
   app.use(csrfProtectionMiddleware);
 
   // High-priority Health Endpoints for Cloud Run & Uptime Monitoring
@@ -198,7 +216,12 @@ async function startServer() {
     console.error('[LibertadGO] HTTP server error:', err.message);
     if (err.code === 'EADDRINUSE') {
       console.error(`[LibertadGO] Port ${PORT} is already in use.`);
+      process.exit(1);
     }
+  });
+
+  process.on('unhandledRejection', (reason) => {
+    console.warn('[LibertadGO Warning] Unhandled Rejection:', reason);
   });
 
   // 4. Register orderly shutdown handlers for Cloud Run SIGTERM / SIGINT

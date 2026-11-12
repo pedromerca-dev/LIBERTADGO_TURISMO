@@ -18,13 +18,34 @@ import { getCreatorsRepository } from './repositories/index.ts';
 import { requireAuth } from './authService.ts';
 import { parseAndValidateVideoUrl } from '../utils/videoUrlParser.ts';
 import { INITIAL_PLACES } from '../data/initialPlaces.ts';
+import { submissionRateLimiter, saveVideoRateLimiter, videoViewDeduplicator } from './rateLimiter.ts';
 
 export const creatorsRouter = Router();
+
+/**
+ * Sanitizes moderation audit fields from public payloads to prevent data leakage.
+ * Internal fields (moderationNotes, moderatedBy, moderatedAt) are only visible
+ * to system administrators or the video's authenticated creator.
+ */
+function sanitizePublicVideo(video: any, req: Request) {
+  if (!video) return video;
+  const isAdmin = req.user?.role === 'ADMIN';
+  const isAuthor = req.user?.userId === video.userId;
+  if (isAdmin || isAuthor) {
+    return video;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { moderationNotes, moderatedBy, moderatedAt, ...safe } = video;
+  return safe;
+}
 
 // 1. GET /api/creators/videos - List approved videos with filters
 creatorsRouter.get('/videos', async (req: Request, res: Response) => {
   const { localityId, category, contentType, platform, q, placeId, page, limit } = req.query;
   const repo = getCreatorsRepository();
+
+  const safePage = Math.max(1, Number(page) || 1);
+  const safeLimit = Math.min(100, Math.max(1, Number(limit) || 20));
 
   try {
     const result = await repo.listApprovedVideos({
@@ -34,16 +55,19 @@ creatorsRouter.get('/videos', async (req: Request, res: Response) => {
       platform: typeof platform === 'string' ? platform : undefined,
       q: typeof q === 'string' ? q : undefined,
       placeId: typeof placeId === 'string' ? placeId : undefined,
-      page: page ? Number(page) : 1,
-      limit: limit ? Number(limit) : 20,
+      page: safePage,
+      limit: safeLimit,
     });
+
+    const sanitizedVideos = result.videos.map((v) => sanitizePublicVideo(v, req));
 
     res.json({
       success: true,
-      data: result.videos,
+      data: sanitizedVideos,
       total: result.total,
-      page: Number(page) || 1,
-      limit: Number(limit) || 20,
+      page: safePage,
+      limit: safeLimit,
+      totalPages: Math.ceil(result.total / safeLimit) || 1,
     });
   } catch (err) {
     console.error('[Creators Error] Error listing approved videos:', err);
@@ -51,19 +75,50 @@ creatorsRouter.get('/videos', async (req: Request, res: Response) => {
   }
 });
 
+// 1a. GET /api/creators/saved-videos & /api/creators/videos/saved - Authenticated user's bookmarked videos
+const handleGetSavedVideos = async (req: Request, res: Response) => {
+  if (!req.user) {
+    res.status(401).json({ success: false, error: 'No autorizado' });
+    return;
+  }
+
+  const repo = getCreatorsRepository();
+  try {
+    const videos = await repo.listSavedVideosByUser(req.user.userId);
+    const sanitized = videos.map((v) => sanitizePublicVideo(v, req));
+    res.json({
+      success: true,
+      data: sanitized,
+      total: sanitized.length,
+    });
+  } catch (err) {
+    console.error('[Creators Error] Error listing saved videos:', err);
+    res.status(500).json({ success: false, error: 'Error al consultar videos guardados' });
+  }
+};
+
+creatorsRouter.get('/saved-videos', requireAuth, handleGetSavedVideos);
+creatorsRouter.get('/videos/saved', requireAuth, handleGetSavedVideos);
+
 // 2. GET /api/creators/videos/:id - Detail of an approved video
 creatorsRouter.get('/videos/:id', async (req: Request, res: Response) => {
   const repo = getCreatorsRepository();
 
   try {
     const video = await repo.findSubmissionById(req.params.id);
-    if (!video || (video.status !== 'APPROVED' && (!req.user || req.user.role !== 'ADMIN' && req.user.userId !== video.userId))) {
+    if (!video || (video.status !== 'APPROVED' && (!req.user || (req.user.role !== 'ADMIN' && req.user.userId !== video.userId)))) {
       res.status(404).json({ success: false, error: 'Video no encontrado o pendiente de aprobación' });
       return;
     }
 
-    // Increment internal view count
-    await repo.incrementInternalViews(video.id);
+    // Deduplicated internal view increment: only for APPROVED videos and not admin inspects
+    if (video.status === 'APPROVED' && (!req.user || req.user.role !== 'ADMIN')) {
+      if (videoViewDeduplicator.shouldIncrement(video.id, req)) {
+        await repo.incrementInternalViews(video.id);
+        video.internalViewsCount = (video.internalViewsCount || 0) + 1;
+      }
+    }
+
     const places = await repo.getPlacesForVideo(video.id);
 
     let isSaved = false;
@@ -71,10 +126,12 @@ creatorsRouter.get('/videos/:id', async (req: Request, res: Response) => {
       isSaved = await repo.isSavedByUser(req.user.userId, video.id);
     }
 
+    const sanitizedVideo = sanitizePublicVideo(video, req);
+
     res.json({
       success: true,
       data: {
-        ...video,
+        ...sanitizedVideo,
         places,
         isSaved,
       },
@@ -86,7 +143,7 @@ creatorsRouter.get('/videos/:id', async (req: Request, res: Response) => {
 });
 
 // 3. POST /api/creators/submissions - Submit video (Auth required)
-creatorsRouter.post('/submissions', requireAuth, async (req: Request, res: Response) => {
+creatorsRouter.post('/submissions', requireAuth, submissionRateLimiter, async (req: Request, res: Response) => {
   if (!req.user) {
     res.status(401).json({ success: false, error: 'Autenticación requerida' });
     return;
@@ -287,7 +344,7 @@ creatorsRouter.put('/profile/me', requireAuth, async (req: Request, res: Respons
 });
 
 // 8. POST /api/creators/videos/:id/save - Toggle bookmark
-creatorsRouter.post('/videos/:id/save', requireAuth, async (req: Request, res: Response) => {
+creatorsRouter.post('/videos/:id/save', requireAuth, saveVideoRateLimiter, async (req: Request, res: Response) => {
   if (!req.user) {
     res.status(401).json({ success: false, error: 'No autorizado' });
     return;
@@ -295,9 +352,19 @@ creatorsRouter.post('/videos/:id/save', requireAuth, async (req: Request, res: R
 
   const repo = getCreatorsRepository();
   try {
+    const video = await repo.findSubmissionById(req.params.id);
+    if (!video || (video.status !== 'APPROVED' && (!req.user || (req.user.role !== 'ADMIN' && req.user.userId !== video.userId)))) {
+      res.status(404).json({ success: false, error: 'Video no encontrado o no disponible para guardar' });
+      return;
+    }
+
     const result = await repo.toggleSaveVideo(req.user.userId, req.params.id);
     res.json({ success: true, saved: result.saved });
-  } catch (err) {
+  } catch (err: any) {
+    if (err?.message?.includes('no encontrado') || err?.message?.includes('no disponible')) {
+      res.status(404).json({ success: false, error: err.message });
+      return;
+    }
     console.error('[Creators Error] Error saving video:', err);
     res.status(500).json({ success: false, error: 'Error al guardar video en favoritos' });
   }
@@ -308,10 +375,11 @@ creatorsRouter.get('/places/:placeId/videos', async (req: Request, res: Response
   const repo = getCreatorsRepository();
   try {
     const videos = await repo.getVideosForPlace(req.params.placeId);
+    const sanitizedVideos = videos.map((v) => sanitizePublicVideo(v, req));
     res.json({
       success: true,
-      data: videos,
-      total: videos.length,
+      data: sanitizedVideos,
+      total: sanitizedVideos.length,
       placeId: req.params.placeId,
     });
   } catch (err) {

@@ -535,6 +535,14 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
       .filter((p): p is Place => p !== undefined);
   }
 
+  async getPlacesForVideos(videoIds: string[]): Promise<Record<string, Place[]>> {
+    const map: Record<string, Place[]> = {};
+    for (const id of videoIds) {
+      map[id] = await this.getPlacesForVideo(id);
+    }
+    return map;
+  }
+
   async getVideosForPlace(placeId: string): Promise<VideoSubmission[]> {
     const videoIds = new Set(
       Array.from(this.videoPlaces.values())
@@ -630,27 +638,65 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
   }
 
   async toggleSaveVideo(userId: string, videoId: string): Promise<{ saved: boolean }> {
-    const key = `${userId}_${videoId}`;
     const sub = this.videoSubmissions.get(videoId);
+    if (!sub) {
+      throw new Error('Video no encontrado');
+    }
+    const key = `${userId}_${videoId}`;
 
+    let isSaved: boolean;
     if (this.savedVideos.has(key)) {
       this.savedVideos.delete(key);
-      if (sub) sub.internalSavesCount = Math.max(0, sub.internalSavesCount - 1);
-      return { saved: false };
+      isSaved = false;
     } else {
       this.savedVideos.set(key, {
-        id: `sv_${Date.now()}`,
+        id: `sv_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
         userId,
         videoId,
         savedAt: new Date().toISOString(),
       });
-      if (sub) sub.internalSavesCount += 1;
-      return { saved: true };
+      isSaved = true;
     }
+
+    // Exact count sync: guarantees counter consistency and prevents drift/negatives
+    let actualCount = 0;
+    for (const sv of this.savedVideos.values()) {
+      if (sv.videoId === videoId) actualCount++;
+    }
+    sub.internalSavesCount = actualCount;
+
+    return { saved: isSaved };
   }
 
   async isSavedByUser(userId: string, videoId: string): Promise<boolean> {
     return this.savedVideos.has(`${userId}_${videoId}`);
+  }
+
+  async listSavedVideosByUser(userId: string): Promise<(VideoSubmission & { places?: Place[] })[]> {
+    const userSaved = Array.from(this.savedVideos.values())
+      .filter((sv) => sv.userId === userId)
+      .sort((a, b) => new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime());
+
+    const result: (VideoSubmission & { places?: Place[] })[] = [];
+    for (const sv of userSaved) {
+      const sub = this.videoSubmissions.get(sv.videoId);
+      if (sub && sub.status === 'APPROVED') {
+        const places = await this.getPlacesForVideo(sub.id);
+        const creatorProfile = sub.creatorProfileId
+          ? Array.from(this.creatorProfiles.values()).find((cp) => cp.id === sub.creatorProfileId)
+          : (this.creatorProfiles.get(sub.userId) || null);
+
+        result.push({
+          ...sub,
+          creatorDisplayName: creatorProfile?.displayName || null,
+          creatorHandle: creatorProfile?.handle || null,
+          creatorAvatarUrl: creatorProfile?.avatarUrl || null,
+          places,
+        });
+      }
+    }
+
+    return result;
   }
 
   async getAdminMetrics(): Promise<AdminMetrics> {

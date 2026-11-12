@@ -853,6 +853,25 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
       .filter((p): p is Place => p !== undefined);
   }
 
+  async getPlacesForVideos(videoIds: string[]): Promise<Record<string, Place[]>> {
+    const map: Record<string, Place[]> = {};
+    if (!videoIds || videoIds.length === 0) return map;
+    for (const id of videoIds) {
+      map[id] = [];
+    }
+    const res = await this.pool.query(
+      `SELECT video_id as "videoId", place_id as "placeId" FROM video_places WHERE video_id = ANY($1::text[]) ORDER BY is_primary DESC, created_at ASC`,
+      [videoIds]
+    );
+    for (const r of res.rows) {
+      const place = INITIAL_PLACES.find((p) => p.id === r.placeId);
+      if (place && map[r.videoId]) {
+        map[r.videoId].push(place);
+      }
+    }
+    return map;
+  }
+
   async getVideosForPlace(placeId: string): Promise<VideoSubmission[]> {
     const res = await this.pool.query(
       `SELECT vs.id, vs.user_id as "userId", vs.creator_profile_id as "creatorProfileId", vs.platform,
@@ -978,26 +997,55 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
   }
 
   async toggleSaveVideo(userId: string, videoId: string): Promise<{ saved: boolean }> {
-    const existing = await this.pool.query(
-      `SELECT id FROM saved_videos WHERE user_id = $1 AND video_id = $2`,
-      [userId, videoId]
-    );
+    const client = await this.pool.connect();
+    try {
+      await client.query('BEGIN');
 
-    if (existing.rows.length > 0) {
-      await this.pool.query(`DELETE FROM saved_videos WHERE user_id = $1 AND video_id = $2`, [userId, videoId]);
-      await this.pool.query(
-        `UPDATE video_submissions SET internal_saves_count = GREATEST(0, internal_saves_count - 1) WHERE id = $1`,
+      // Verify that video exists
+      const videoCheck = await client.query(
+        `SELECT id, status FROM video_submissions WHERE id = $1 FOR UPDATE`,
         [videoId]
       );
-      return { saved: false };
-    } else {
-      const svId = `sv_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
-      await this.pool.query(`INSERT INTO saved_videos (id, user_id, video_id) VALUES ($1, $2, $3)`, [svId, userId, videoId]);
-      await this.pool.query(
-        `UPDATE video_submissions SET internal_saves_count = internal_saves_count + 1 WHERE id = $1`,
+
+      if (videoCheck.rows.length === 0) {
+        await client.query('ROLLBACK');
+        throw new Error('Video no encontrado');
+      }
+
+      const existing = await client.query(
+        `SELECT id FROM saved_videos WHERE user_id = $1 AND video_id = $2 FOR UPDATE`,
+        [userId, videoId]
+      );
+
+      let isSaved: boolean;
+      if (existing.rows.length > 0) {
+        await client.query(`DELETE FROM saved_videos WHERE user_id = $1 AND video_id = $2`, [userId, videoId]);
+        isSaved = false;
+      } else {
+        const svId = `sv_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+        await client.query(
+          `INSERT INTO saved_videos (id, user_id, video_id) VALUES ($1, $2, $3)
+           ON CONFLICT (user_id, video_id) DO NOTHING`,
+          [svId, userId, videoId]
+        );
+        isSaved = true;
+      }
+
+      // Exact count sync: guarantees counter consistency under concurrency and non-negative counts
+      await client.query(
+        `UPDATE video_submissions 
+         SET internal_saves_count = (SELECT COUNT(*)::int FROM saved_videos WHERE video_id = $1)
+         WHERE id = $1`,
         [videoId]
       );
-      return { saved: true };
+
+      await client.query('COMMIT');
+      return { saved: isSaved };
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
     }
   }
 
@@ -1007,6 +1055,56 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
       [userId, videoId]
     );
     return res.rows.length > 0;
+  }
+
+  async listSavedVideosByUser(userId: string): Promise<(VideoSubmission & { places?: Place[] })[]> {
+    const res = await this.pool.query(
+      `SELECT vs.id, vs.user_id as "userId", vs.creator_profile_id as "creatorProfileId", vs.platform,
+              vs.external_video_id as "externalVideoId", vs.video_url as "videoUrl", vs.embed_url as "embedUrl",
+              vs.thumbnail_url as "thumbnailUrl", vs.title, vs.description, vs.content_type as "contentType",
+              vs.category, vs.locality_id as "localityId", vs.status,
+              vs.internal_views_count as "internalViewsCount",
+              vs.internal_saves_count as "internalSavesCount", vs.external_metrics as "externalMetrics",
+              vs.created_at as "createdAt", vs.updated_at as "updatedAt",
+              cp.display_name as "creatorDisplayName",
+              cp.handle as "creatorHandle",
+              cp.avatar_url as "creatorAvatarUrl"
+       FROM saved_videos sv
+       INNER JOIN video_submissions vs ON vs.id = sv.video_id
+       LEFT JOIN creator_profiles cp ON cp.id = vs.creator_profile_id
+       WHERE sv.user_id = $1 AND vs.status = 'APPROVED'
+       ORDER BY sv.saved_at DESC`,
+      [userId]
+    );
+
+    if (res.rows.length === 0) {
+      return [];
+    }
+
+    const videoIds = res.rows.map((r: { id: string }) => r.id);
+    const placesRes = await this.pool.query(
+      `SELECT video_id as "videoId", place_id as "placeId", is_primary as "isPrimary"
+       FROM video_places
+       WHERE video_id = ANY($1)
+       ORDER BY is_primary DESC`,
+      [videoIds]
+    );
+
+    const placesByVideoId: Record<string, Place[]> = {};
+    for (const row of placesRes.rows as { videoId: string; placeId: string; isPrimary: boolean }[]) {
+      const place = INITIAL_PLACES.find((p) => p.id === row.placeId);
+      if (place) {
+        if (!placesByVideoId[row.videoId]) {
+          placesByVideoId[row.videoId] = [];
+        }
+        placesByVideoId[row.videoId].push(place);
+      }
+    }
+
+    return res.rows.map((row: any) => ({
+      ...mapVideoSubmissionRow(row),
+      places: placesByVideoId[row.id] || [],
+    }));
   }
 
   async getAdminMetrics(): Promise<AdminMetrics> {

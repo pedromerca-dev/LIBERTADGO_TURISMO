@@ -135,6 +135,7 @@ export interface ICreatorsRepository {
     primaryPlaceId?: string | null
   ): Promise<void>;
   getPlacesForVideo(videoId: string): Promise<Place[]>;
+  getPlacesForVideos?(videoIds: string[]): Promise<Record<string, Place[]>>;
   getVideosForPlace(placeId: string): Promise<VideoSubmission[]>;
 
   // Creator Profiles
@@ -160,5 +161,6 @@ export interface ICreatorsRepository {
   incrementInternalViews(videoId: string): Promise<void>;
   toggleSaveVideo(userId: string, videoId: string): Promise<{ saved: boolean }>;
   isSavedByUser(userId: string, videoId: string): Promise<boolean>;
+  listSavedVideosByUser(userId: string): Promise<(VideoSubmission & { places?: Place[] })[]>;
   getAdminMetrics(): Promise<AdminMetrics>;
 }
