@@ -471,8 +471,9 @@ adminRouter.post('/creators', async (req: Request, res: Response) => {
   const repo = getCreatorsRepository();
 
   try {
-    // Los creadores pueden existir sin una cuenta de usuario propia.
-    const targetUserId = parseResult.data.userId ?? null;
+    // Los perfiles creados desde administración son independientes.
+    // No deben vincularse automáticamente a la cuenta del administrador.
+    const targetUserId = null;
 
     // Un handle debe ser único entre todos los perfiles.
     const existing = await repo.findCreatorProfileByHandle(parseResult.data.handle);
