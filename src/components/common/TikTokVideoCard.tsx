@@ -8,6 +8,7 @@ interface TikTokVideoCardProps {
   placeName?: string;
   thumbnailUrl?: string;
   category?: string;
+  platform?: string;
 }
 
 export function TikTokVideoCard({
@@ -17,11 +18,14 @@ export function TikTokVideoCard({
   placeName,
   thumbnailUrl,
   category = 'Video turístico',
+  platform = 'tiktok',
 }: TikTokVideoCardProps) {
+  const platformLabel =
+    platform === 'youtube' ? 'YouTube' : platform === 'instagram' ? 'Instagram' : 'TikTok';
+
   return (
     <article className="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
-                  <div className="relative aspect-[16/9] overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700">
-     
+      <div className="relative aspect-[16/9] overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700">
         {thumbnailUrl ? (
           <img
             src={thumbnailUrl}
@@ -36,7 +40,7 @@ export function TikTokVideoCard({
                 <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.4v13.67a2.9 2.9 0 0 1-2.9 2.9 2.9 2.9 0 1 1 2.9-2.9V12.2a6.3 6.3 0 1 0 3.4 5.6V10.8a8.2 8.2 0 0 0 4.8 1.55V8.96a4.85 4.85 0 0 1-1.03-.27Z" />
               </svg>
             </div>
-            <span className="text-xs text-white/70">Video disponible en TikTok</span>
+            <span className="text-xs text-white/70">Video disponible en {platformLabel}</span>
           </div>
         )}
 
@@ -45,7 +49,7 @@ export function TikTokVideoCard({
         </span>
 
         <span className="absolute bottom-3 right-3 rounded-full bg-black/70 px-3 py-1 text-xs font-medium text-white">
-          TikTok
+          {platformLabel}
         </span>
       </div>
 
@@ -70,7 +74,7 @@ export function TikTokVideoCard({
           rel="noopener noreferrer"
           className="flex w-full items-center justify-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-700"
         >
-          Ver video en TikTok
+          Ver en {platformLabel}
           <span aria-hidden="true">↗</span>
         </a>
       </div>

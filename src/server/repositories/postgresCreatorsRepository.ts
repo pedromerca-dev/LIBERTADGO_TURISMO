@@ -292,20 +292,49 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
               vs.category, vs.locality_id as "localityId", vs.status, vs.moderation_notes as "moderationNotes",
               vs.moderated_by as "moderatedBy", vs.moderated_at as "moderatedAt", vs.internal_views_count as "internalViewsCount",
               vs.internal_saves_count as "internalSavesCount", vs.external_metrics as "externalMetrics",
-              vs.created_at as "createdAt", vs.updated_at as "updatedAt"
+              vs.created_at as "createdAt", vs.updated_at as "updatedAt",
+              cp.display_name as "creatorDisplayName",
+              cp.handle as "creatorHandle",
+              cp.avatar_url as "creatorAvatarUrl",
+              u.name as "userName"
        FROM video_submissions vs
+       LEFT JOIN creator_profiles cp ON cp.id = vs.creator_profile_id
+       LEFT JOIN users u ON u.id = vs.user_id
        ${whereClause}
        ORDER BY vs.created_at DESC
        LIMIT $${limitIndex} OFFSET $${offsetIndex}`,
       queryParams
     );
 
-    const videosWithPlaces = await Promise.all(
-      res.rows.map(async (v) => {
-        const places = await this.getPlacesForVideo(v.id);
-        return { ...v, places };
-      })
+    if (res.rows.length === 0) {
+      return { videos: [], total };
+    }
+
+    // Batch fetch associated places in a single query instead of N+1
+    const videoIds = res.rows.map((r: { id: string }) => r.id);
+    const placesRes = await this.pool.query(
+      `SELECT video_id as "videoId", place_id as "placeId", is_primary as "isPrimary"
+       FROM video_places
+       WHERE video_id = ANY($1)
+       ORDER BY is_primary DESC`,
+      [videoIds]
     );
+
+    const placesByVideoId: Record<string, Place[]> = {};
+    for (const row of placesRes.rows as { videoId: string; placeId: string; isPrimary: boolean }[]) {
+      const place = INITIAL_PLACES.find((p) => p.id === row.placeId);
+      if (place) {
+        if (!placesByVideoId[row.videoId]) {
+          placesByVideoId[row.videoId] = [];
+        }
+        placesByVideoId[row.videoId].push(place);
+      }
+    }
+
+    const videosWithPlaces = res.rows.map((v: VideoSubmission) => ({
+      ...v,
+      places: placesByVideoId[v.id] || [],
+    }));
 
     return { videos: videosWithPlaces, total };
   }

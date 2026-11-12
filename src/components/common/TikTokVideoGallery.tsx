@@ -1,7 +1,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { TikTokVideoCard } from './TikTokVideoCard';
-import { Eye, Heart, Star, Clock, TrendingUp } from 'lucide-react';
+import { Eye, Heart, Clock, TrendingUp, Bookmark, Play } from 'lucide-react';
 import { FILTER_CATEGORIES } from '../../utils/filterUtils';
 
 export interface TikTokVideo {
@@ -12,13 +12,21 @@ export interface TikTokVideo {
   placeName: string;
   category: string;
   thumbnailUrl?: string;
-  views: number;
-  likes: number;
-  rating: number;
-  updatedAt: string;
+  views?: number;
+  likes?: number;
+  rating?: number;
+  updatedAt?: string;
   demo?: boolean;
   locality?: string;
   department?: string;
+  externalViews?: number | null;
+  externalLikes?: number | null;
+  externalComments?: number | null;
+  internalViews?: number;
+  internalSaves?: number;
+  platform?: string;
+  embedUrl?: string;
+  places?: Array<{ id: string; name: string; locality?: string }>;
 }
 
 interface TikTokVideoGalleryProps {
@@ -29,14 +37,15 @@ interface TikTokVideoGalleryProps {
   showSearch?: boolean;
   compact?: boolean;
   showCount?: boolean;
+  onClearFilters?: () => void;
 }
 
 const VIDEO_CATEGORIES = FILTER_CATEGORIES.map(category => category.label);
 
 const SORT_OPTIONS = [
-  { id: 'popular', label: 'Más vistos' },
+  { id: 'popular', label: 'Más vistos en TikTok' },
   { id: 'likes', label: 'Más likes' },
-  { id: 'rating', label: 'Mejor valorados' },
+  { id: 'app_views', label: 'Más vistos en app' },
   { id: 'recent', label: 'Más recientes' },
 ];
 
@@ -48,6 +57,7 @@ export function TikTokVideoGallery({
   showSearch = true,
   compact = false,
   showCount = true,
+  onClearFilters,
 }: TikTokVideoGalleryProps) {
   const [activeCategory, setActiveCategory] = useState('Todos');
   const [sortBy, setSortBy] = useState('popular');
@@ -60,7 +70,7 @@ export function TikTokVideoGallery({
       .filter(video => {
         const matchesCategory =
           activeCategory === 'Todos' ||
-          video.category === activeCategory;
+          video.category.toLowerCase() === activeCategory.toLowerCase();
 
         const matchesSearch =
           !normalizedSearch ||
@@ -72,15 +82,26 @@ export function TikTokVideoGallery({
       })
       .sort((a, b) => {
         switch (sortBy) {
-          case 'likes':
-            return b.likes - a.likes;
-          case 'rating':
-            return b.rating - a.rating;
+          case 'likes': {
+            const likesB = b.externalLikes ?? b.likes ?? 0;
+            const likesA = a.externalLikes ?? a.likes ?? 0;
+            return likesB - likesA;
+          }
+          case 'app_views': {
+            const viewsB = b.internalViews ?? 0;
+            const viewsA = a.internalViews ?? 0;
+            return viewsB - viewsA;
+          }
           case 'recent':
-            return new Date(b.updatedAt).getTime() -
-              new Date(a.updatedAt).getTime();
-          default:
-            return b.views - a.views;
+            return (
+              new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime()
+            );
+          case 'popular':
+          default: {
+            const viewsB = b.externalViews ?? b.views ?? 0;
+            const viewsA = a.externalViews ?? a.views ?? 0;
+            return viewsB - viewsA;
+          }
         }
       });
   }, [videos, activeCategory, sortBy, search]);
@@ -163,45 +184,75 @@ export function TikTokVideoGallery({
                 placeName={video.placeName}
                 thumbnailUrl={video.thumbnailUrl}
                 category={video.category}
+                platform={video.platform}
               />
 
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-slate-500">
-                <span className="flex items-center gap-1">
-                  <Eye className="h-3 w-3" />
-                  {(video.views ?? 0).toLocaleString('es-PE')}
-                </span>
+              {/* Métricas: separación estricta de métricas externas (TikTok) y métricas de plataforma */}
+              <div className="space-y-1">
+                <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[10px] text-slate-600">
+                  {typeof video.externalViews === 'number' && video.externalViews > 0 ? (
+                    <span className="flex items-center gap-1 font-semibold text-slate-800" title="Vistas en TikTok">
+                      <Eye className="h-3 w-3 text-[#E85B49]" />
+                      {video.externalViews.toLocaleString('es-PE')}
+                    </span>
+                  ) : null}
 
-                <span className="flex items-center gap-1">
-                  <Heart className="h-3 w-3" />
-                  {(video.likes ?? 0).toLocaleString('es-PE')}
-                </span>
+                  {typeof video.externalLikes === 'number' && video.externalLikes > 0 ? (
+                    <span className="flex items-center gap-1 font-semibold text-slate-800" title="Likes en TikTok">
+                      <Heart className="h-3 w-3 text-rose-500 fill-rose-500/20" />
+                      {video.externalLikes.toLocaleString('es-PE')}
+                    </span>
+                  ) : null}
 
-                <span className="flex items-center gap-1 text-amber-600">
-                  <Star className="h-3 w-3 fill-amber-500" />
-                  {(video.rating ?? 0).toFixed(1)}
-                </span>
+                  {video.externalViews == null && video.externalLikes == null && (
+                    <span className="text-[10px] text-slate-400 italic">
+                      Métricas sociales en verificación
+                    </span>
+                  )}
+                </div>
+
+                {/* Métricas internas en la app */}
+                {((video.internalViews ?? 0) > 0 || (video.internalSaves ?? 0) > 0) && (
+                  <div className="flex flex-wrap items-center gap-x-2 text-[9px] text-slate-400">
+                    {(video.internalViews ?? 0) > 0 && (
+                      <span className="flex items-center gap-0.5" title="Reproducciones en LibertadGO">
+                        <Play className="h-2.5 w-2.5 text-slate-400" />
+                        {video.internalViews?.toLocaleString('es-PE')} en app
+                      </span>
+                    )}
+                    {(video.internalSaves ?? 0) > 0 && (
+                      <span className="flex items-center gap-0.5" title="Guardado en favoritos">
+                        <Bookmark className="h-2.5 w-2.5 text-amber-500" />
+                        {video.internalSaves} guardados
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
 
               <p className="flex items-center gap-1 text-[10px] text-slate-400">
                 <Clock className="h-3 w-3" />
-                Actualizado: {video.updatedAt}
+                {video.updatedAt}
               </p>
 
               {video.demo && (
-                <span className="inline-block rounded bg-amber-50 px-2 py-1 text-[9px] text-amber-700">
-                  Datos de demostración
+                <span className="inline-block rounded bg-amber-50 px-2 py-0.5 text-[9px] font-medium text-amber-700">
+                  Demostración
                 </span>
               )}
             </div>
           ))}
         </div>
       ) : (
-        <div className="rounded-xl border border-dashed border-slate-300 p-6 text-center">
+        <div className="rounded-xl border border-dashed border-slate-300 p-8 text-center bg-white">
+          <div className="mx-auto w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mb-2">
+            <TrendingUp className="w-5 h-5" />
+          </div>
           <p className="text-sm font-semibold text-slate-700">
-            No encontramos videos en esta categoría
+            No encontramos publicaciones con estos filtros
           </p>
-          <p className="mt-1 text-xs text-slate-500">
-            Prueba otra categoría o modifica tu búsqueda.
+          <p className="mt-1 text-xs text-slate-500 max-w-sm mx-auto">
+            Prueba seleccionando otra categoría o limpiando los términos de búsqueda.
           </p>
           <button
             type="button"
@@ -209,8 +260,9 @@ export function TikTokVideoGallery({
               setActiveCategory('Todos');
               setSearch('');
               setSortBy('popular');
+              if (onClearFilters) onClearFilters();
             }}
-            className="mt-2 text-xs font-semibold text-[#E05A47] underline"
+            className="mt-3 inline-flex items-center justify-center rounded-lg bg-slate-900 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-slate-800 transition"
           >
             Limpiar filtros
           </button>

@@ -223,7 +223,19 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
     const videosWithPlaces = await Promise.all(
       paginated.map(async (v) => {
         const places = await this.getPlacesForVideo(v.id);
-        return { ...v, places };
+        const creatorProfile = v.creatorProfileId
+          ? Array.from(this.creatorProfiles.values()).find((cp) => cp.id === v.creatorProfileId)
+          : this.creatorProfiles.get(v.userId);
+        const user = this.users.get(v.userId);
+
+        return {
+          ...v,
+          creatorDisplayName: creatorProfile?.displayName || null,
+          creatorHandle: creatorProfile?.handle || null,
+          creatorAvatarUrl: creatorProfile?.avatarUrl || null,
+          userName: user?.name || null,
+          places,
+        };
       })
     );
 
