@@ -192,6 +192,7 @@ export function TikTokVideoGallery({
         </div>
       )}
 
+      {/* Filtros de ordenación compactos */}
       <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
         <TrendingUp className="h-3.5 w-3.5 shrink-0 text-slate-400 mr-1" />
 
@@ -200,10 +201,10 @@ export function TikTokVideoGallery({
             key={option.id}
             type="button"
             onClick={() => setSortBy(option.id)}
-            className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-medium transition-colors ${
+            className={`shrink-0 rounded-md border px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer ${
               sortBy === option.id
-                ? 'border-[#E05A47] bg-[#E05A47]/10 text-[#C94B39] font-semibold'
-                : 'border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+                ? 'border-[#E85B49] bg-[#E85B49] text-white'
+                : 'border-[#E9E7E1] text-[#64748B] hover:text-[#263B35] bg-white hover:bg-slate-50'
             }`}
           >
             {option.label}
@@ -214,91 +215,24 @@ export function TikTokVideoGallery({
       {filteredVideos.length > 0 ? (
         <div className={
           compact
-            ? 'grid grid-cols-2 gap-2'
-            : 'grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4'
+            ? 'grid grid-cols-1 sm:grid-cols-2 gap-2.5'
+            : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3'
         }>
           {filteredVideos.map(video => (
-            <div key={video.id} className="min-w-0 space-y-2">
+            <div key={video.id} className="min-w-0">
               <TikTokVideoCard
                 videoUrl={video.videoUrl}
                 title={video.title}
                 creator={video.creator}
+                creatorHandle={video.creatorHandle}
                 creatorAvatarUrl={video.creatorAvatarUrl}
                 placeName={video.placeName}
                 thumbnailUrl={video.thumbnailUrl}
                 category={video.category}
                 platform={video.platform}
+                publishedDate={video.updatedAt}
+                isApproved={true}
               />
-
-              {/* Métricas: separación estricta de métricas externas (TikTok) y métricas de plataforma */}
-              <div className="space-y-1">
-                <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[10px] text-slate-600">
-                  {typeof video.externalViews === 'number' && video.externalViews > 0 ? (
-                    <span className="flex items-center gap-1 font-semibold text-slate-800" title="Vistas en red social">
-                      <Eye className="h-3 w-3 text-[#E85B49]" />
-                      {video.externalViews.toLocaleString('es-PE')}
-                    </span>
-                  ) : null}
-
-                  {typeof video.externalLikes === 'number' && video.externalLikes > 0 ? (
-                    <span className="flex items-center gap-1 font-semibold text-slate-800" title="Likes en red social">
-                      <Heart className="h-3 w-3 text-rose-500 fill-rose-500/20" />
-                      {video.externalLikes.toLocaleString('es-PE')}
-                    </span>
-                  ) : null}
-
-                  {video.externalViews == null && video.externalLikes == null && (
-                    <span className="text-[10px] text-slate-400 italic">
-                      Métricas sociales en verificación
-                    </span>
-                  )}
-                </div>
-
-                {/* Audiencia declarada del creador si está disponible */}
-                {(typeof video.tiktokFollowers === 'number' ||
-                  typeof video.instagramFollowers === 'number' ||
-                  typeof video.youtubeSubscribers === 'number') && (
-                  <div className="flex items-center gap-1 text-[9px] text-slate-500 font-medium">
-                    <Users className="w-2.5 h-2.5 text-slate-400 shrink-0" />
-                    <span>
-                      {typeof video.tiktokFollowers === 'number'
-                        ? `${video.tiktokFollowers.toLocaleString('es-PE')} seg. TT`
-                        : typeof video.instagramFollowers === 'number'
-                        ? `${video.instagramFollowers.toLocaleString('es-PE')} seg. IG`
-                        : `${video.youtubeSubscribers?.toLocaleString('es-PE')} susc. YT`}
-                    </span>
-                  </div>
-                )}
-
-                {/* Métricas internas en la app */}
-                {((video.internalViews ?? 0) > 0 || (video.internalSaves ?? 0) > 0) && (
-                  <div className="flex flex-wrap items-center gap-x-2 text-[9px] text-slate-400">
-                    {(video.internalViews ?? 0) > 0 && (
-                      <span className="flex items-center gap-0.5" title="Reproducciones en RIYMO">
-                        <Play className="h-2.5 w-2.5 text-slate-400" />
-                        {video.internalViews?.toLocaleString('es-PE')} en app
-                      </span>
-                    )}
-                    {(video.internalSaves ?? 0) > 0 && (
-                      <span className="flex items-center gap-0.5" title="Guardado en favoritos">
-                        <Bookmark className="h-2.5 w-2.5 text-amber-500" />
-                        {video.internalSaves} guardados
-                      </span>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              <p className="flex items-center gap-1 text-[10px] text-slate-400">
-                <Clock className="h-3 w-3" />
-                {video.updatedAt}
-              </p>
-
-              {video.demo && (
-                <span className="inline-block rounded bg-amber-50 px-2 py-0.5 text-[9px] font-medium text-amber-700">
-                  Demostración
-                </span>
-              )}
             </div>
           ))}
         </div>

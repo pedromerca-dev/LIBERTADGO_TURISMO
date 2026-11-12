@@ -226,153 +226,152 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
     return (
       <div
         ref={scrollContainerRef}
-        className={`${containerWidthClass} h-full min-h-0 bg-white border-r border-[#E9EEF4] flex flex-col overflow-y-auto`}
+        className={`${containerWidthClass} h-full min-h-0 bg-white border-r border-[#E9E7E1] flex flex-col overflow-y-auto`}
       >
         <div className="p-5 sm:p-6 space-y-5">
 
           {/* Encabezado del destino */}
-          <div className="space-y-2">
+          <div className="space-y-1">
             <span className="text-[10px] font-bold uppercase tracking-widest text-[#E85B49]">
-              Tu próxima aventura
+              Tu viaje
             </span>
 
-            <h2 className="text-2xl font-bold text-[#17243A]">
+            <h2 className="text-xl font-bold text-[#263B35]">
               {trip.destinationName}
             </h2>
 
-            <p className="text-sm text-[#64748B]">
+            <p className="text-xs text-[#64748B]">
               Explora, descubre y organiza tu viaje a tu propio ritmo.
             </p>
           </div>
 
           {/* Información del viaje */}
-          <div className="rounded-2xl bg-[#17243A] p-4 text-white space-y-3">
+          <div className="rounded-lg bg-[#263B35] p-4 text-white space-y-3">
             <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-[#FF8A75]" />
+              <Calendar className="w-4 h-4 text-[#D9B66F]" />
               <span className="text-sm font-semibold">
-                {trip.totalDays} días de aventura
+                {trip.totalDays} días de viaje
               </span>
             </div>
 
             <div className="flex items-center justify-between gap-2">
               <div>
-                <p className="text-[10px] text-slate-300">Llegada</p>
-                <p className="text-xs font-semibold">
+                <p className="text-[10px] text-white/70">Llegada</p>
+                <p className="text-xs font-medium">
                   {dayItems[0]?.formattedDate ?? 'Por definir'}
                 </p>
               </div>
 
-              <div className="h-8 w-px bg-white/20" />
+              <div className="h-6 w-px bg-white/20" />
 
               <div>
-                <p className="text-[10px] text-slate-300">Salida</p>
-                <p className="text-xs font-semibold">
+                <p className="text-[10px] text-white/70">Salida</p>
+                <p className="text-xs font-medium">
                   {dayItems[dayItems.length - 1]?.formattedDate ?? 'Por definir'}
                 </p>
               </div>
 
-              <div className="h-8 w-px bg-white/20" />
+              <div className="h-6 w-px bg-white/20" />
 
               <div>
-                <p className="text-[10px] text-slate-300">Estancia</p>
-                <p className="text-xs font-semibold">
+                <p className="text-[10px] text-white/70">Estancia</p>
+                <p className="text-xs font-medium">
                   {trip.totalNights} noches
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Accesos turísticos */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-bold text-[#17243A]">
-              ¿Qué te gustaría hacer?
+          {/* Accesos rápidos */}
+          <div className="space-y-2">
+            <h3 className="text-xs font-semibold text-[#263B35]">
+              Acceso rápido
             </h3>
 
             <button
               type="button"
               onClick={() => onSelectSection?.('explore')}
-              className="w-full flex items-center gap-3 p-4 rounded-xl border border-[#E9EEF4] bg-white hover:border-[#E85B49] hover:bg-[#FFF9F7] transition-all text-left"
+              className="w-full flex items-center gap-3 p-3 rounded-lg border border-[#E9E7E1] bg-white hover:bg-[#F7F2E8] transition-colors text-left cursor-pointer"
             >
-              <div className="w-10 h-10 rounded-xl bg-[#FFF0EC] flex items-center justify-center shrink-0">
-                <Compass className="w-5 h-5 text-[#E85B49]" />
+              <div className="w-8 h-8 rounded-md bg-[#F7F2E8] flex items-center justify-center shrink-0">
+                <Compass className="w-4 h-4 text-[#E85B49]" />
               </div>
-              <div className="flex-1">
-                <p className="text-sm font-bold text-[#17243A]">
-                  Explorar destinos
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-[#263B35]">
+                  Explorar lugares
                 </p>
-                <p className="text-xs text-[#64748B]">
-                  Descubre playas, restaurantes, cultura y atractivos.
+                <p className="text-[11px] text-[#64748B] truncate">
+                  Playas, gastronomía, arqueología y cultura.
                 </p>
               </div>
-              <ChevronRight className="w-4 h-4 text-slate-400" />
+              <ChevronRight className="w-4 h-4 text-[#64748B]" />
             </button>
 
             <button
               type="button"
               onClick={() => onSelectSection?.('itinerary')}
-              className="w-full flex items-center gap-3 p-4 rounded-xl border border-[#E9EEF4] bg-white hover:border-[#E85B49] hover:bg-[#FFF9F7] transition-all text-left"
+              className="w-full flex items-center gap-3 p-3 rounded-lg border border-[#E9E7E1] bg-white hover:bg-[#F7F2E8] transition-colors text-left cursor-pointer"
             >
-              <div className="w-10 h-10 rounded-xl bg-[#EEF4FF] flex items-center justify-center shrink-0">
-                <Calendar className="w-5 h-5 text-blue-600" />
+              <div className="w-8 h-8 rounded-md bg-[#F7F2E8] flex items-center justify-center shrink-0">
+                <Calendar className="w-4 h-4 text-[#263B35]" />
               </div>
-              <div className="flex-1">
-                <p className="text-sm font-bold text-[#17243A]">
-                  Mi itinerario
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-[#263B35]">
+                  Itinerario por días
                 </p>
-                <p className="text-xs text-[#64748B]">
-                  Organiza tus actividades y visitas por día.
+                <p className="text-[11px] text-[#64748B] truncate">
+                  Organiza tus actividades y visitas día a día.
                 </p>
               </div>
-              <ChevronRight className="w-4 h-4 text-slate-400" />
+              <ChevronRight className="w-4 h-4 text-[#64748B]" />
             </button>
 
             <button
               type="button"
               onClick={() => onSelectSection?.('ranking')}
-              className="w-full flex items-center gap-3 p-4 rounded-xl border border-[#E9EEF4] bg-white hover:border-[#E85B49] hover:bg-[#FFF9F7] transition-all text-left"
+              className="w-full flex items-center gap-3 p-3 rounded-lg border border-[#E9E7E1] bg-white hover:bg-[#F7F2E8] transition-colors text-left cursor-pointer"
             >
-              <div className="w-10 h-10 rounded-xl bg-[#FFF7E8] flex items-center justify-center shrink-0">
-                <Star className="w-5 h-5 text-amber-500" />
+              <div className="w-8 h-8 rounded-md bg-[#F7F2E8] flex items-center justify-center shrink-0">
+                <Star className="w-4 h-4 text-[#D9B66F]" />
               </div>
-              <div className="flex-1">
-                <p className="text-sm font-bold text-[#17243A]">
-                  Videos turísticos
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-[#263B35]">
+                  Ranking de videos
                 </p>
-                <p className="text-xs text-[#64748B]">
-                  Inspírate con experiencias de otros viajeros.
+                <p className="text-[11px] text-[#64748B] truncate">
+                  Videos de creadores locales en TikTok.
                 </p>
               </div>
-              <ChevronRight className="w-4 h-4 text-slate-400" />
+              <ChevronRight className="w-4 h-4 text-[#64748B]" />
             </button>
 
             <button
               type="button"
               onClick={() => onSelectSection?.('saved')}
-              className="w-full flex items-center gap-3 p-4 rounded-xl border border-[#E9EEF4] bg-white hover:border-[#E85B49] hover:bg-[#FFF9F7] transition-all text-left"
+              className="w-full flex items-center gap-3 p-3 rounded-lg border border-[#E9E7E1] bg-white hover:bg-[#F7F2E8] transition-colors text-left cursor-pointer"
             >
-              <div className="w-10 h-10 rounded-xl bg-[#F3F0FF] flex items-center justify-center shrink-0">
-                <Bookmark className="w-5 h-5 text-violet-600" />
+              <div className="w-8 h-8 rounded-md bg-[#F7F2E8] flex items-center justify-center shrink-0">
+                <Bookmark className="w-4 h-4 text-[#71958B]" />
               </div>
-              <div className="flex-1">
-                <p className="text-sm font-bold text-[#17243A]">
-                  Lugares guardados
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-[#263B35]">
+                  Lugares para visitar
                 </p>
-                <p className="text-xs text-[#64748B]">
-                  Consulta los sitios que quieres visitar.
+                <p className="text-[11px] text-[#64748B] truncate">
+                  Sitios pendientes por programar en el mapa.
                 </p>
               </div>
-              <ChevronRight className="w-4 h-4 text-slate-400" />
+              <ChevronRight className="w-4 h-4 text-[#64748B]" />
             </button>
           </div>
 
-          {/* Mensaje de bienvenida */}
-          <div className="rounded-xl bg-[#FFF8F5] border border-[#FCE2DA] p-4">
-            <p className="text-xs font-semibold text-[#17243A]">
-              Tu viaje, a tu manera.
+          {/* Mensaje breve */}
+          <div className="rounded-lg bg-[#F7F2E8] border border-[#E9E7E1] p-3 text-xs text-[#263B35]">
+            <p className="font-semibold text-[#263B35]">
+              Tu viaje en La Libertad
             </p>
-            <p className="text-xs text-[#64748B] mt-1 leading-relaxed">
-              Encuentra lugares, descubre experiencias y construye un itinerario
-              que se adapte a ti.
+            <p className="text-[11px] text-[#64748B] mt-0.5 leading-relaxed">
+              Selecciona experiencias en el mapa y agrégalas directamente a tus días de viaje.
             </p>
           </div>
 
@@ -389,61 +388,55 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
     return (
       <div
         ref={scrollContainerRef}
-        className={`${containerWidthClass} h-full min-h-0 bg-white border-r border-[#E9EEF4] flex flex-col overflow-hidden`}
+        className={`${containerWidthClass} h-full min-h-0 bg-white border-r border-[#E9E7E1] flex flex-col overflow-hidden`}
       >
-        {/* Cabecera de búsqueda con jerarquía turística premium */}
-        <div className="p-3.5 sm:p-4 border-b border-[#E9EEF4] space-y-3 bg-white shrink-0">
-          <div className="flex items-start justify-between gap-2">
+        {/* Cabecera de búsqueda con jerarquía clara y directa */}
+        <div className="p-3.5 sm:p-4 border-b border-[#E9E7E1] space-y-2.5 bg-white shrink-0">
+          <div className="flex items-baseline justify-between gap-2">
             <div>
-              <h2 className="text-base sm:text-lg font-bold font-display text-[#17243A] tracking-tight leading-snug">
+              <h2 className="text-base font-semibold text-[#263B35] tracking-tight">
                 Explorar {activeLocalityLabel}
               </h2>
-              {/* Contador real de resultados */}
               <p className="text-xs text-[#64748B] mt-0.5">
-                Mostrando {filteredPlaces.length} de {places.length} lugares disponibles
+                {filteredPlaces.length} {filteredPlaces.length === 1 ? 'lugar encontrado' : 'lugares encontrados'}
               </p>
             </div>
 
-            {/* Indicador de lugares guardados más discreto */}
             {savedPlaces.length > 0 && (
-              <button
-                type="button"
-                onClick={() => {}}
-                className="flex items-center gap-1.5 text-[11px] font-medium text-[#64748B] bg-[#F8FAFC] border border-[#E2E8F0] px-2.5 py-1 rounded-lg shrink-0"
-              >
-                <Bookmark className="w-3 h-3 text-[#D97706] fill-[#D97706]" />
+              <span className="text-xs text-[#64748B] font-medium flex items-center gap-1">
+                <Bookmark className="w-3 h-3 text-[#D9B66F] fill-[#D9B66F]" />
                 <span>{savedPlaces.length} guardados</span>
-              </button>
+              </span>
             )}
           </div>
 
-          {/* Buscador de ancho completo con altura táctil cómoda */}
+          {/* Buscador de estilo Google Maps */}
           <div className="relative">
-            <Search className="w-4 h-4 text-[#94A3B8] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => onSearchChange?.(e.target.value)}
-              placeholder={`Buscar en ${activeLocalityLabel} (ceviche, huacas, surf, museos)...`}
-              className="w-full h-11 sm:h-10 pl-10 pr-9 text-xs sm:text-sm bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-[#17243A] placeholder:text-[#94A3B8] focus:bg-white focus:outline-none focus:border-[#E85B49] focus:ring-2 focus:ring-[#E85B49]/15 transition-all shadow-2xs"
+              placeholder={`Buscar en ${activeLocalityLabel} (ceviche, huacas, playas, museos)...`}
+              className="w-full h-9 pl-9 pr-8 text-xs bg-white border border-[#E9E7E1] rounded-md text-[#263B35] placeholder:text-slate-400 focus:outline-none focus:border-[#E85B49] focus:ring-1 focus:ring-[#E85B49]"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => onSearchChange?.('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 rounded-md cursor-pointer"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 rounded cursor-pointer"
                 title="Limpiar búsqueda"
               >
-                <X className="w-4 h-4" />
+                <X className="w-3.5 h-3.5" />
               </button>
             )}
           </div>
 
-          {/* Selector de Localidades de La Libertad (filtro no destructivo) */}
+          {/* Selector de Localidades */}
           <HorizontalScrollContainer
             innerRef={localityContainerRef}
             containerClassName="w-full"
-            className="gap-1.5 pt-0.5 pb-0.5"
+            className="gap-1.5 py-0.5"
             gradientTheme="white"
             ariaLabel="Filtros de localidad"
           >
@@ -458,22 +451,16 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
                   key={loc.id}
                   type="button"
                   onClick={() => onLocalityChange?.(loc.id)}
-                  className={`px-2.5 py-1 text-xs rounded-lg transition-all whitespace-nowrap cursor-pointer shrink-0 flex-shrink-0 font-medium flex items-center gap-1.5 ${
+                  className={`px-2.5 py-1 text-xs rounded-md transition-colors whitespace-nowrap cursor-pointer shrink-0 flex-shrink-0 font-medium flex items-center gap-1 ${
                     isLocActive
-                      ? 'bg-[#E85B49] text-white shadow-xs font-semibold'
-                      : 'bg-[#F8FAFC] text-[#475569] hover:bg-[#F1F5F9] hover:text-[#0F172A] border border-[#E2E8F0]/80'
+                      ? 'bg-[#E85B49] text-white'
+                      : 'bg-white text-[#475569] hover:bg-slate-50 border border-[#E9E7E1]'
                   }`}
                   title={`Filtrar por ${loc.name} (${loc.count} lugares)`}
                 >
                   <MapPin className={`w-3 h-3 ${isLocActive ? 'text-white' : 'text-[#E85B49]'}`} />
                   <span>{loc.name}</span>
-                  <span
-                    className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full leading-tight font-semibold ${
-                      isLocActive
-                        ? 'bg-white/25 text-white'
-                        : 'bg-[#E2E8F0] text-[#64748B]'
-                    }`}
-                  >
+                  <span className={`text-[10px] tabular-nums font-mono ${isLocActive ? 'text-white/80' : 'text-[#64748B]'}`}>
                     {loc.count}
                   </span>
                 </button>
@@ -481,11 +468,11 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
             })}
           </HorizontalScrollContainer>
 
-          {/* Separación visual y Chips de Categorías deslizables con soporte táctil fluido, degradados y flechas en desktop */}
+          {/* Selector de Categorías */}
           <HorizontalScrollContainer
             innerRef={categoryContainerRef}
             containerClassName="w-full"
-            className="gap-1.5 pt-0.5 pb-0.5"
+            className="gap-1.5 py-0.5"
             gradientTheme="white"
             ariaLabel="Filtros de categoría"
           >
@@ -498,10 +485,10 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
                 key={cat.id}
                 type="button"
                 onClick={() => onCategoryChange?.(cat.id)}
-                className={`px-3 py-1.5 text-xs rounded-lg transition-all whitespace-nowrap cursor-pointer shrink-0 flex-shrink-0 font-medium flex items-center gap-1.5 ${
+                className={`px-2.5 py-1 text-xs rounded-md transition-colors whitespace-nowrap cursor-pointer shrink-0 flex-shrink-0 font-medium flex items-center gap-1 ${
                   selectedCategory === cat.id
-                    ? 'bg-[#17243A] text-white shadow-xs font-semibold'
-                    : 'bg-[#F8FAFC] text-[#475569] hover:bg-[#F1F5F9] hover:text-[#0F172A] border border-[#E2E8F0]/80'
+                    ? 'bg-[#263B35] text-white'
+                    : 'bg-white text-[#475569] hover:bg-slate-50 border border-[#E9E7E1]'
                 }`}
               >
                 <span>{cat.icon}</span>
@@ -513,15 +500,15 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
 
         {/* Vista Detallada de un Lugar (cuando está seleccionado) */}
         {selectedPlace ? (
-          <div className="flex-1 overflow-y-auto p-3.5 sm:p-4 space-y-3.5 bg-[#F8FAFC]">
+          <div className="flex-1 overflow-y-auto p-3.5 sm:p-4 space-y-3 bg-white">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => onSelectPlace(null)}
-                  className="text-xs text-[#64748B] hover:text-[#17243A] font-semibold flex items-center gap-1 cursor-pointer"
+                  className="text-xs text-[#263B35] hover:text-[#E85B49] font-medium flex items-center gap-1 cursor-pointer"
                 >
-                  ← Volver al catálogo
+                  ← Volver a resultados
                 </button>
                 {previousSection && previousSection !== 'explore' && onReturnToPreviousSection && (
                   <>
@@ -536,19 +523,17 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
                   </>
                 )}
               </div>
-              {selectedPlace.verification.isVerified && (
-                <span className="text-[10px] text-[#27856C] bg-[#27856C]/10 px-2 py-0.5 rounded font-medium flex items-center gap-1">
-                  <ShieldCheck className="w-3 h-3" />
-                  {selectedPlace.verification.verificationLevel === 'official_mincetur'
-                    ? 'MINCETUR Oficial'
-                    : 'Verificado'}
+              {selectedPlace.verification?.isVerified === true && (
+                <span className="text-[11px] text-emerald-700 font-medium flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span>Verificado por RiyMo</span>
                 </span>
               )}
             </div>
 
-            <div className="bg-white rounded-xl border border-[#E9EEF4] overflow-hidden shadow-xs">
-              {/* Fotografía de alta calidad con PlaceImage y fallback editorial */}
-              <div className="relative h-44 sm:h-52 bg-slate-100">
+            <div className="bg-white rounded-lg border border-[#E9E7E1] overflow-hidden">
+              {/* Fotografía de alta calidad con PlaceImage */}
+              <div className="relative h-48 sm:h-56 bg-slate-100">
                 <PlaceImage
                   src={selectedPlace.images[0]?.url}
                   alt={selectedPlace.name}
@@ -559,20 +544,24 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
 
               <div className="p-4 space-y-3">
                 <div>
-                  <h3 className="text-base font-bold font-display text-[#17243A]">
+                  <h3 className="text-lg font-semibold text-[#263B35] leading-snug">
                     {selectedPlace.name}
                   </h3>
                   <div className="flex items-center gap-2 mt-1 text-xs text-[#64748B]">
                     {selectedPlace.rating && (
-                      <div className="flex items-center gap-1 text-amber-600 font-semibold">
-                        <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
-                        <span>{selectedPlace.rating}</span>
+                      <div className="flex items-center gap-1 text-amber-600 font-medium">
+                        <span>★ {selectedPlace.rating}</span>
+                        {selectedPlace.reviewsCount ? (
+                          <span className="text-slate-500 font-normal">
+                            · {selectedPlace.reviewsCount} opiniones
+                          </span>
+                        ) : null}
                       </div>
                     )}
                     <span>·</span>
-                    <span className="capitalize">{selectedPlace.category}</span>
+                    <span className="capitalize">{selectedPlace.subcategory || selectedPlace.category}</span>
                     <span>·</span>
-                    <span>{selectedPlace.localityName}</span>
+                    <span>{selectedPlace.localityName}, La Libertad</span>
                   </div>
                 </div>
 
@@ -580,9 +569,9 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
                   {selectedPlace.fullDescription || selectedPlace.shortDescription}
                 </p>
 
-                <div className="pt-2 border-t border-[#E9EEF4] space-y-1.5 text-xs text-[#64748B]">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-3.5 h-3.5 shrink-0 text-[#E85B49]" />
+                <div className="pt-2 border-t border-[#E9E7E1] space-y-1 text-xs text-[#64748B]">
+                  <div className="flex items-start gap-2">
+                    <MapPin className="w-3.5 h-3.5 shrink-0 text-[#E85B49] mt-0.5" />
                     <span>{selectedPlace.address}</span>
                   </div>
                   {selectedPlace.phone && (
@@ -591,40 +580,35 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
                       <span>{selectedPlace.phone}</span>
                     </div>
                   )}
-                  {selectedPlace.sources?.[0] && (
-                    <div className="flex items-center gap-2 text-[11px] text-slate-500 pt-1">
-                      <Info className="w-3 h-3 text-slate-400" />
-                      <span>Fuente: {selectedPlace.sources[0].sourceId.replace('_', ' ').toUpperCase()}</span>
-                    </div>
-                  )}
                 </div>
 
-                {/* Acciones de la Ficha adaptadas para mobile */}
-                <div className="pt-3 border-t border-[#E9EEF4] flex items-center gap-2">
+                {/* Acciones principales directas */}
+                <div className="pt-3 border-t border-[#E9E7E1] flex items-center gap-2">
                   <button
                     type="button"
                     onClick={() => onToggleSavePlace(selectedPlace.id)}
-                    className="p-2.5 border border-[#E2E8F0] rounded-xl text-[#17243A] hover:bg-[#F8FAFC] active:scale-95 transition-all cursor-pointer"
+                    className="px-3 py-1.5 border border-[#E9E7E1] rounded-md text-xs text-[#263B35] hover:bg-slate-50 transition-colors flex items-center gap-1.5 cursor-pointer"
                     title={
                       trip.savedPlaceIds?.includes(selectedPlace.id)
                         ? 'Quitar de lugares para visitar'
-                        : 'Guardar en lugares para visitar'
+                        : 'Guardar en Por visitar'
                     }
                   >
                     <Bookmark
-                      className={`w-4 h-4 ${
+                      className={`w-3.5 h-3.5 ${
                         trip.savedPlaceIds?.includes(selectedPlace.id)
-                          ? 'fill-[#D97706] text-[#D97706]'
+                          ? 'fill-[#D9B66F] text-[#D9B66F]'
                           : 'text-[#64748B]'
                       }`}
                     />
+                    <span>{trip.savedPlaceIds?.includes(selectedPlace.id) ? 'Guardado' : 'Guardar'}</span>
                   </button>
 
                   <div className="flex-1 min-w-0 flex items-center gap-1.5">
-                    <span className="text-xs text-[#64748B] shrink-0 font-medium">Añadir a:</span>
+                    <span className="text-xs text-[#64748B] shrink-0 font-medium">Asignar al día:</span>
                     <HorizontalScrollContainer
                       containerClassName="flex-1 min-w-0"
-                      className="gap-1.5 py-0.5"
+                      className="gap-1 py-0.5"
                       gradientTheme="slate"
                       arrowSize="sm"
                       ariaLabel="Asignar lugar a día"
@@ -638,14 +622,14 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
                             key={d.dayNumber}
                             type="button"
                             onClick={() => handleToggleDay(selectedPlace, d.dayNumber)}
-                            className={`px-3 py-1.5 text-xs rounded-lg font-mono font-semibold shrink-0 flex-shrink-0 whitespace-nowrap transition-all cursor-pointer ${
+                            className={`px-2.5 py-1 text-xs rounded-md font-mono font-medium shrink-0 flex-shrink-0 whitespace-nowrap transition-colors cursor-pointer ${
                               isAlreadyInDay
-                                ? 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-2xs'
-                                : 'bg-[#17243A] text-white hover:bg-[#E85B49] active:scale-95 shadow-2xs'
+                                ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+                                : 'bg-[#263B35] text-white hover:bg-[#E85B49]'
                             }`}
-                            title={isAlreadyInDay ? `Día ${d.dayNumber} asignado (Pulsar para desasignar)` : `Añadir a Día ${d.dayNumber}`}
+                            title={isAlreadyInDay ? `Día ${d.dayNumber} asignado (Pulsar para quitar)` : `Asignar al Día ${d.dayNumber}`}
                           >
-                            {isAlreadyInDay ? `✓ Día ${d.dayNumber}` : `Día ${d.dayNumber}`}
+                            {isAlreadyInDay ? `✓ D${d.dayNumber}` : `D${d.dayNumber}`}
                           </button>
                         );
                       })}
@@ -664,147 +648,102 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
             </div>
           </div>
         ) : (
-          /* Lista de Tarjetas de Lugares adaptadas al ancho móvil */
+          /* Lista de Tarjetas de Lugares estilo Google Maps (limpio y directo) */
           <div className="flex-1 overflow-y-auto p-3 sm:p-4">
-            <div className={`grid grid-cols-1 ${isMapCollapsed ? 'md:grid-cols-2 xl:grid-cols-3' : ''} gap-3`}>
+            <div className={`grid grid-cols-1 ${isMapCollapsed ? 'md:grid-cols-2 xl:grid-cols-3' : ''} gap-2.5`}>
               {filteredPlaces.map((place) => {
                 const isSaved = trip.savedPlaceIds?.includes(place.id);
                 const placeActivities = trip.activities.filter((a) => a.placeId === place.id);
-                const isDayPickerOpen = activeDayPickerPlaceId === place.id;
+                const isRealVerified = place.verification?.isVerified === true;
+                const categoryLabel = place.subcategory || place.category;
 
                 return (
                   <div
                     key={place.id}
                     onClick={() => onSelectPlace(place)}
-                    className="bg-white rounded-xl border border-[#E9EEF4] hover:border-[#CBD5E1] p-3 sm:p-3.5 transition-all cursor-pointer group flex flex-col justify-between shadow-2xs hover:shadow-xs"
+                    className="bg-white rounded-lg border border-[#E9E7E1] hover:border-slate-300 p-3 transition-colors cursor-pointer group flex gap-3 select-none"
                   >
-                    <div>
-                      <div className="flex gap-3">
-                        {/* Thumbnail equilibrado para pantallas móviles */}
-                        <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-xl overflow-hidden shrink-0 bg-slate-100 border border-slate-100">
-                          <PlaceImage
-                            src={place.images[0]?.url}
-                            alt={place.name}
-                            category={place.category}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        </div>
+                    {/* Fotografía protagonista */}
+                    <div className="w-20 h-20 rounded-md overflow-hidden shrink-0 bg-slate-100">
+                      <PlaceImage
+                        src={place.images[0]?.url}
+                        alt={place.name}
+                        category={place.category}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                      />
+                    </div>
 
-                        <div className="flex-1 min-w-0 flex flex-col justify-between">
-                          <div>
-                            <div className="flex items-start justify-between gap-1.5">
-                              <h4 className="text-xs sm:text-sm font-bold text-[#17243A] group-hover:text-[#E85B49] transition-colors leading-snug line-clamp-1">
-                                {place.name}
-                              </h4>
-                              {placeActivities.length > 0 && (
-                                <span className="text-[10px] font-semibold text-white bg-[#E85B49] px-1.5 py-0.2 rounded shrink-0 leading-tight">
-                                  {placeActivities.map((a) => `Día ${a.dayNumber}`).join(', ')}
-                                </span>
-                              )}
-                            </div>
+                    {/* Información concisa y directa */}
+                    <div className="flex-1 min-w-0 flex flex-col justify-between">
+                      <div>
+                        <h4 className="text-sm font-semibold text-[#263B35] group-hover:text-[#E85B49] transition-colors leading-snug truncate">
+                          {place.name}
+                        </h4>
 
-                            <div className="flex items-center gap-1.5 text-[11px] text-[#64748B] mt-1">
-                              {place.rating && (
-                                <span className="flex items-center gap-0.5 text-amber-600 font-semibold">
-                                  <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
-                                  <span>{place.rating}</span>
-                                </span>
-                              )}
-                              <span>·</span>
-                              <span className="capitalize">{place.subcategory || place.category}</span>
-                            </div>
+                        <p className="text-xs text-[#64748B] mt-0.5 truncate capitalize">
+                          {categoryLabel} · {place.localityName}, La Libertad
+                        </p>
+
+                        {/* Valoración real */}
+                        {place.rating && (
+                          <div className="flex items-center gap-1 text-xs text-[#64748B] mt-1">
+                            <span className="text-amber-600 font-medium">★ {place.rating}</span>
+                            {place.reviewsCount ? (
+                              <span>· {place.reviewsCount} opiniones</span>
+                            ) : null}
                           </div>
+                        )}
 
-                          <div className="text-[11px] text-[#64748B] truncate mt-1">
-                            {place.address.split(',')[0]}
+                        {/* Verificado real */}
+                        {isRealVerified && (
+                          <div className="text-[11px] text-emerald-700 mt-1 flex items-center gap-1">
+                            <ShieldCheck className="w-3 h-3" />
+                            <span>Verificado por RiyMo</span>
                           </div>
+                        )}
+                      </div>
+
+                      {/* Acción principal directa */}
+                      <div className="flex items-center justify-between pt-2 border-t border-[#E9E7E1]/60 mt-1.5" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          type="button"
+                          onClick={() => onSelectPlace(place)}
+                          className="text-xs font-medium text-[#E85B49] hover:text-[#D94C3C] cursor-pointer"
+                        >
+                          Ver lugar
+                        </button>
+
+                        <div className="flex items-center gap-1.5">
+                          {placeActivities.length > 0 && (
+                            <span className="text-[11px] text-emerald-700 font-medium">
+                              {placeActivities.map((a) => `Día ${a.dayNumber}`).join(', ')}
+                            </span>
+                          )}
+
+                          <button
+                            type="button"
+                            onClick={() => onToggleSavePlace(place.id)}
+                            className="p-1 text-[#64748B] hover:text-[#263B35] rounded transition-colors cursor-pointer"
+                            title={isSaved ? 'Quitar de guardados' : 'Guardar en Por visitar'}
+                            aria-label={isSaved ? 'Quitar de guardados' : 'Guardar en Por visitar'}
+                          >
+                            <Bookmark
+                              className={`w-3.5 h-3.5 ${
+                                isSaved ? 'fill-[#D9B66F] text-[#D9B66F]' : ''
+                              }`}
+                            />
+                          </button>
                         </div>
                       </div>
                     </div>
-
-                    {/* Barra inferior de acciones con touch target cómodo */}
-                    <div className="flex items-center justify-between pt-2.5 mt-2.5 border-t border-[#F1F5F9] text-xs">
-                      <span className="text-[10px] text-[#27856C] bg-[#27856C]/8 px-2 py-0.5 rounded-md font-medium">
-                        {place.verification.verificationLevel === 'official_mincetur'
-                          ? 'MINCETUR'
-                          : 'Verificado'}
-                      </span>
-
-                      <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
-                        <button
-                          type="button"
-                          onClick={() => onToggleSavePlace(place.id)}
-                          className="p-1.5 text-[#64748B] hover:text-[#17243A] hover:bg-[#F8FAFC] rounded-lg transition-colors cursor-pointer"
-                          title={isSaved ? 'Quitar de guardados' : 'Guardar en Por visitar'}
-                          aria-label={isSaved ? 'Quitar de guardados' : 'Guardar en Por visitar'}
-                        >
-                          <Bookmark
-                            className={`w-4 h-4 ${
-                              isSaved ? 'fill-[#D97706] text-[#D97706]' : ''
-                            }`}
-                          />
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => setActiveDayPickerPlaceId(isDayPickerOpen ? null : place.id)}
-                          className={`px-2.5 py-1 text-xs font-semibold rounded-lg flex items-center gap-1 transition-colors cursor-pointer ${
-                            placeActivities.length > 0
-                              ? 'text-emerald-800 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100'
-                              : 'text-[#17243A] hover:text-white hover:bg-[#17243A] bg-[#F8FAFC] border border-[#E2E8F0]'
-                          }`}
-                        >
-                          <span>{placeActivities.length > 0 ? 'Días' : '+ Añadir'}</span>
-                          <ChevronRight className="w-3 h-3 opacity-60" />
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Selector emergente de día asignable (con toggle independiente) */}
-                    {isDayPickerOpen && (
-                      <div
-                        className="mt-2.5 pt-2.5 border-t border-[#E9EEF4] flex items-center justify-between text-xs gap-2 animate-in fade-in duration-100 min-w-0"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <span className="text-[#64748B] text-[11px] font-medium shrink-0">Asignar a:</span>
-                        <HorizontalScrollContainer
-                          containerClassName="flex-1 min-w-0"
-                          className="gap-1 py-0.5"
-                          gradientTheme="white"
-                          arrowSize="sm"
-                          ariaLabel="Asignar actividad a día"
-                        >
-                          {dayItems.map((d) => {
-                            const isAlreadyInDay = trip.activities.some(
-                              (a) => a.placeId === place.id && a.dayNumber === d.dayNumber
-                            );
-                            return (
-                              <button
-                                key={d.dayNumber}
-                                type="button"
-                                onClick={() => handleToggleDay(place, d.dayNumber)}
-                                className={`px-2.5 py-1 font-mono font-medium text-[11px] rounded-lg cursor-pointer transition-colors shrink-0 flex-shrink-0 whitespace-nowrap ${
-                                  isAlreadyInDay
-                                    ? 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-2xs'
-                                    : 'bg-[#17243A] text-white hover:bg-[#E85B49] border border-[#17243A]'
-                                }`}
-                                title={isAlreadyInDay ? `Día ${d.dayNumber} asignado (Pulsar para desasignar)` : `Añadir a Día ${d.dayNumber}`}
-                              >
-                                {isAlreadyInDay ? `✓ D${d.dayNumber}` : `D${d.dayNumber}`}
-                              </button>
-                            );
-                          })}
-                        </HorizontalScrollContainer>
-                      </div>
-                    )}
                   </div>
                 );
               })}
             </div>
 
             {filteredPlaces.length === 0 && (
-              <div className="text-center py-12 px-4 border border-dashed border-[#E9EEF4] rounded-xl text-xs text-[#64748B] bg-white flex flex-col items-center justify-center gap-2.5">
-                <Compass className="w-8 h-8 text-slate-300 stroke-[1.5]" />
+              <div className="text-center py-12 px-4 border border-dashed border-[#E9E7E1] rounded-lg text-xs text-[#64748B] bg-white flex flex-col items-center justify-center gap-2">
+                <Compass className="w-7 h-7 text-slate-300 stroke-[1.5]" />
                 <div>
                   <p className="font-semibold text-slate-700 text-sm">No se encontraron lugares</p>
                   <p className="text-[#64748B] mt-0.5">
@@ -818,7 +757,7 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
                     onLocalityChange?.('todas');
                     onSearchChange?.('');
                   }}
-                  className="mt-1 px-3.5 py-1.5 bg-[#17243A] text-white text-xs font-semibold rounded-lg hover:bg-[#E85B49] transition-colors cursor-pointer"
+                  className="mt-1 px-3 py-1.5 bg-[#263B35] text-white text-xs font-medium rounded-md hover:bg-[#E85B49] transition-colors cursor-pointer"
                 >
                   Limpiar filtros
                 </button>
@@ -848,7 +787,7 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
     return (
       <div
         ref={scrollContainerRef}
-        className={`${containerWidthClass} h-full min-h-0 bg-white border-r border-[#E9EEF4] flex flex-col overflow-hidden select-none`}
+        className={`${containerWidthClass} h-full min-h-0 bg-white border-r border-[#E9E7E1] flex flex-col overflow-hidden select-none`}
       >
         <ItineraryView
           trip={trip}
@@ -877,35 +816,35 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
     return (
       <div
         ref={scrollContainerRef}
-        className={`${containerWidthClass} h-full min-h-0 bg-white border-r border-[#E9EEF4] flex flex-col p-4 overflow-y-auto select-none`}
+        className={`${containerWidthClass} h-full min-h-0 bg-white border-r border-[#E9E7E1] flex flex-col p-4 overflow-y-auto select-none`}
       >
-        <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#E9EEF4]">
+        <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#E9E7E1]">
           <div>
-            <h2 className="text-sm font-bold font-display text-[#17243A]">
+            <h2 className="text-sm font-semibold text-[#263B35]">
               Lugares para visitar
             </h2>
             <span className="text-xs text-[#64748B]">
-              Lista de deseos sin día asignado (<strong className="text-[#D97706]">{savedPlaces.length}</strong> lugares)
+              Lista de deseos sin día asignado ({savedPlaces.length} {savedPlaces.length === 1 ? 'lugar' : 'lugares'})
             </span>
           </div>
         </div>
 
         {savedPlaces.length === 0 ? (
-          <div className="text-center py-12 px-4 border border-dashed border-[#E9EEF4] rounded-xl text-xs text-[#64748B]">
-            No tienes lugares guardados todavía. Explora {trip.destinationName} y presiona el icono de marcador para guardarlos aquí.
+          <div className="text-center py-12 px-4 border border-dashed border-[#E9E7E1] rounded-md text-xs text-[#64748B]">
+            No tienes lugares guardados todavía. Explora {trip.destinationName} y presiona Guardar para tenerlos aquí.
           </div>
         ) : (
-          <div className={`space-y-2 ${isMapCollapsed ? 'grid grid-cols-1 md:grid-cols-2 gap-3 space-y-0' : ''}`}>
+          <div className={`space-y-2 ${isMapCollapsed ? 'grid grid-cols-1 md:grid-cols-2 gap-2 space-y-0' : ''}`}>
             {savedPlaces.map((place) => (
               <div
                 key={place.id}
-                className="p-3 bg-white border border-[#E9EEF4] rounded-xl flex items-center justify-between gap-3 shadow-2xs hover:border-slate-300 transition-colors"
+                className="p-2.5 bg-white border border-[#E9E7E1] rounded-md flex items-center justify-between gap-3 hover:border-[#263B35] transition-colors"
               >
                 <div
                   className="flex items-center gap-2.5 truncate cursor-pointer flex-1"
                   onClick={() => onSelectPlace(place)}
                 >
-                  <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-slate-100">
+                  <div className="w-10 h-10 rounded-md overflow-hidden shrink-0 bg-slate-100 border border-[#E9E7E1]">
                     <PlaceImage
                       src={place.images[0]?.url}
                       alt={place.name}
@@ -914,10 +853,10 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
                     />
                   </div>
                   <div className="truncate">
-                    <div className="text-xs font-bold text-[#17243A] truncate hover:text-[#E85B49]">
+                    <div className="text-xs font-semibold text-[#263B35] truncate hover:text-[#E85B49]">
                       {place.name}
                     </div>
-                    <div className="text-[11px] text-[#64748B] capitalize">{place.category}</div>
+                    <div className="text-[11px] text-[#64748B] capitalize">{place.category} · {place.localityName}</div>
                   </div>
                 </div>
 
@@ -933,10 +872,10 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
                           key={d.dayNumber}
                           type="button"
                           onClick={() => handleToggleDay(place, d.dayNumber)}
-                          className={`px-2 py-0.5 text-[10px] font-mono rounded cursor-pointer transition-colors ${
+                          className={`px-2 py-0.5 text-[10px] font-medium rounded cursor-pointer transition-colors ${
                             isAlreadyInDay
-                              ? 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-2xs'
-                              : 'bg-[#17243A] text-white hover:bg-[#E85B49] border border-[#17243A]'
+                              ? 'bg-[#263B35] text-white'
+                              : 'bg-[#F7F2E8] text-[#263B35] hover:bg-[#E85B49] hover:text-white border border-[#E9E7E1]'
                           }`}
                           title={isAlreadyInDay ? `Día ${d.dayNumber} asignado (Pulsar para desasignar)` : `Añadir a Día ${d.dayNumber}`}
                         >
@@ -949,7 +888,7 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
                   <button
                     type="button"
                     onClick={() => onToggleSavePlace(place.id)}
-                    className="p-1 text-[#64748B] hover:text-rose-600 cursor-pointer"
+                    className="p-1 text-[#64748B] hover:text-[#E85B49] cursor-pointer"
                     title="Quitar de la lista"
                   >
                     <X className="w-3.5 h-3.5" />
@@ -969,18 +908,18 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
   return (
     <div
       ref={scrollContainerRef}
-      className={`${containerWidthClass} h-full min-h-0 bg-white border-r border-[#E9EEF4] flex flex-col p-6 select-none`}
+      className={`${containerWidthClass} h-full min-h-0 bg-white border-r border-[#E9E7E1] flex flex-col p-5 select-none`}
     >
-      <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#E9EEF4]">
+      <div className="flex items-center justify-between mb-3 pb-2 border-b border-[#E9E7E1]">
         <div>
-          <h2 className="text-sm font-bold font-display text-[#17243A]">
+          <h2 className="text-sm font-semibold text-[#263B35]">
             Notas y recordatorios
           </h2>
           <span className="text-xs text-[#64748B]">
             Apunta datos de reservas, contactos y consejos para tu estadía en {trip.destinationName}
           </span>
         </div>
-        <span className="text-[10px] text-[#64748B] font-medium bg-[#F7F8FA] px-2 py-0.5 rounded border border-[#E9EEF4]">
+        <span className="text-[10px] text-[#263B35] font-medium bg-[#F7F2E8] px-2 py-0.5 rounded border border-[#E9E7E1]">
           Autoguardado
         </span>
       </div>
@@ -989,7 +928,7 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
         value={trip.notes || ''}
         onChange={(e) => onUpdateNotes(e.target.value)}
         placeholder={`Escribe consejos, contactos locales, números de reserva o detalles de transporte en ${trip.destinationName}...`}
-        className="w-full flex-1 p-4 text-xs bg-[#F7F8FA] border border-[#E9EEF4] rounded-xl resize-none text-[#17243A] leading-relaxed focus:outline-none focus:border-[#17243A]"
+        className="w-full flex-1 p-3 text-xs bg-[#F7F2E8]/40 border border-[#E9E7E1] rounded-md resize-none text-[#263B35] leading-relaxed focus:outline-none focus:border-[#263B35]"
       />
     </div>
   );
