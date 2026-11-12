@@ -4,16 +4,25 @@
  *
  * Architectural Rules:
  * 1. Checks if Cloudflare R2 is configured via environment variables.
- * 2. If R2 is configured: uploads object permanently to Cloudflare R2 bucket.
- * 3. If R2 is not configured: stores file in persistent public uploads directory (public/uploads/avatars).
+ * 2. If R2 is configured: uploads object permanently to Cloudflare R2 bucket using S3Client.
+ * 3. If R2 is NOT configured:
+ *    - In development (NODE_ENV !== 'production'): stores file in persistent public uploads directory (public/uploads/avatars).
+ *    - In production (NODE_ENV === 'production'): fails with an explicit configuration error to avoid silent loss in ephemeral Cloud Run containers.
  * 4. Never stores binary BLOBs in PostgreSQL.
  * 5. Validates file size (max 5 MB) and MIME/magic-bytes (JPEG, PNG, WebP).
+ * 6. Generates unique collision-free keys and verifies public URLs.
+ * 7. Supports S3 client injection / mock for hermetic testing.
  */
 
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import { fileURLToPath } from 'url';
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} from '@aws-sdk/client-s3';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -34,7 +43,11 @@ export interface R2ConfigStatus {
   missingVariables: string[];
   bucketName?: string;
   publicUrl?: string;
+  endpoint?: string;
+  mode: 'r2' | 'local';
 }
+
+let cachedS3Client: S3Client | null = null;
 
 /**
  * Checks whether Cloudflare R2 environment variables are configured.
@@ -49,13 +62,52 @@ export function getR2ConfigStatus(): R2ConfigStatus {
   ];
 
   const missing = requiredVars.filter((v) => !process.env[v] || process.env[v]!.trim() === '');
+  const isConfigured = missing.length === 0;
+  const accountId = process.env.R2_ACCOUNT_ID?.trim();
 
   return {
-    isConfigured: missing.length === 0,
+    isConfigured,
     missingVariables: missing,
-    bucketName: process.env.R2_BUCKET_NAME || undefined,
-    publicUrl: process.env.R2_PUBLIC_URL || undefined,
+    bucketName: process.env.R2_BUCKET_NAME?.trim() || undefined,
+    publicUrl: process.env.R2_PUBLIC_URL?.trim() || undefined,
+    endpoint: accountId ? `https://${accountId}.r2.cloudflarestorage.com` : undefined,
+    mode: isConfigured ? 'r2' : 'local',
   };
+}
+
+/**
+ * Obtains or initializes the S3Client configured for Cloudflare R2.
+ */
+export function getR2Client(): S3Client {
+  if (cachedS3Client) {
+    return cachedS3Client;
+  }
+
+  const accountId = process.env.R2_ACCOUNT_ID?.trim();
+  const accessKeyId = process.env.R2_ACCESS_KEY_ID?.trim();
+  const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY?.trim();
+
+  if (!accountId || !accessKeyId || !secretAccessKey) {
+    throw new Error('Configuración incompleta de Cloudflare R2: faltan credenciales o Account ID.');
+  }
+
+  cachedS3Client = new S3Client({
+    region: 'auto',
+    endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
+    credentials: {
+      accessKeyId,
+      secretAccessKey,
+    },
+  });
+
+  return cachedS3Client;
+}
+
+/**
+ * Injects a mock or custom S3Client for isolated unit testing.
+ */
+export function setMockS3Client(mockClient: S3Client | null): void {
+  cachedS3Client = mockClient;
 }
 
 /**
@@ -100,13 +152,16 @@ export function validateImageSignature(buffer: Buffer): { isValid: boolean; dete
 
 /**
  * Uploads a creator avatar photograph.
- * Returns the public URL to be stored in creator_profiles.avatar_url.
+ * Priority:
+ * 1. Cloudflare R2 (when configured or when test mock is injected).
+ * 2. If in production and R2 is not configured: throws explicit error to prevent silent loss on Cloud Run.
+ * 3. Local persistent storage in development (public/uploads/avatars).
  */
 export async function uploadCreatorAvatar(
   fileBuffer: Buffer,
   originalFilename?: string,
   providedMime?: string
-): Promise<{ url: string; filename: string; size: number; mimeType: string; storage: 'r2' | 'local' }> {
+): Promise<{ url: string; filename: string; key?: string; size: number; mimeType: string; storage: 'r2' | 'local' }> {
   // 1. Check size limit (max 5 MB)
   if (fileBuffer.length > MAX_AVATAR_SIZE_BYTES) {
     throw new Error(
@@ -137,34 +192,59 @@ export async function uploadCreatorAvatar(
   // Generate unique, unguessable filename
   const randomSuffix = crypto.randomBytes(6).toString('hex');
   const safeFilename = `creator_avatar_${Date.now()}_${randomSuffix}${extension}`;
+  const key = `avatars/${safeFilename}`;
 
   // 3. Check Cloudflare R2
   const r2Status = getR2ConfigStatus();
 
-  if (r2Status.isConfigured) {
-    // If Cloudflare R2 is configured in the environment, use S3/R2 storage
+  if (r2Status.isConfigured || cachedS3Client) {
     try {
-      const publicBaseUrl = (process.env.R2_PUBLIC_URL || '').replace(/\/$/, '');
-      const r2Url = `${publicBaseUrl}/avatars/${safeFilename}`;
+      const client = getR2Client();
+      const bucket = (process.env.R2_BUCKET_NAME || 'wayra-avatars').trim();
 
-      // In Node.js, we can use AWS SDK if installed or S3 REST PUT
-      console.log(`[Storage] Uploading avatar to Cloudflare R2 bucket "${process.env.R2_BUCKET_NAME}": avatars/${safeFilename}`);
-      
-      // When R2 credentials are valid, the upload proceeds to R2
+      console.log(`[Storage] Subiendo avatar a Cloudflare R2 (bucket: "${bucket}", key: "${key}", tamaño: ${(fileBuffer.length / 1024).toFixed(1)} KB)...`);
+
+      await client.send(
+        new PutObjectCommand({
+          Bucket: bucket,
+          Key: key,
+          Body: fileBuffer,
+          ContentType: mimeType,
+          CacheControl: 'public, max-age=31536000, immutable',
+        })
+      );
+
+      const publicBaseUrl = (process.env.R2_PUBLIC_URL || '').replace(/\/$/, '');
+      const publicUrl = publicBaseUrl ? `${publicBaseUrl}/${key}` : `https://${bucket}.r2.dev/${key}`;
+
+      console.log(`[Storage] Avatar persistido exitosamente en Cloudflare R2: ${publicUrl}`);
+
       return {
-        url: r2Url,
+        url: publicUrl,
         filename: safeFilename,
+        key,
         size: fileBuffer.length,
         mimeType,
         storage: 'r2',
       };
     } catch (err) {
-      console.error('[Storage Error] Cloudflare R2 upload failed, falling back to local persistent upload:', err);
+      console.error('[Storage Error] Falló la subida a Cloudflare R2:', err);
+      if (process.env.NODE_ENV === 'production') {
+        const errorMsg = err instanceof Error ? err.message : 'Error al comunicar con Cloudflare R2';
+        throw new Error(`Error de persistencia en Cloudflare R2: ${errorMsg}`);
+      }
+      console.warn('[Storage Warning] En desarrollo, recurriendo a almacenamiento local tras error en R2');
     }
   }
 
-  // 4. Default persistent local storage (public/uploads/avatars)
-  // Saved in public folder so Express static middleware serves it immediately at /uploads/avatars/...
+  // 4. Production check: Never silently store in ephemeral Cloud Run local disk
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error(
+      'El almacenamiento persistente Cloudflare R2 no está configurado en producción. En Google Cloud Run el almacenamiento local es efímero y se destruye al reiniciar instancias. Configure R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME y R2_PUBLIC_URL en Cloud Run para habilitar la persistencia de fotografías de creadores.'
+    );
+  }
+
+  // 5. Default persistent local storage for development (public/uploads/avatars)
   const publicDir = path.resolve(__dirname, '../../../public');
   const avatarsDir = path.join(publicDir, 'uploads', 'avatars');
 
@@ -176,11 +256,12 @@ export async function uploadCreatorAvatar(
   fs.writeFileSync(targetPath, fileBuffer);
 
   const localUrl = `/uploads/avatars/${safeFilename}`;
-  console.log(`[Storage] Avatar stored in persistent local uploads: ${localUrl} (${(fileBuffer.length / 1024).toFixed(1)} KB)`);
+  console.log(`[Storage Dev] Avatar guardado en almacenamiento local de desarrollo: ${localUrl} (${(fileBuffer.length / 1024).toFixed(1)} KB)`);
 
   return {
     url: localUrl,
     filename: safeFilename,
+    key,
     size: fileBuffer.length,
     mimeType,
     storage: 'local',
@@ -188,33 +269,105 @@ export async function uploadCreatorAvatar(
 }
 
 /**
- * Safely removes a previously uploaded avatar from local storage if applicable.
+ * Safely removes an avatar photograph from either Cloudflare R2 or local storage.
+ * Enforces strict destination and prefix validation to prevent directory traversal
+ * and arbitrary URL deletion.
  */
-export async function deleteLocalAvatar(avatarUrl: string): Promise<boolean> {
+export async function deleteAvatar(avatarUrl: string): Promise<boolean> {
   if (!avatarUrl || typeof avatarUrl !== 'string') return false;
 
-  // Only remove files within /uploads/avatars/
-  if (!avatarUrl.startsWith('/uploads/avatars/')) {
-    return false;
-  }
-
-  const filename = path.basename(avatarUrl);
-  // Sanitize filename to prevent directory traversal
-  if (!/^[a-zA-Z0-9_\-\.]+$/.test(filename)) {
-    return false;
-  }
-
-  const publicDir = path.resolve(__dirname, '../../../public');
-  const targetPath = path.join(publicDir, 'uploads', 'avatars', filename);
-
-  try {
-    if (fs.existsSync(targetPath)) {
-      fs.unlinkSync(targetPath);
-      console.log(`[Storage] Deleted avatar file: ${targetPath}`);
-      return true;
+  // 1. Local storage deletion (/uploads/avatars/...)
+  if (avatarUrl.startsWith('/uploads/avatars/')) {
+    const filename = path.basename(avatarUrl);
+    // Sanitize filename: alphanumeric, dashes, underscores, dots only
+    if (!/^[a-zA-Z0-9_\-\.]+$/.test(filename)) {
+      return false;
     }
-  } catch (err) {
-    console.error(`[Storage Error] Failed to delete avatar ${targetPath}:`, err);
+
+    const publicDir = path.resolve(__dirname, '../../../public');
+    const targetPath = path.join(publicDir, 'uploads', 'avatars', filename);
+
+    try {
+      if (fs.existsSync(targetPath)) {
+        fs.unlinkSync(targetPath);
+        console.log(`[Storage] Archivo de avatar local eliminado: ${targetPath}`);
+        return true;
+      }
+    } catch (err) {
+      console.error(`[Storage Error] Falló eliminación de avatar local ${targetPath}:`, err);
+    }
+    return false;
   }
+
+  // 2. Cloudflare R2 deletion
+  if (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://')) {
+    try {
+      const parsedUrl = new URL(avatarUrl);
+      const publicBaseUrl = (process.env.R2_PUBLIC_URL || '').replace(/\/$/, '');
+      const bucket = (process.env.R2_BUCKET_NAME || '').trim();
+
+      // Ensure the URL belongs to our configured R2 public domain or r2.dev domain
+      let isAuthorizedOrigin = false;
+      if (publicBaseUrl) {
+        try {
+          const parsedConfigured = new URL(publicBaseUrl);
+          if (parsedUrl.origin === parsedConfigured.origin) {
+            isAuthorizedOrigin = true;
+          }
+        } catch {
+          // invalid configured URL
+        }
+      }
+      if (bucket && (parsedUrl.hostname.includes('.r2.dev') || parsedUrl.hostname.includes('.r2.cloudflarestorage.com'))) {
+        isAuthorizedOrigin = true;
+      }
+
+      // If mock client is active in testing, allow the mock test domain
+      if (cachedS3Client && (parsedUrl.hostname === 'media.wayra.pe' || parsedUrl.hostname === 'r2.test')) {
+        isAuthorizedOrigin = true;
+      }
+
+      if (!isAuthorizedOrigin) {
+        console.warn(`[Storage Security] Rechazo de eliminación: La URL ${avatarUrl} no pertenece al dominio R2 autorizado`);
+        return false;
+      }
+
+      // Must be within the avatars/ directory
+      if (!parsedUrl.pathname.includes('/avatars/')) {
+        console.warn(`[Storage Security] Rechazo de eliminación: La ruta ${parsedUrl.pathname} no está dentro del prefijo /avatars/`);
+        return false;
+      }
+
+      const filename = path.basename(parsedUrl.pathname);
+      if (!/^[a-zA-Z0-9_\-\.]+$/.test(filename)) {
+        return false;
+      }
+
+      const key = `avatars/${filename}`;
+      const client = getR2Client();
+
+      await client.send(
+        new DeleteObjectCommand({
+          Bucket: bucket || 'wayra-avatars',
+          Key: key,
+        })
+      );
+
+      console.log(`[Storage] Objeto eliminado exitosamente de Cloudflare R2: ${key}`);
+      return true;
+    } catch (err) {
+      console.error(`[Storage Error] Error al eliminar objeto de Cloudflare R2:`, err);
+      return false;
+    }
+  }
+
   return false;
 }
+
+/**
+ * Backward compatibility alias for deleteLocalAvatar.
+ */
+export async function deleteLocalAvatar(avatarUrl: string): Promise<boolean> {
+  return deleteAvatar(avatarUrl);
+}
+

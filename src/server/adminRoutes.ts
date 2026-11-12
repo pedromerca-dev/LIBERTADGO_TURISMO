@@ -23,6 +23,7 @@ import { INITIAL_PLACES } from '../data/initialPlaces.ts';
 import { parseAndValidateVideoUrl } from '../utils/videoUrlParser.ts';
 import {
   uploadCreatorAvatar,
+  deleteAvatar,
   deleteLocalAvatar,
   getR2ConfigStatus,
   MAX_AVATAR_SIZE_BYTES,
@@ -541,11 +542,12 @@ adminRouter.get('/storage/status', async (_req: Request, res: Response) => {
     const r2Status = getR2ConfigStatus();
     res.json({
       success: true,
-      storage: r2Status.isConfigured ? 'r2' : 'local',
+      storage: r2Status.mode,
       r2Configured: r2Status.isConfigured,
       missingConfig: r2Status.missingVariables,
       bucketName: r2Status.bucketName,
       publicUrl: r2Status.publicUrl,
+      endpoint: r2Status.endpoint,
       maxSizeBytes: MAX_AVATAR_SIZE_BYTES,
       allowedMimeTypes: ALLOWED_MIME_TYPES,
     });
@@ -609,7 +611,7 @@ adminRouter.post(
   }
 );
 
-// 5h. DELETE /api/admin/uploads/avatar - Remove local creator avatar
+// 5h. DELETE /api/admin/uploads/avatar - Remove creator avatar (R2 or local)
 adminRouter.delete('/uploads/avatar', async (req: Request, res: Response) => {
   const { url } = req.body;
   if (!url || typeof url !== 'string') {
@@ -618,7 +620,7 @@ adminRouter.delete('/uploads/avatar', async (req: Request, res: Response) => {
   }
 
   try {
-    const deleted = await deleteLocalAvatar(url);
+    const deleted = await deleteAvatar(url);
     res.json({ success: true, deleted });
   } catch (err) {
     console.error('[Admin Error] Error deleting avatar:', err);
