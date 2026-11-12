@@ -11,12 +11,14 @@ interface CreatorEditorModalProps {
   users?: { id: string; email: string; name: string }[];
 }
 
+const DEFAULT_USERS: { id: string; email: string; name: string }[] = [];
+
 export const CreatorEditorModal: React.FC<CreatorEditorModalProps> = ({
   isOpen,
   onClose,
   onCreatorSaved,
   initialCreator,
-  users = [],
+  users = DEFAULT_USERS,
 }) => {
   const { token, user: currentUser } = useAuth();
   const isEditing = Boolean(initialCreator);
@@ -37,18 +39,20 @@ export const CreatorEditorModal: React.FC<CreatorEditorModalProps> = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!isOpen) return;
+
     if (initialCreator) {
-      setHandle(initialCreator.handle);
-      setDisplayName(initialCreator.displayName);
+      setHandle(initialCreator.handle || '');
+      setDisplayName(initialCreator.displayName || '');
       setBio(initialCreator.bio || '');
       setAvatarUrl(initialCreator.avatarUrl || '');
-      setPrimaryPlatform(initialCreator.primaryPlatform);
+      setPrimaryPlatform(initialCreator.primaryPlatform || 'tiktok');
       setTiktokUrl(initialCreator.tiktokUrl || '');
       setInstagramUrl(initialCreator.instagramUrl || '');
       setYoutubeUrl(initialCreator.youtubeUrl || '');
-      setIsPublic(initialCreator.isPublic);
-      setIsVerified(initialCreator.isVerified);
-      setSelectedUserId(initialCreator.userId);
+      setIsPublic(initialCreator.isPublic ?? true);
+      setIsVerified(Boolean(initialCreator.isVerified));
+      setSelectedUserId(initialCreator.userId || '');
     } else {
       setHandle('');
       setDisplayName('');
@@ -63,7 +67,7 @@ export const CreatorEditorModal: React.FC<CreatorEditorModalProps> = ({
       setSelectedUserId(users[0]?.id || currentUser?.id || '');
     }
     setErrorMessage(null);
-  }, [initialCreator, isOpen, users, currentUser]);
+  }, [isOpen, initialCreator]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

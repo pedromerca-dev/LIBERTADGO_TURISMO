@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   X,
   Video,
@@ -16,6 +16,8 @@ import { Place } from '../../types/catalog.ts';
 import { INITIAL_PLACES } from '../../data/initialPlaces.ts';
 import { LA_LIBERTAD_LOCALITIES } from '../../types/geo.ts';
 import { parseAndValidateVideoUrl } from '../../utils/videoUrlParser.ts';
+import { VideoPreviewCard } from './VideoPreviewCard.tsx';
+import { VideoPreviewData, PreviewState } from '../../server/oembedService.ts';
 
 interface VideoEditorModalProps {
   isOpen: boolean;
@@ -73,7 +75,99 @@ export const VideoEditorModal: React.FC<VideoEditorModalProps> = ({
     error?: string;
   }>({ isValid: false });
 
+  // Official Video Preview state machine
+  const [previewState, setPreviewState] = useState<PreviewState>('idle');
+  const [previewData, setPreviewData] = useState<VideoPreviewData | null>(null);
+  const [previewError, setPreviewError] = useState<string | undefined>(undefined);
+
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Safe preview fetcher with cancellation
+  const fetchPreviewForUrl = useCallback(async (url: string) => {
+    const trimmed = url.trim();
+    if (!trimmed) {
+      setPreviewState('idle');
+      setPreviewData(null);
+      setPreviewError(undefined);
+      return;
+    }
+
+    const parsed = parseAndValidateVideoUrl(trimmed);
+    if (!parsed.isValid || !parsed.data) {
+      setPreviewState('invalid_format');
+      setPreviewData(null);
+      setPreviewError(parsed.error || 'Formato de enlace no admitido');
+      return;
+    }
+
+    // Cancel in-flight request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
+    setPreviewState('loading');
+    setPreviewError(undefined);
+
+    try {
+      const res = await fetch(`/api/creators/oembed?url=${encodeURIComponent(trimmed)}`, {
+        signal: controller.signal,
+      });
+
+      const json = await res.json();
+      if (controller.signal.aborted) return;
+
+      if (json.state === 'ready' && json.data) {
+        setPreviewState('ready');
+        setPreviewData(json.data);
+        setPreviewError(undefined);
+
+        // Smart auto-fill for empty fields (without overwriting existing text)
+        if (json.data.title) {
+          setTitle((prev) => (!prev.trim() ? json.data.title : prev));
+        }
+        if (json.data.authorName) {
+          setExternalCreatorDisplayName((prev) =>
+            !prev.trim() ? json.data.authorName : prev
+          );
+        }
+        if (json.data.thumbnailUrl) {
+          setThumbnailUrl((prev) =>
+            !prev.trim() ? json.data.thumbnailUrl : prev
+          );
+        }
+      } else if (json.state === 'unavailable') {
+        setPreviewState('unavailable');
+        setPreviewData(null);
+        setPreviewError(json.message || 'No se pudo generar la vista previa. El enlace original puede registrarse igualmente.');
+      } else if (json.state === 'provider_error') {
+        setPreviewState('provider_error');
+        setPreviewData(null);
+        setPreviewError(json.message || 'Error temporal del proveedor. Puedes registrar el video con su enlace original.');
+      } else {
+        setPreviewState('invalid_format');
+        setPreviewData(null);
+        setPreviewError(json.error || json.message || 'Enlace no válido');
+      }
+    } catch (err: any) {
+      if (err.name === 'AbortError') return;
+      console.error('[Preview Fetch Error]:', err);
+      setPreviewState('provider_error');
+      setPreviewData(null);
+      setPreviewError('Error de conexión al obtener la vista previa oficial.');
+    }
+  }, []);
+
+  // Modal open/close and initial data loading
   useEffect(() => {
+    if (!isOpen) {
+      if (abortControllerRef.current) abortControllerRef.current.abort();
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+      return;
+    }
+
     if (initialVideo) {
       setVideoUrl(initialVideo.videoUrl);
       setTitle(initialVideo.title);
@@ -104,6 +198,9 @@ export const VideoEditorModal: React.FC<VideoEditorModalProps> = ({
       setSelectedPlaceIds(pIds);
       setPrimaryPlaceId(pIds[0] || '');
       setUrlValidation({ isValid: true, platform: initialVideo.platform });
+
+      // Automatically resolve preview for the existing video being edited
+      fetchPreviewForUrl(initialVideo.videoUrl);
     } else {
       setVideoUrl('');
       setTitle('');
@@ -120,16 +217,35 @@ export const VideoEditorModal: React.FC<VideoEditorModalProps> = ({
       setPrimaryPlaceId('');
       setStatus('APPROVED');
       setUrlValidation({ isValid: false });
+      setPreviewState('idle');
+      setPreviewData(null);
+      setPreviewError(undefined);
     }
     setErrorMessage(null);
     setPlaceSearch('');
-  }, [initialVideo, isOpen]);
 
-  // Handle URL change with live validation
+    return () => {
+      if (abortControllerRef.current) abortControllerRef.current.abort();
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    };
+  }, [initialVideo, isOpen, fetchPreviewForUrl]);
+
+  // Handle URL change with live validation & debounced preview fetch
   const handleUrlChange = (url: string) => {
     setVideoUrl(url);
+
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
     if (!url.trim()) {
       setUrlValidation({ isValid: false });
+      setPreviewState('idle');
+      setPreviewData(null);
+      setPreviewError(undefined);
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
       return;
     }
 
@@ -139,19 +255,34 @@ export const VideoEditorModal: React.FC<VideoEditorModalProps> = ({
         isValid: true,
         platform: parsed.data.platform,
       });
-      // Auto-fill title if empty
-      if (!title && parsed.data.platform === 'tiktok') {
-        setTitle(`Experiencia turística TikTok en La Libertad`);
-      }
+
       // Auto-detect author handle if creatorProfileId is not assigned
       if (parsed.data.authorHandle && !creatorProfileId && !externalCreatorHandle) {
         setExternalCreatorHandle(parsed.data.authorHandle);
       }
+
+      // Indicate loading immediately and trigger debounced fetch
+      setPreviewState('loading');
+      debounceTimerRef.current = setTimeout(() => {
+        fetchPreviewForUrl(url);
+      }, 400);
     } else {
       setUrlValidation({
         isValid: false,
         error: parsed.error || 'URL no soportada',
       });
+      setPreviewState('invalid_format');
+      setPreviewData(null);
+      setPreviewError(parsed.error);
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    }
+  };
+
+  const handleRetryPreview = () => {
+    if (videoUrl.trim()) {
+      fetchPreviewForUrl(videoUrl);
     }
   };
 
@@ -315,6 +446,20 @@ export const VideoEditorModal: React.FC<VideoEditorModalProps> = ({
             <p className="text-[11px] text-slate-500">
               Pega el enlace original. No se descargarán ni alojarán archivos multimedia de terceros; se utiliza embebido oficial seguro.
             </p>
+          </div>
+
+          {/* Previsualización Oficial Automática de Video */}
+          <div className="space-y-1.5">
+            <label className="block text-xs font-semibold text-slate-800">
+              Previsualización Oficial del Video
+            </label>
+            <VideoPreviewCard
+              state={previewState}
+              data={previewData}
+              rawUrl={videoUrl}
+              errorMessage={previewError}
+              onRetry={handleRetryPreview}
+            />
           </div>
 
           {/* Title & Description */}

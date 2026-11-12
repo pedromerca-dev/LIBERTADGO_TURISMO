@@ -20,7 +20,38 @@ import { parseAndValidateVideoUrl } from '../utils/videoUrlParser.ts';
 import { INITIAL_PLACES } from '../data/initialPlaces.ts';
 import { submissionRateLimiter, saveVideoRateLimiter, videoViewDeduplicator } from './rateLimiter.ts';
 
+import { getVideoPreview } from './oembedService.ts';
+
 export const creatorsRouter = Router();
+
+/**
+ * GET /api/creators/oembed
+ * Safe video preview and metadata resolver for TikTok, YouTube, and Instagram.
+ * Protected by strict domain allowlists, SSRF safeguards, timeouts, and response size limits.
+ */
+creatorsRouter.get('/oembed', async (req: Request, res: Response) => {
+  const rawUrl = req.query.url;
+  if (!rawUrl || typeof rawUrl !== 'string') {
+    res.status(400).json({
+      success: false,
+      state: 'invalid_format',
+      error: 'Parámetro "url" requerido',
+    });
+    return;
+  }
+
+  try {
+    const result = await getVideoPreview(rawUrl);
+    res.json(result);
+  } catch (err: any) {
+    console.error('[oEmbed Router Error]:', err);
+    res.status(500).json({
+      success: false,
+      state: 'provider_error',
+      message: 'Error al procesar la previsualización del video',
+    });
+  }
+});
 
 /**
  * Sanitizes moderation audit fields from public payloads to prevent data leakage.

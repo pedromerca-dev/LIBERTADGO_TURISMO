@@ -107,17 +107,17 @@ export function parseAndValidateVideoUrl(rawUrl: string): ParseResult {
       };
     }
 
-    // Short links (vt.tiktok.com/ABC, vm.tiktok.com/ABC)
-    if (hostname === 'vt.tiktok.com' || hostname === 'vm.tiktok.com') {
-      const shortCode = pathname.replace(/^\/+/, '').split('/')[0];
+    // Short links (vt.tiktok.com/ABC, vm.tiktok.com/ABC, or tiktok.com/t/ABC)
+    if (hostname === 'vt.tiktok.com' || hostname === 'vm.tiktok.com' || (hostname === 'tiktok.com' && pathname.startsWith('/t/'))) {
+      const shortCode = pathname.replace(/^\/+t\/?|^\/+/, '').split('/')[0].split('?')[0];
       if (/^[a-zA-Z0-9_-]{5,15}$/.test(shortCode)) {
         return {
           isValid: true,
           data: {
             platform: 'tiktok',
             externalVideoId: `short_${shortCode}`,
-            canonicalUrl: `https://${hostname}/${shortCode}`,
-            embedUrl: `https://www.tiktok.com/embed/v2/short_${shortCode}`,
+            canonicalUrl: hostname === 'tiktok.com' ? `https://www.tiktok.com/t/${shortCode}` : `https://${hostname}/${shortCode}`,
+            embedUrl: `https://www.tiktok.com/player/v1/${shortCode}?music_info=1&description=1&autoplay=0`,
           },
         };
       }
