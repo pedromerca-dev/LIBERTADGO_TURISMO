@@ -36,6 +36,11 @@ export interface CreatorProfile {
   tiktokUrl?: string | null;
   instagramUrl?: string | null;
   youtubeUrl?: string | null;
+  // Audience self-declared metrics
+  tiktokFollowers?: number | null;
+  instagramFollowers?: number | null;
+  youtubeSubscribers?: number | null;
+  audienceUpdatedAt?: string | null;
   isPublic: boolean;                    // Creator profiles are optional and can be private/public
   isVerified: boolean;
   totalApprovedVideos: number;
@@ -83,6 +88,11 @@ export interface VideoSubmission {
   creatorDisplayName?: string | null;
   creatorHandle?: string | null;
   creatorAvatarUrl?: string | null;
+  // Audience metrics (inherited from creator_profile)
+  tiktokFollowers?: number | null;
+  instagramFollowers?: number | null;
+  youtubeSubscribers?: number | null;
+  audienceUpdatedAt?: string | null;
   userName?: string | null;
   createdAt: string;
   updatedAt: string;

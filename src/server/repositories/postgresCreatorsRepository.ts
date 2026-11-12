@@ -880,9 +880,15 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
               vs.category, vs.locality_id as "localityId", vs.status, vs.moderation_notes as "moderationNotes",
               vs.moderated_by as "moderatedBy", vs.moderated_at as "moderatedAt", vs.internal_views_count as "internalViewsCount",
               vs.internal_saves_count as "internalSavesCount", vs.external_metrics as "externalMetrics",
-              vs.created_at as "createdAt", vs.updated_at as "updatedAt"
+              vs.created_at as "createdAt", vs.updated_at as "updatedAt",
+              cp.display_name as "creatorDisplayName",
+              cp.handle as "creatorHandle",
+              cp.avatar_url as "creatorAvatarUrl",
+              u.name as "userName"
        FROM video_submissions vs
        INNER JOIN video_places vp ON vp.video_id = vs.id
+       LEFT JOIN creator_profiles cp ON cp.id = vs.creator_profile_id
+       LEFT JOIN users u ON u.id = vs.user_id
        WHERE vp.place_id = $1 AND vs.status = 'APPROVED'
        ORDER BY vs.created_at DESC`,
       [placeId]
@@ -924,7 +930,12 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
     tiktokUrl?: string | null;
     instagramUrl?: string | null;
     youtubeUrl?: string | null;
+    tiktokFollowers?: number | null;
+    instagramFollowers?: number | null;
+    youtubeSubscribers?: number | null;
+    audienceUpdatedAt?: string | null;
     isPublic: boolean;
+    isVerified?: boolean;
   }): Promise<CreatorProfile> {
     const id = `cp_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
     const res = await this.pool.query(

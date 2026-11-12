@@ -1,14 +1,15 @@
-
 import React, { useMemo, useState } from 'react';
-import { TikTokVideoCard } from './TikTokVideoCard';
-import { Eye, Heart, Clock, TrendingUp, Bookmark, Play } from 'lucide-react';
-import { FILTER_CATEGORIES } from '../../utils/filterUtils';
+import { TikTokVideoCard } from './TikTokVideoCard.tsx';
+import { Eye, Heart, Clock, TrendingUp, Bookmark, Play, Users } from 'lucide-react';
+import { FILTER_CATEGORIES } from '../../utils/filterUtils.ts';
 
 export interface TikTokVideo {
   id: string;
   videoUrl: string;
   title: string;
   creator: string;
+  creatorAvatarUrl?: string;
+  creatorHandle?: string;
   placeName: string;
   category: string;
   thumbnailUrl?: string;
@@ -24,6 +25,9 @@ export interface TikTokVideo {
   externalComments?: number | null;
   internalViews?: number;
   internalSaves?: number;
+  tiktokFollowers?: number | null;
+  instagramFollowers?: number | null;
+  youtubeSubscribers?: number | null;
   platform?: string;
   embedUrl?: string;
   places?: Array<{ id: string; name: string; locality?: string }>;
@@ -43,11 +47,14 @@ interface TikTokVideoGalleryProps {
 
 const VIDEO_CATEGORIES = FILTER_CATEGORIES.map(category => category.label);
 
-const SORT_OPTIONS = [
+export const SORT_OPTIONS = [
   { id: 'popular', label: 'Más vistos en TikTok' },
   { id: 'likes', label: 'Más likes' },
   { id: 'app_views', label: 'Más vistos en app' },
   { id: 'recent', label: 'Más recientes' },
+  { id: 'tiktok_followers', label: 'Más seguidores en TikTok' },
+  { id: 'instagram_followers', label: 'Más seguidores en Instagram' },
+  { id: 'youtube_subscribers', label: 'Más suscriptores en YouTube' },
 ];
 
 export function TikTokVideoGallery({
@@ -97,6 +104,39 @@ export function TikTokVideoGallery({
             const timeB = b.rawDate ? new Date(b.rawDate).getTime() : new Date(b.updatedAt || 0).getTime();
             const timeA = a.rawDate ? new Date(a.rawDate).getTime() : new Date(a.updatedAt || 0).getTime();
             return (isNaN(timeB) ? 0 : timeB) - (isNaN(timeA) ? 0 : timeA);
+          }
+          case 'tiktok_followers': {
+            const fA = a.tiktokFollowers;
+            const fB = b.tiktokFollowers;
+            if (fA == null && fB == null) return 0;
+            if (fA == null) return 1; // nulls last
+            if (fB == null) return -1;
+            if (fB !== fA) return fB - fA;
+            const timeB = b.rawDate ? new Date(b.rawDate).getTime() : 0;
+            const timeA = a.rawDate ? new Date(a.rawDate).getTime() : 0;
+            return timeB - timeA;
+          }
+          case 'instagram_followers': {
+            const fA = a.instagramFollowers;
+            const fB = b.instagramFollowers;
+            if (fA == null && fB == null) return 0;
+            if (fA == null) return 1; // nulls last
+            if (fB == null) return -1;
+            if (fB !== fA) return fB - fA;
+            const timeB = b.rawDate ? new Date(b.rawDate).getTime() : 0;
+            const timeA = a.rawDate ? new Date(a.rawDate).getTime() : 0;
+            return timeB - timeA;
+          }
+          case 'youtube_subscribers': {
+            const fA = a.youtubeSubscribers;
+            const fB = b.youtubeSubscribers;
+            if (fA == null && fB == null) return 0;
+            if (fA == null) return 1; // nulls last
+            if (fB == null) return -1;
+            if (fB !== fA) return fB - fA;
+            const timeB = b.rawDate ? new Date(b.rawDate).getTime() : 0;
+            const timeA = a.rawDate ? new Date(a.rawDate).getTime() : 0;
+            return timeB - timeA;
           }
           case 'popular':
           default: {
@@ -152,18 +192,18 @@ export function TikTokVideoGallery({
         </div>
       )}
 
-      <div className="flex items-center gap-2 overflow-x-auto pb-1">
-        <TrendingUp className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+        <TrendingUp className="h-3.5 w-3.5 shrink-0 text-slate-400 mr-1" />
 
         {SORT_OPTIONS.map(option => (
           <button
             key={option.id}
             type="button"
             onClick={() => setSortBy(option.id)}
-            className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-medium ${
+            className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-medium transition-colors ${
               sortBy === option.id
-                ? 'border-[#E05A47] bg-[#E05A47]/10 text-[#C94B39]'
-                : 'border-slate-200 text-slate-500'
+                ? 'border-[#E05A47] bg-[#E05A47]/10 text-[#C94B39] font-semibold'
+                : 'border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50'
             }`}
           >
             {option.label}
@@ -183,6 +223,7 @@ export function TikTokVideoGallery({
                 videoUrl={video.videoUrl}
                 title={video.title}
                 creator={video.creator}
+                creatorAvatarUrl={video.creatorAvatarUrl}
                 placeName={video.placeName}
                 thumbnailUrl={video.thumbnailUrl}
                 category={video.category}
@@ -193,14 +234,14 @@ export function TikTokVideoGallery({
               <div className="space-y-1">
                 <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[10px] text-slate-600">
                   {typeof video.externalViews === 'number' && video.externalViews > 0 ? (
-                    <span className="flex items-center gap-1 font-semibold text-slate-800" title="Vistas en TikTok">
+                    <span className="flex items-center gap-1 font-semibold text-slate-800" title="Vistas en red social">
                       <Eye className="h-3 w-3 text-[#E85B49]" />
                       {video.externalViews.toLocaleString('es-PE')}
                     </span>
                   ) : null}
 
                   {typeof video.externalLikes === 'number' && video.externalLikes > 0 ? (
-                    <span className="flex items-center gap-1 font-semibold text-slate-800" title="Likes en TikTok">
+                    <span className="flex items-center gap-1 font-semibold text-slate-800" title="Likes en red social">
                       <Heart className="h-3 w-3 text-rose-500 fill-rose-500/20" />
                       {video.externalLikes.toLocaleString('es-PE')}
                     </span>
@@ -212,6 +253,22 @@ export function TikTokVideoGallery({
                     </span>
                   )}
                 </div>
+
+                {/* Audiencia declarada del creador si está disponible */}
+                {(typeof video.tiktokFollowers === 'number' ||
+                  typeof video.instagramFollowers === 'number' ||
+                  typeof video.youtubeSubscribers === 'number') && (
+                  <div className="flex items-center gap-1 text-[9px] text-slate-500 font-medium">
+                    <Users className="w-2.5 h-2.5 text-slate-400 shrink-0" />
+                    <span>
+                      {typeof video.tiktokFollowers === 'number'
+                        ? `${video.tiktokFollowers.toLocaleString('es-PE')} seg. TT`
+                        : typeof video.instagramFollowers === 'number'
+                        ? `${video.instagramFollowers.toLocaleString('es-PE')} seg. IG`
+                        : `${video.youtubeSubscribers?.toLocaleString('es-PE')} susc. YT`}
+                    </span>
+                  </div>
+                )}
 
                 {/* Métricas internas en la app */}
                 {((video.internalViews ?? 0) > 0 || (video.internalSaves ?? 0) > 0) && (

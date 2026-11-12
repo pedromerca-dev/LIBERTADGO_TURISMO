@@ -31,8 +31,7 @@ import {
 } from '../../utils/filterUtils.ts';
 import { ItineraryView } from './ItineraryView.tsx';
 import { HorizontalScrollContainer } from '../common/HorizontalScrollContainer.tsx';
-import { TikTokVideoGallery } from '../common/TikTokVideoGallery';
-import { demoTikTokVideos } from '../../data/demoTikTokVideos';
+import { PlaceVideosSection } from '../common/PlaceVideosSection.tsx';
 import { TikTokRankingPanel } from './TikTokRankingPanel';
 
 
@@ -655,15 +654,14 @@ export const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
                 </div>
               </div>
             </div>
-            {/* Galería de videos turísticos del lugar */}
-<TikTokVideoGallery
- videos={demoTikTokVideos}
-  title="Videos de este lugar"
-  description="Descubre experiencias compartidas por viajeros"
-  showFilters={true}
-  showSearch={false}
-  compact={true}
-/>
+            {/* Galería de videos reales del lugar seleccionado */}
+            <div className="mt-3">
+              <PlaceVideosSection
+                placeId={selectedPlace.id}
+                placeName={selectedPlace.name}
+                compact={true}
+              />
+            </div>
           </div>
         ) : (
           /* Lista de Tarjetas de Lugares adaptadas al ancho móvil */

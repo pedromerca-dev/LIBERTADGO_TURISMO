@@ -406,6 +406,10 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
           creatorDisplayName: creatorProfile?.displayName || null,
           creatorHandle: creatorProfile?.handle || null,
           creatorAvatarUrl: creatorProfile?.avatarUrl || null,
+          tiktokFollowers: creatorProfile?.tiktokFollowers ?? null,
+          instagramFollowers: creatorProfile?.instagramFollowers ?? null,
+          youtubeSubscribers: creatorProfile?.youtubeSubscribers ?? null,
+          audienceUpdatedAt: creatorProfile?.audienceUpdatedAt ?? null,
           externalCreatorHandle: v.externalCreatorHandle || (v.externalMetrics as any)?.creatorHandle || null,
           externalCreatorDisplayName: v.externalCreatorDisplayName || (v.externalMetrics as any)?.creatorDisplayName || null,
           externalCreatorAvatarUrl: v.externalCreatorAvatarUrl || (v.externalMetrics as any)?.creatorAvatarUrl || null,
@@ -550,12 +554,38 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
         .map((vp) => vp.videoId)
     );
 
-    return Array.from(this.videoSubmissions.values())
+    const matching = Array.from(this.videoSubmissions.values())
       .filter((v) => videoIds.has(v.id) && v.status === 'APPROVED')
       .sort(
         (a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
+
+    return Promise.all(
+      matching.map(async (v) => {
+        const places = await this.getPlacesForVideo(v.id);
+        const creatorProfile = v.creatorProfileId
+          ? Array.from(this.creatorProfiles.values()).find((cp) => cp.id === v.creatorProfileId)
+          : (this.creatorProfiles.get(v.userId) || null);
+        const user = this.users.get(v.userId);
+
+        return {
+          ...v,
+          creatorDisplayName: creatorProfile?.displayName || null,
+          creatorHandle: creatorProfile?.handle || null,
+          creatorAvatarUrl: creatorProfile?.avatarUrl || null,
+          tiktokFollowers: creatorProfile?.tiktokFollowers ?? null,
+          instagramFollowers: creatorProfile?.instagramFollowers ?? null,
+          youtubeSubscribers: creatorProfile?.youtubeSubscribers ?? null,
+          audienceUpdatedAt: creatorProfile?.audienceUpdatedAt ?? null,
+          externalCreatorHandle: v.externalCreatorHandle || (v.externalMetrics as any)?.creatorHandle || null,
+          externalCreatorDisplayName: v.externalCreatorDisplayName || (v.externalMetrics as any)?.creatorDisplayName || null,
+          externalCreatorAvatarUrl: v.externalCreatorAvatarUrl || (v.externalMetrics as any)?.creatorAvatarUrl || null,
+          userName: user?.name || null,
+          places,
+        };
+      })
+    );
   }
 
   async findCreatorProfileByUserId(userId: string): Promise<CreatorProfile | null> {
@@ -583,6 +613,10 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
     tiktokUrl?: string | null;
     instagramUrl?: string | null;
     youtubeUrl?: string | null;
+    tiktokFollowers?: number | null;
+    instagramFollowers?: number | null;
+    youtubeSubscribers?: number | null;
+    audienceUpdatedAt?: string | null;
     isPublic: boolean;
     isVerified?: boolean;
   }): Promise<CreatorProfile> {
@@ -600,6 +634,10 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
       tiktokUrl: data.tiktokUrl || null,
       instagramUrl: data.instagramUrl || null,
       youtubeUrl: data.youtubeUrl || null,
+      tiktokFollowers: data.tiktokFollowers !== undefined ? data.tiktokFollowers : existing?.tiktokFollowers ?? null,
+      instagramFollowers: data.instagramFollowers !== undefined ? data.instagramFollowers : existing?.instagramFollowers ?? null,
+      youtubeSubscribers: data.youtubeSubscribers !== undefined ? data.youtubeSubscribers : existing?.youtubeSubscribers ?? null,
+      audienceUpdatedAt: data.audienceUpdatedAt !== undefined ? data.audienceUpdatedAt : existing?.audienceUpdatedAt ?? null,
       isPublic: data.isPublic,
       isVerified: data.isVerified !== undefined ? data.isVerified : existing ? existing.isVerified : false,
       totalApprovedVideos: existing ? existing.totalApprovedVideos : 0,

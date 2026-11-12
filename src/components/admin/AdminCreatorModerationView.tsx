@@ -735,6 +735,37 @@ export const AdminCreatorModerationView: React.FC = () => {
                         {creator.totalApprovedVideos} videos aprobados
                       </span>
                     </div>
+
+                    {/* Audience Breakdown */}
+                    {(typeof creator.tiktokFollowers === 'number' ||
+                      typeof creator.instagramFollowers === 'number' ||
+                      typeof creator.youtubeSubscribers === 'number') && (
+                      <div className="pt-2.5 pb-1 border-t border-slate-100 space-y-1 bg-slate-50/60 -mx-5 px-5">
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-700 font-medium">
+                          {typeof creator.tiktokFollowers === 'number' && (
+                            <span>
+                              <strong>{creator.tiktokFollowers.toLocaleString('es-PE')}</strong> seguidores TikTok
+                            </span>
+                          )}
+                          {typeof creator.instagramFollowers === 'number' && (
+                            <span>
+                              <strong>{creator.instagramFollowers.toLocaleString('es-PE')}</strong> seguidores Instagram
+                            </span>
+                          )}
+                          {typeof creator.youtubeSubscribers === 'number' && (
+                            <span>
+                              <strong>{creator.youtubeSubscribers.toLocaleString('es-PE')}</strong> suscriptores YouTube
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-slate-400 italic">
+                          Datos declarados por el creador o administrador
+                          {creator.audienceUpdatedAt && (
+                            <span> · Act. {new Date(creator.audienceUpdatedAt).toLocaleDateString('es-PE')}</span>
+                          )}
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   {/* Actions Footer */}

@@ -47,8 +47,7 @@ import { getDayColor } from '../../utils/itineraryUtils.ts';
 import { calculateRealRoute, RouteData } from '../../utils/routingService.ts';
 import { WorkspaceSection } from './WorkspaceSidebar.tsx';
 import { HorizontalScrollContainer } from '../common/HorizontalScrollContainer.tsx';
-import { TikTokVideoGallery } from '../common/TikTokVideoGallery.tsx';
-import { demoTikTokVideos } from '../../data/demoTikTokVideos';
+import { PlaceVideosSection } from '../common/PlaceVideosSection.tsx';
 
 interface MapPanelProps {
   trip: TripItinerary;
@@ -719,7 +718,7 @@ export const MapPanel: React.FC<MapPanelProps> = ({
         el.style.cursor = 'pointer';
         el.style.userSelect = 'none';
         el.style.pointerEvents = 'auto';
-        el.style.zIndex = isSelected ? '60' : '30';
+        el.style.zIndex = isSelected ? '20' : '10';
         el.setAttribute('role', 'button');
         el.setAttribute('tabindex', '0');
         el.setAttribute('aria-label', `${place.name} · Día ${act.dayNumber} · #${act.order}`);
@@ -829,7 +828,7 @@ export const MapPanel: React.FC<MapPanelProps> = ({
         el.style.cursor = 'pointer';
         el.style.userSelect = 'none';
         el.style.pointerEvents = 'auto';
-        el.style.zIndex = isSelected ? '55' : '20';
+        el.style.zIndex = isSelected ? '20' : '10';
 
         const inner = document.createElement('div');
         inner.className = 'libertadgo-map-marker-badge';
@@ -1600,7 +1599,7 @@ export const MapPanel: React.FC<MapPanelProps> = ({
         {/* ============================================================ */}
         {selectedPlace && (
           <div
-            className={`absolute bottom-3 left-3 right-3 sm:right-auto sm:max-w-md z-30 transition-all duration-300 ease-in-out ${
+            className={`absolute bottom-3 left-3 right-3 sm:right-auto sm:max-w-md z-40 transition-all duration-300 ease-in-out ${
               isCardExpanded ? 'max-h-[80vh]' : 'max-h-56'
             }`}
           >
@@ -1709,15 +1708,12 @@ export const MapPanel: React.FC<MapPanelProps> = ({
                     )}
                   </div>
                   <div className="mt-4">
-                  <TikTokVideoGallery
-  title="Videos de este lugar"
-  description="Conoce este destino a través de sus creadores."
-  showFilters={false}
-  showSearch={false}
-  compact={true}
-  videos={demoTikTokVideos}
-/>
-</div>
+                    <PlaceVideosSection
+                      placeId={selectedPlace.id}
+                      placeName={selectedPlace.name}
+                      compact={true}
+                    />
+                  </div>
                   {/* Asignación directa a días del viaje con toggle independiente */}
                   <div className="pt-3 border-t border-[#E9EEF4] space-y-2">
                     <span className="text-xs font-bold text-[#17243A] block">

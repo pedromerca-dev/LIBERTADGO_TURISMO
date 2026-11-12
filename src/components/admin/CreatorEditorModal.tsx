@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, UserCheck, Check, AlertCircle, Sparkles } from 'lucide-react';
+import { X, UserCheck, Check, AlertCircle, Sparkles, Users } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.tsx';
 import { CreatorProfile, VideoPlatform } from '../../types/creators.ts';
 
@@ -31,6 +31,9 @@ export const CreatorEditorModal: React.FC<CreatorEditorModalProps> = ({
   const [tiktokUrl, setTiktokUrl] = useState('');
   const [instagramUrl, setInstagramUrl] = useState('');
   const [youtubeUrl, setYoutubeUrl] = useState('');
+  const [tiktokFollowers, setTiktokFollowers] = useState('');
+  const [instagramFollowers, setInstagramFollowers] = useState('');
+  const [youtubeSubscribers, setYoutubeSubscribers] = useState('');
   const [isPublic, setIsPublic] = useState(true);
   const [isVerified, setIsVerified] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState('');
@@ -50,6 +53,9 @@ export const CreatorEditorModal: React.FC<CreatorEditorModalProps> = ({
       setTiktokUrl(initialCreator.tiktokUrl || '');
       setInstagramUrl(initialCreator.instagramUrl || '');
       setYoutubeUrl(initialCreator.youtubeUrl || '');
+      setTiktokFollowers(initialCreator.tiktokFollowers != null ? String(initialCreator.tiktokFollowers) : '');
+      setInstagramFollowers(initialCreator.instagramFollowers != null ? String(initialCreator.instagramFollowers) : '');
+      setYoutubeSubscribers(initialCreator.youtubeSubscribers != null ? String(initialCreator.youtubeSubscribers) : '');
       setIsPublic(initialCreator.isPublic ?? true);
       setIsVerified(Boolean(initialCreator.isVerified));
       setSelectedUserId(initialCreator.userId || '');
@@ -62,12 +68,15 @@ export const CreatorEditorModal: React.FC<CreatorEditorModalProps> = ({
       setTiktokUrl('');
       setInstagramUrl('');
       setYoutubeUrl('');
+      setTiktokFollowers('');
+      setInstagramFollowers('');
+      setYoutubeSubscribers('');
       setIsPublic(true);
       setIsVerified(false);
       setSelectedUserId(users[0]?.id || currentUser?.id || '');
     }
     setErrorMessage(null);
-  }, [isOpen, initialCreator]);
+  }, [isOpen, initialCreator, currentUser?.id, users]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,6 +93,34 @@ export const CreatorEditorModal: React.FC<CreatorEditorModalProps> = ({
       return;
     }
 
+    // Validate integer >= 0 for audience metrics
+    let parsedTiktok: number | null = null;
+    if (tiktokFollowers.trim().length > 0) {
+      if (!/^\d+$/.test(tiktokFollowers.trim())) {
+        setErrorMessage('Los seguidores de TikTok deben ser un número entero mayor o igual a 0');
+        return;
+      }
+      parsedTiktok = parseInt(tiktokFollowers.trim(), 10);
+    }
+
+    let parsedInstagram: number | null = null;
+    if (instagramFollowers.trim().length > 0) {
+      if (!/^\d+$/.test(instagramFollowers.trim())) {
+        setErrorMessage('Los seguidores de Instagram deben ser un número entero mayor o igual a 0');
+        return;
+      }
+      parsedInstagram = parseInt(instagramFollowers.trim(), 10);
+    }
+
+    let parsedYoutube: number | null = null;
+    if (youtubeSubscribers.trim().length > 0) {
+      if (!/^\d+$/.test(youtubeSubscribers.trim())) {
+        setErrorMessage('Los suscriptores de YouTube deben ser un número entero mayor o igual a 0');
+        return;
+      }
+      parsedYoutube = parseInt(youtubeSubscribers.trim(), 10);
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -97,6 +134,13 @@ export const CreatorEditorModal: React.FC<CreatorEditorModalProps> = ({
         tiktokUrl: tiktokUrl.trim() || null,
         instagramUrl: instagramUrl.trim() || null,
         youtubeUrl: youtubeUrl.trim() || null,
+        tiktokFollowers: parsedTiktok,
+        instagramFollowers: parsedInstagram,
+        youtubeSubscribers: parsedYoutube,
+        audienceUpdatedAt:
+          parsedTiktok !== null || parsedInstagram !== null || parsedYoutube !== null
+            ? new Date().toISOString()
+            : null,
         isPublic,
         isVerified,
       };
@@ -140,24 +184,49 @@ export const CreatorEditorModal: React.FC<CreatorEditorModalProps> = ({
                 {isEditing ? 'Editar Perfil de Creador' : 'Registrar Perfil de Creador'}
               </h3>
               <p className="text-[11px] text-slate-400">
-                Directorio oficial de creadores de contenido de La Libertad
+                Directorio y autoría de creadores turísticos de La Libertad
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+            className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
+        {/* Error Alert */}
+        {errorMessage && (
+          <div className="m-4 p-3 bg-rose-50 border border-rose-200 rounded-xl flex items-start gap-2.5 text-rose-800 text-xs">
+            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-semibold">No se pudo guardar el creador</p>
+              <p className="mt-0.5 text-rose-700">{errorMessage}</p>
+            </div>
+          </div>
+        )}
+
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-4">
-          {errorMessage && (
-            <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0 text-red-500" />
-              <span>{errorMessage}</span>
+        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-4 flex-1">
+          {/* User Association (Optional) */}
+          {users.length > 0 && (
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-slate-800">
+                Asociar a Usuario del Sistema (Opcional)
+              </label>
+              <select
+                value={selectedUserId}
+                onChange={(e) => setSelectedUserId(e.target.value)}
+                className="w-full text-xs p-2 bg-white border border-slate-300 rounded-lg focus:outline-none focus:border-[#E85B49]"
+              >
+                <option value="">Cuenta de Administrador Actual</option>
+                {users.map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.name} ({u.email})
+                  </option>
+                ))}
+              </select>
             </div>
           )}
 
@@ -165,88 +234,68 @@ export const CreatorEditorModal: React.FC<CreatorEditorModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <label className="block text-xs font-semibold text-slate-800">
-                Handle único (@usuario) *
+                Identificador (@handle) *
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs">
-                  @
-                </span>
+                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs">@</span>
                 <input
                   type="text"
                   value={handle}
-                  onChange={(e) => setHandle(e.target.value.toLowerCase())}
-                  placeholder="huanchaco_surf"
-                  className="w-full text-xs pl-7 pr-3 py-2 bg-white border border-slate-300 rounded-lg focus:outline-none focus:border-[#E85B49] font-mono"
+                  onChange={(e) => setHandle(e.target.value)}
+                  placeholder="trujillofoodie"
                   required
-                  maxLength={30}
+                  className="w-full text-xs py-2 pr-2 pl-7 bg-white border border-slate-300 rounded-lg focus:outline-none focus:border-[#E85B49]"
                 />
               </div>
             </div>
 
             <div className="space-y-1.5">
               <label className="block text-xs font-semibold text-slate-800">
-                Nombre para Mostrar *
+                Nombre Visible / Marca *
               </label>
               <input
                 type="text"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
-                placeholder="Huanchaco Surf & Food"
-                className="w-full text-xs p-2 bg-white border border-slate-300 rounded-lg focus:outline-none focus:border-[#E85B49]"
+                placeholder="Trujillo Gastronómico"
                 required
-                maxLength={60}
+                className="w-full text-xs p-2 bg-white border border-slate-300 rounded-lg focus:outline-none focus:border-[#E85B49]"
               />
             </div>
           </div>
 
-          {/* Primary Platform & Verification */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-slate-800">
-                Plataforma Principal *
-              </label>
-              <select
-                value={primaryPlatform}
-                onChange={(e) => setPrimaryPlatform(e.target.value as VideoPlatform)}
-                className="w-full text-xs p-2 bg-white border border-slate-300 rounded-lg focus:outline-none focus:border-[#E85B49]"
-              >
-                <option value="tiktok">TikTok</option>
-                <option value="instagram">Instagram</option>
-                <option value="youtube">YouTube</option>
-              </select>
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-slate-800">
-                Usuario del Sistema
-              </label>
-              <select
-                value={selectedUserId}
-                onChange={(e) => setSelectedUserId(e.target.value)}
-                className="w-full text-xs p-2 bg-white border border-slate-300 rounded-lg focus:outline-none focus:border-[#E85B49]"
-              >
-                {users.length > 0 ? (
-                  users.map((u) => (
-                    <option key={u.id} value={u.id}>
-                      {u.name} ({u.email})
-                    </option>
-                  ))
-                ) : (
-                  <option value={currentUser?.id || ''}>
-                    {currentUser?.name || 'Administrador actual'} ({currentUser?.email})
-                  </option>
-                )}
-              </select>
+          {/* Primary Platform */}
+          <div className="space-y-1.5">
+            <label className="block text-xs font-semibold text-slate-800">
+              Plataforma Principal *
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {(['tiktok', 'instagram', 'youtube'] as VideoPlatform[]).map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => setPrimaryPlatform(p)}
+                  className={`py-2 px-3 rounded-lg text-xs font-semibold border text-center capitalize transition-colors ${
+                    primaryPlatform === p
+                      ? 'border-[#E85B49] bg-rose-50/50 text-[#E85B49]'
+                      : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
             </div>
           </div>
 
           {/* Bio */}
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold text-slate-800">Biografía</label>
+            <label className="block text-xs font-semibold text-slate-800">
+              Biografía / Reseña corta
+            </label>
             <textarea
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              placeholder="Creador de contenido gastronómico y cultural en Trujillo..."
+              placeholder="Creador local apasionado por el turismo cultural y la gastronomía liberteña..."
               rows={2}
               maxLength={300}
               className="w-full text-xs p-2 bg-white border border-slate-300 rounded-lg focus:outline-none focus:border-[#E85B49]"
@@ -292,6 +341,78 @@ export const CreatorEditorModal: React.FC<CreatorEditorModalProps> = ({
                 placeholder="Canal de YouTube (https://youtube.com/@...)"
                 className="w-full text-xs p-2 bg-white border border-slate-300 rounded-lg focus:outline-none focus:border-[#E85B49]"
               />
+            </div>
+          </div>
+
+          {/* Audience Section (Followers & Subscribers) */}
+          <div className="space-y-2.5 pt-3 border-t border-slate-200 bg-slate-50/70 p-3 rounded-xl border">
+            <div className="flex items-center gap-1.5">
+              <Users className="w-3.5 h-3.5 text-[#E85B49]" />
+              <label className="text-xs font-bold text-slate-900">
+                Audiencia en Redes Sociales
+              </label>
+            </div>
+            <p className="text-[11px] text-slate-500 leading-relaxed">
+              Datos declarados por el creador o administrador. Ingrese valores enteros positivos o deje vacío si no se conoce.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              <div className="space-y-1">
+                <label className="block text-[11px] font-semibold text-slate-700">
+                  Seguidores TikTok
+                </label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={tiktokFollowers}
+                  onChange={(e) => setTiktokFollowers(e.target.value)}
+                  placeholder="ej. 150000"
+                  className="w-full text-xs p-2 bg-white border border-slate-300 rounded-lg focus:outline-none focus:border-[#E85B49]"
+                />
+                {tiktokFollowers && /^\d+$/.test(tiktokFollowers) && (
+                  <span className="text-[10px] text-slate-500 block">
+                    {parseInt(tiktokFollowers, 10).toLocaleString('es-PE')} seguidores
+                  </span>
+                )}
+              </div>
+
+              <div className="space-y-1">
+                <label className="block text-[11px] font-semibold text-slate-700">
+                  Seguidores Instagram
+                </label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={instagramFollowers}
+                  onChange={(e) => setInstagramFollowers(e.target.value)}
+                  placeholder="ej. 45000"
+                  className="w-full text-xs p-2 bg-white border border-slate-300 rounded-lg focus:outline-none focus:border-[#E85B49]"
+                />
+                {instagramFollowers && /^\d+$/.test(instagramFollowers) && (
+                  <span className="text-[10px] text-slate-500 block">
+                    {parseInt(instagramFollowers, 10).toLocaleString('es-PE')} seguidores
+                  </span>
+                )}
+              </div>
+
+              <div className="space-y-1">
+                <label className="block text-[11px] font-semibold text-slate-700">
+                  Suscriptores YouTube
+                </label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={youtubeSubscribers}
+                  onChange={(e) => setYoutubeSubscribers(e.target.value)}
+                  placeholder="ej. 20000"
+                  className="w-full text-xs p-2 bg-white border border-slate-300 rounded-lg focus:outline-none focus:border-[#E85B49]"
+                />
+                {youtubeSubscribers && /^\d+$/.test(youtubeSubscribers) && (
+                  <span className="text-[10px] text-slate-500 block">
+                    {parseInt(youtubeSubscribers, 10).toLocaleString('es-PE')} suscriptores
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 

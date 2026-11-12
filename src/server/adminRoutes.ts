@@ -461,9 +461,12 @@ adminRouter.post('/creators', async (req: Request, res: Response) => {
 
   const repo = getCreatorsRepository();
   try {
-    // Check if handle is already taken
+    // Link to specified userId or fallback to current admin userId
+    const targetUserId = parseResult.data.userId || req.user.userId;
+
+    // Check if handle is already taken by a different user
     const existing = await repo.findCreatorProfileByHandle(parseResult.data.handle);
-    if (existing) {
+    if (existing && existing.userId !== targetUserId) {
       res.status(409).json({
         success: false,
         error: `El identificador @${parseResult.data.handle} ya está registrado`,
@@ -471,8 +474,14 @@ adminRouter.post('/creators', async (req: Request, res: Response) => {
       return;
     }
 
-    // Link to specified userId or fallback to current admin userId
-    const targetUserId = parseResult.data.userId || req.user.userId;
+    const hasAudienceData =
+      parseResult.data.tiktokFollowers !== undefined ||
+      parseResult.data.instagramFollowers !== undefined ||
+      parseResult.data.youtubeSubscribers !== undefined;
+
+    const audienceUpdatedAt =
+      parseResult.data.audienceUpdatedAt ||
+      (hasAudienceData ? new Date().toISOString() : null);
 
     const profile = await repo.saveCreatorProfile({
       userId: targetUserId,
@@ -484,6 +493,10 @@ adminRouter.post('/creators', async (req: Request, res: Response) => {
       tiktokUrl: parseResult.data.tiktokUrl || null,
       instagramUrl: parseResult.data.instagramUrl || null,
       youtubeUrl: parseResult.data.youtubeUrl || null,
+      tiktokFollowers: parseResult.data.tiktokFollowers ?? null,
+      instagramFollowers: parseResult.data.instagramFollowers ?? null,
+      youtubeSubscribers: parseResult.data.youtubeSubscribers ?? null,
+      audienceUpdatedAt,
       isPublic: parseResult.data.isPublic ?? true,
       isVerified: parseResult.data.isVerified ?? false,
     });

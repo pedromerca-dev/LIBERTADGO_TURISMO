@@ -71,6 +71,25 @@ export const CreatorProfileSchema = z.object({
   tiktokUrl: safeUrlSchema.optional().nullable(),
   instagramUrl: safeUrlSchema.optional().nullable(),
   youtubeUrl: safeUrlSchema.optional().nullable(),
+  tiktokFollowers: z
+    .number()
+    .int('Los seguidores de TikTok deben ser un número entero')
+    .nonnegative('Los seguidores de TikTok no pueden ser negativos')
+    .optional()
+    .nullable(),
+  instagramFollowers: z
+    .number()
+    .int('Los seguidores de Instagram deben ser un número entero')
+    .nonnegative('Los seguidores de Instagram no pueden ser negativos')
+    .optional()
+    .nullable(),
+  youtubeSubscribers: z
+    .number()
+    .int('Los suscriptores de YouTube deben ser un número entero')
+    .nonnegative('Los suscriptores de YouTube no pueden ser negativos')
+    .optional()
+    .nullable(),
+  audienceUpdatedAt: z.string().optional().nullable(),
   isPublic: z.boolean().default(true),
 });
 
@@ -341,6 +360,25 @@ export const AdminCreateCreatorSchema = z.object({
   tiktokUrl: safeUrlSchema.optional().nullable(),
   instagramUrl: safeUrlSchema.optional().nullable(),
   youtubeUrl: safeUrlSchema.optional().nullable(),
+  tiktokFollowers: z
+    .number()
+    .int('Los seguidores de TikTok deben ser un número entero')
+    .nonnegative('Los seguidores de TikTok no pueden ser negativos')
+    .optional()
+    .nullable(),
+  instagramFollowers: z
+    .number()
+    .int('Los seguidores de Instagram deben ser un número entero')
+    .nonnegative('Los seguidores de Instagram no pueden ser negativos')
+    .optional()
+    .nullable(),
+  youtubeSubscribers: z
+    .number()
+    .int('Los suscriptores de YouTube deben ser un número entero')
+    .nonnegative('Los suscriptores de YouTube no pueden ser negativos')
+    .optional()
+    .nullable(),
+  audienceUpdatedAt: z.string().optional().nullable(),
   isPublic: z.boolean().default(true),
   isVerified: z.boolean().default(false),
 });

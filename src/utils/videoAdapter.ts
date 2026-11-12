@@ -120,14 +120,47 @@ export function adaptVideoSubmissionToTikTokVideo(
   const internalViews = submission.internalViewsCount || 0;
   const internalSaves = submission.internalSavesCount || 0;
 
+  const creatorAvatarUrl =
+    submission.creatorAvatarUrl ||
+    submission.externalCreatorAvatarUrl ||
+    submission.externalMetrics?.creatorAvatarUrl ||
+    undefined;
+
+  const creatorHandle =
+    submission.creatorHandle ||
+    submission.externalCreatorHandle ||
+    submission.externalMetrics?.creatorHandle ||
+    undefined;
+
+  const tiktokFollowers =
+    typeof submission.tiktokFollowers === 'number'
+      ? submission.tiktokFollowers
+      : null;
+
+  const instagramFollowers =
+    typeof submission.instagramFollowers === 'number'
+      ? submission.instagramFollowers
+      : null;
+
+  const youtubeSubscribers =
+    typeof submission.youtubeSubscribers === 'number'
+      ? submission.youtubeSubscribers
+      : null;
+
   return {
     id: submission.id,
     videoUrl: submission.videoUrl,
     title: submission.title,
     creator,
+    creatorAvatarUrl,
+    creatorHandle,
     placeName,
     category: submission.category || 'Destinos',
     thumbnailUrl: submission.thumbnailUrl || undefined,
+    // Audience metrics
+    tiktokFollowers,
+    instagramFollowers,
+    youtubeSubscribers,
     // Real external metrics
     externalViews,
     externalLikes,

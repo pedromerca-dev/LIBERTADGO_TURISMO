@@ -151,6 +151,10 @@ export interface ICreatorsRepository {
     tiktokUrl?: string | null;
     instagramUrl?: string | null;
     youtubeUrl?: string | null;
+    tiktokFollowers?: number | null;
+    instagramFollowers?: number | null;
+    youtubeSubscribers?: number | null;
+    audienceUpdatedAt?: string | null;
     isPublic: boolean;
     isVerified?: boolean;
   }): Promise<CreatorProfile>;
