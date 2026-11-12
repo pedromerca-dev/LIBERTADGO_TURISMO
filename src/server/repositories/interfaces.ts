@@ -69,6 +69,9 @@ export interface ICreatorsRepository {
       category: string;
       localityId?: string | null;
       status?: ModerationStatus;
+      externalCreatorHandle?: string | null;
+      externalCreatorDisplayName?: string | null;
+      externalCreatorAvatarUrl?: string | null;
     },
     placeIds?: string[],
     primaryPlaceId?: string | null
@@ -84,6 +87,9 @@ export interface ICreatorsRepository {
       thumbnailUrl: string | null;
       creatorProfileId: string | null;
       status: ModerationStatus;
+      externalCreatorHandle: string | null;
+      externalCreatorDisplayName: string | null;
+      externalCreatorAvatarUrl: string | null;
     }>,
     placeIds?: string[],
     primaryPlaceId?: string | null

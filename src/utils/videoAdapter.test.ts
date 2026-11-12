@@ -25,19 +25,49 @@ describe('videoAdapter: Data Adaptation & Metrics Isolation', () => {
     assert.equal(labelWithoutAt, '@cultura_norte');
   });
 
-  test('resolveCreatorLabel falls back to displayName or userName or default', () => {
+  test('resolveCreatorLabel prioritizes registered profile, external identity, and never admin userName', () => {
+    // 1. Registered profile displayName when handle is null
     const labelDisplayName = resolveCreatorLabel({
       creatorHandle: null,
       creatorDisplayName: 'Rutas de La Libertad',
     } as any);
     assert.equal(labelDisplayName, 'Rutas de La Libertad');
 
-    const labelUserName = resolveCreatorLabel({
+    // 2. External creator handle
+    const labelExternalHandle = resolveCreatorLabel({
       creatorHandle: null,
       creatorDisplayName: null,
-      userName: 'Carlos Mendoza',
+      externalCreatorHandle: 'tiktok_viajero',
+      userName: 'Admin Principal',
     } as any);
-    assert.equal(labelUserName, 'Carlos Mendoza');
+    assert.equal(labelExternalHandle, '@tiktok_viajero');
+
+    // 2b. External creator in externalMetrics
+    const labelExternalMetrics = resolveCreatorLabel({
+      creatorHandle: null,
+      creatorDisplayName: null,
+      externalMetrics: { creatorHandle: '@turismo_moche', creatorDisplayName: 'Turismo Moche' },
+      userName: 'Admin Principal',
+    } as any);
+    assert.equal(labelExternalMetrics, '@turismo_moche');
+
+    // 2c. Extraction directly from TikTok videoUrl
+    const labelFromUrl = resolveCreatorLabel({
+      creatorHandle: null,
+      creatorDisplayName: null,
+      videoUrl: 'https://www.tiktok.com/@arqueologianorte/video/7391827391827391827',
+      userName: 'Admin Gestor',
+    } as any);
+    assert.equal(labelFromUrl, '@arqueologianorte');
+
+    // 3. Fallback when no handle or creator exists: NEVER uses admin userName
+    const labelAdminIgnored = resolveCreatorLabel({
+      creatorHandle: null,
+      creatorDisplayName: null,
+      videoUrl: 'https://www.instagram.com/p/C2xyz123/',
+      userName: 'Admin Moderador Master',
+    } as any);
+    assert.equal(labelAdminIgnored, 'Creador de contenido');
 
     const labelDefault = resolveCreatorLabel({
       creatorHandle: null,

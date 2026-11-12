@@ -48,6 +48,9 @@ export interface VideoExternalMetrics {
   likes?: number;
   comments?: number;
   recordedAt?: string;
+  creatorHandle?: string | null;
+  creatorDisplayName?: string | null;
+  creatorAvatarUrl?: string | null;
 }
 
 export interface VideoSubmission {
@@ -72,6 +75,10 @@ export interface VideoSubmission {
   internalViewsCount: number;           // Times played/viewed within LibertadGO
   internalSavesCount: number;           // Times bookmarked by users within LibertadGO
   externalMetrics?: VideoExternalMetrics | null; // Real external social metrics if provided by verified creator
+  // External creator identity when creatorProfileId is NULL
+  externalCreatorHandle?: string | null;
+  externalCreatorDisplayName?: string | null;
+  externalCreatorAvatarUrl?: string | null;
   // Creator enrichment (joined from creator_profiles and users)
   creatorDisplayName?: string | null;
   creatorHandle?: string | null;

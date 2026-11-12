@@ -8,10 +8,15 @@ export type VideoSubmissionWithPlaces = VideoSubmission & {
 };
 
 /**
- * Resolves creator display text prioritizing handle (@username), display name, user name, or default label.
- * Never invents mock or random names.
+ * Resolves creator display text prioritizing:
+ * 1. Registered Creator Profile (@handle, displayName)
+ * 2. External Creator Identity (externalCreatorHandle, externalMetrics, or URL extraction)
+ * 3. Neutral default label: "Creador de contenido"
+ *
+ * CRITICAL RULE: Never uses userName (which belongs to the system user or admin who submitted the record).
  */
 export function resolveCreatorLabel(video: VideoSubmission): string {
+  // 1. Perfil de creador registrado
   if (video.creatorHandle && video.creatorHandle.trim().length > 0) {
     const cleanHandle = video.creatorHandle.trim().replace(/^@+/, '');
     return `@${cleanHandle}`;
@@ -19,9 +24,32 @@ export function resolveCreatorLabel(video: VideoSubmission): string {
   if (video.creatorDisplayName && video.creatorDisplayName.trim().length > 0) {
     return video.creatorDisplayName.trim();
   }
-  if (video.userName && video.userName.trim().length > 0) {
-    return video.userName.trim();
+
+  // 2. Identidad externa del creador (TikTok, Instagram, YouTube)
+  if (video.externalCreatorHandle && video.externalCreatorHandle.trim().length > 0) {
+    const cleanHandle = video.externalCreatorHandle.trim().replace(/^@+/, '');
+    return `@${cleanHandle}`;
   }
+  if (video.externalMetrics?.creatorHandle && video.externalMetrics.creatorHandle.trim().length > 0) {
+    const cleanHandle = video.externalMetrics.creatorHandle.trim().replace(/^@+/, '');
+    return `@${cleanHandle}`;
+  }
+  if (video.externalCreatorDisplayName && video.externalCreatorDisplayName.trim().length > 0) {
+    return video.externalCreatorDisplayName.trim();
+  }
+  if (video.externalMetrics?.creatorDisplayName && video.externalMetrics.creatorDisplayName.trim().length > 0) {
+    return video.externalMetrics.creatorDisplayName.trim();
+  }
+
+  // 2b. Intentar extraer @handle directamente de la URL original si es TikTok o YouTube
+  if (video.videoUrl) {
+    const urlHandleMatch = video.videoUrl.match(/@([a-zA-Z0-9_.-]+)/);
+    if (urlHandleMatch && urlHandleMatch[1]) {
+      return `@${urlHandleMatch[1]}`;
+    }
+  }
+
+  // 3. Etiqueta neutral por defecto (NUNCA el nombre del administrador / userName)
   return 'Creador de contenido';
 }
 

@@ -113,6 +113,9 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
       category: string;
       localityId?: string | null;
       status?: ModerationStatus;
+      externalCreatorHandle?: string | null;
+      externalCreatorDisplayName?: string | null;
+      externalCreatorAvatarUrl?: string | null;
     },
     placeIds: string[] = [],
     primaryPlaceId?: string | null
@@ -128,12 +131,19 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
       description: data.description || null,
       localityId: data.localityId || null,
       status: data.status || 'PENDING',
+      externalCreatorHandle: data.externalCreatorHandle || null,
+      externalCreatorDisplayName: data.externalCreatorDisplayName || null,
+      externalCreatorAvatarUrl: data.externalCreatorAvatarUrl || null,
       moderationNotes: null,
-      moderatedBy: null,
-      moderatedAt: null,
+      moderatedBy: data.status === 'APPROVED' ? data.userId : null,
+      moderatedAt: data.status === 'APPROVED' ? now : null,
       internalViewsCount: 0,
       internalSavesCount: 0,
-      externalMetrics: null,
+      externalMetrics: data.externalCreatorHandle || data.externalCreatorDisplayName ? {
+        creatorHandle: data.externalCreatorHandle,
+        creatorDisplayName: data.externalCreatorDisplayName,
+        creatorAvatarUrl: data.externalCreatorAvatarUrl,
+      } : null,
       createdAt: now,
       updatedAt: now,
     };
@@ -159,6 +169,9 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
       thumbnailUrl: string | null;
       creatorProfileId: string | null;
       status: ModerationStatus;
+      externalCreatorHandle: string | null;
+      externalCreatorDisplayName: string | null;
+      externalCreatorAvatarUrl: string | null;
     }>,
     placeIds?: string[],
     primaryPlaceId?: string | null
@@ -176,6 +189,9 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
       thumbnailUrl: data.thumbnailUrl !== undefined ? data.thumbnailUrl : sub.thumbnailUrl,
       creatorProfileId: data.creatorProfileId !== undefined ? data.creatorProfileId : sub.creatorProfileId,
       status: data.status ?? sub.status,
+      externalCreatorHandle: data.externalCreatorHandle !== undefined ? data.externalCreatorHandle : sub.externalCreatorHandle,
+      externalCreatorDisplayName: data.externalCreatorDisplayName !== undefined ? data.externalCreatorDisplayName : sub.externalCreatorDisplayName,
+      externalCreatorAvatarUrl: data.externalCreatorAvatarUrl !== undefined ? data.externalCreatorAvatarUrl : sub.externalCreatorAvatarUrl,
       updatedAt: new Date().toISOString(),
     };
 
@@ -270,7 +286,7 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
         const places = await this.getPlacesForVideo(v.id);
         const creatorProfile = v.creatorProfileId
           ? Array.from(this.creatorProfiles.values()).find((cp) => cp.id === v.creatorProfileId)
-          : this.creatorProfiles.get(v.userId);
+          : null;
         const user = this.users.get(v.userId);
 
         return {
@@ -278,6 +294,9 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
           creatorDisplayName: creatorProfile?.displayName || null,
           creatorHandle: creatorProfile?.handle || null,
           creatorAvatarUrl: creatorProfile?.avatarUrl || null,
+          externalCreatorHandle: v.externalCreatorHandle || (v.externalMetrics as any)?.creatorHandle || null,
+          externalCreatorDisplayName: v.externalCreatorDisplayName || (v.externalMetrics as any)?.creatorDisplayName || null,
+          externalCreatorAvatarUrl: v.externalCreatorAvatarUrl || (v.externalMetrics as any)?.creatorAvatarUrl || null,
           userName: user?.name || null,
           places,
         };
