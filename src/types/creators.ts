@@ -97,15 +97,30 @@ export interface VideoPlace {
   createdAt: string;
 }
 
+export type ModerationActionType = 'CREATE' | 'UPDATE' | 'APPROVE' | 'REJECT' | 'OBSERVE' | 'HIDE';
+
+export interface ModerationAuditPayload {
+  adminUserId: string;
+  adminName: string;
+  action: ModerationActionType;
+  previousStatus?: ModerationStatus | null;
+  newStatus: ModerationStatus;
+  reason?: string | null;
+  internalNotes?: string | null;
+  changedFields?: string[] | null;
+}
+
 export interface VideoModerationLog {
   id: string;
   videoId: string;
   adminUserId: string;
   adminName: string;
-  previousStatus: ModerationStatus;
+  action: ModerationActionType;
+  previousStatus: ModerationStatus | null;
   newStatus: ModerationStatus;
   reason?: string | null;
   internalNotes?: string | null;
+  changedFields?: string[] | null;
   createdAt: string;
 }
 

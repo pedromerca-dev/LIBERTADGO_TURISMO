@@ -13,7 +13,11 @@ import {
 } from './creatorsSchemas.ts';
 import { getCreatorsRepository, getAuthRepository } from './repositories/index.ts';
 import { requireAuth, requireAdmin } from './authService.ts';
-import { ModerationStatus } from '../types/creators.ts';
+import {
+  ModerationStatus,
+  ModerationActionType,
+  ModerationAuditPayload,
+} from '../types/creators.ts';
 import { INITIAL_PLACES } from '../data/initialPlaces.ts';
 import { parseAndValidateVideoUrl } from '../utils/videoUrlParser.ts';
 
@@ -102,32 +106,29 @@ adminRouter.post('/moderation/:id/action', async (req: Request, res: Response) =
     };
     const newStatus: ModerationStatus = actionToStatusMap[action];
 
-    // If verified places are provided by admin, update associations
-    if (verifiedPlaceIds && Array.isArray(verifiedPlaceIds)) {
-      const validIds = verifiedPlaceIds.filter((pId) =>
-        INITIAL_PLACES.some((p) => p.id === pId)
-      );
-      await repo.associatePlaces(submission.id, validIds);
-    }
+    const validPlaceIds = verifiedPlaceIds && Array.isArray(verifiedPlaceIds)
+      ? verifiedPlaceIds.filter((pId) => INITIAL_PLACES.some((p) => p.id === pId))
+      : undefined;
 
-    // Update status
-    const updated = await repo.updateSubmissionStatus(
-      submission.id,
-      newStatus,
-      reason || null,
-      req.user.userId
-    );
-
-    // Record immutable audit log
-    await repo.addModerationLog({
-      videoId: submission.id,
+    const auditPayload: ModerationAuditPayload = {
       adminUserId: req.user.userId,
       adminName: req.user.name,
+      action,
       previousStatus,
       newStatus,
       reason: reason || null,
       internalNotes: internalNotes || null,
-    });
+    };
+
+    // Update status and record audit log atomically
+    const updated = await repo.updateSubmissionStatus(
+      submission.id,
+      newStatus,
+      reason || null,
+      req.user.userId,
+      auditPayload,
+      validPlaceIds
+    );
 
     res.json({
       success: true,
@@ -206,6 +207,9 @@ adminRouter.post('/videos', async (req: Request, res: Response) => {
     placeIds,
     primaryPlaceId,
     status,
+    externalCreatorHandle,
+    externalCreatorDisplayName,
+    externalCreatorAvatarUrl,
   } = parseResult.data;
 
   const parsed = parseAndValidateVideoUrl(videoUrl);
@@ -235,6 +239,17 @@ adminRouter.post('/videos', async (req: Request, res: Response) => {
       INITIAL_PLACES.some((p) => p.id === pId)
     );
 
+    const resultingStatus = status || 'APPROVED';
+    const auditPayload: ModerationAuditPayload = {
+      adminUserId: req.user.userId,
+      adminName: req.user.name,
+      action: 'CREATE',
+      previousStatus: null,
+      newStatus: resultingStatus,
+      reason: 'Registro y publicación directa desde el panel de administración',
+      internalNotes: `Creado por administrador ${req.user.name}`,
+    };
+
     const submission = await repo.createSubmission(
       {
         userId: req.user.userId,
@@ -249,22 +264,15 @@ adminRouter.post('/videos', async (req: Request, res: Response) => {
         contentType,
         category,
         localityId: localityId || null,
-        status: status || 'APPROVED',
+        status: resultingStatus,
+        externalCreatorHandle: externalCreatorHandle || (!creatorProfileId ? parsed.data.authorHandle || null : null),
+        externalCreatorDisplayName: externalCreatorDisplayName || null,
+        externalCreatorAvatarUrl: externalCreatorAvatarUrl || null,
       },
       validPlaceIds,
-      primaryPlaceId || (validPlaceIds[0] || null)
+      primaryPlaceId || (validPlaceIds[0] || null),
+      auditPayload
     );
-
-    // Audit log
-    await repo.addModerationLog({
-      videoId: submission.id,
-      adminUserId: req.user.userId,
-      adminName: req.user.name,
-      previousStatus: 'PENDING',
-      newStatus: submission.status,
-      reason: 'Registro y publicación directa desde el panel de administración',
-      internalNotes: `Creado por administrador ${req.user.name}`,
-    });
 
     res.status(201).json({
       success: true,
@@ -305,23 +313,39 @@ adminRouter.put('/videos/:id', async (req: Request, res: Response) => {
       ? placeIds.filter((pId) => INITIAL_PLACES.some((p) => p.id === pId))
       : undefined;
 
+    // Detect changed fields for precise traceability
+    const changedFields: string[] = [];
+    for (const [key, val] of Object.entries(updateFields)) {
+      if (val !== undefined && (existing as any)[key] !== val) {
+        changedFields.push(key);
+      }
+    }
+    if (validPlaceIds !== undefined) {
+      changedFields.push('placeIds');
+    }
+    if (primaryPlaceId !== undefined) {
+      changedFields.push('primaryPlaceId');
+    }
+
+    const resultingStatus = updateFields.status || existing.status;
+    const auditPayload: ModerationAuditPayload = {
+      adminUserId: req.user.userId,
+      adminName: req.user.name,
+      action: 'UPDATE',
+      previousStatus: existing.status,
+      newStatus: resultingStatus,
+      reason: 'Edición administrativa de metadatos o lugares asociados',
+      internalNotes: `Modificado por ${req.user.name}`,
+      changedFields: changedFields.length > 0 ? changedFields : null,
+    };
+
     const updated = await repo.updateSubmission(
       req.params.id,
       updateFields,
       validPlaceIds,
-      primaryPlaceId
+      primaryPlaceId,
+      auditPayload
     );
-
-    // Record audit log for edit
-    await repo.addModerationLog({
-      videoId: req.params.id,
-      adminUserId: req.user.userId,
-      adminName: req.user.name,
-      previousStatus: existing.status,
-      newStatus: updated?.status || existing.status,
-      reason: 'Edición administrativa de metadatos o lugares asociados',
-      internalNotes: `Modificado por ${req.user.name}`,
-    });
 
     res.json({
       success: true,

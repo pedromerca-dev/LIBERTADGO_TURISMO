@@ -25,6 +25,7 @@ import { INITIAL_PLACES } from '../../data/initialPlaces.ts';
 import { VideoEditorModal } from './VideoEditorModal.tsx';
 import { CreatorEditorModal } from './CreatorEditorModal.tsx';
 import { VideoHistoryModal } from './VideoHistoryModal.tsx';
+import { resolveCreatorLabel } from '../../utils/videoAdapter.ts';
 
 interface EnrichedVideoSubmission extends VideoSubmission {
   places?: VideoPlace[];
@@ -197,6 +198,8 @@ export const AdminCreatorModerationView: React.FC = () => {
         (v.description && v.description.toLowerCase().includes(q)) ||
         (v.creatorHandle && v.creatorHandle.toLowerCase().includes(q)) ||
         (v.creatorDisplayName && v.creatorDisplayName.toLowerCase().includes(q)) ||
+        (v.externalCreatorHandle && v.externalCreatorHandle.toLowerCase().includes(q)) ||
+        (v.externalCreatorDisplayName && v.externalCreatorDisplayName.toLowerCase().includes(q)) ||
         v.category.toLowerCase().includes(q) ||
         (v.localityId && v.localityId.toLowerCase().includes(q));
 
@@ -430,8 +433,8 @@ export const AdminCreatorModerationView: React.FC = () => {
                         <div className="flex items-center justify-between text-[11px] text-slate-500 pb-2 border-b border-slate-100">
                           <div className="flex items-center gap-1.5 min-w-0">
                             <User className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                            <span className="font-semibold text-slate-800 truncate">
-                              {sub.creatorDisplayName || sub.creatorHandle ? `@${sub.creatorHandle || sub.creatorDisplayName}` : 'Creador Externo'}
+                            <span className="font-semibold text-slate-800 truncate" title={resolveCreatorLabel(sub)}>
+                              {resolveCreatorLabel(sub)}
                             </span>
                           </div>
                           <span className="text-[10px] font-mono text-slate-400 capitalize">

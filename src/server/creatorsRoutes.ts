@@ -156,6 +156,7 @@ creatorsRouter.post('/submissions', requireAuth, async (req: Request, res: Respo
         contentType,
         category,
         localityId: localityId || null,
+        externalCreatorHandle: (!profile && parsed.data.authorHandle) ? parsed.data.authorHandle : null,
       },
       validPlaceIds,
       primaryPlaceId || (validPlaceIds[0] || null)

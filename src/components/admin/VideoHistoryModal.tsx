@@ -10,7 +10,7 @@ interface VideoHistoryModalProps {
   videoTitle: string;
 }
 
-const statusBadgeColor = (status: ModerationStatus) => {
+const statusBadgeColor = (status?: ModerationStatus | null) => {
   switch (status) {
     case 'APPROVED':
       return 'bg-emerald-100 text-emerald-800 border-emerald-200';
@@ -23,8 +23,35 @@ const statusBadgeColor = (status: ModerationStatus) => {
     case 'HIDDEN':
       return 'bg-slate-200 text-slate-700 border-slate-300';
     default:
-      return 'bg-slate-100 text-slate-700 border-slate-200';
+      return 'bg-slate-100 text-slate-500 border-slate-200';
   }
+};
+
+const actionBadgeStyle = (action?: string) => {
+  switch (action) {
+    case 'CREATE':
+      return 'bg-emerald-500/10 text-emerald-700 border-emerald-300';
+    case 'APPROVE':
+      return 'bg-green-500/10 text-green-700 border-green-300';
+    case 'REJECT':
+      return 'bg-rose-500/10 text-rose-700 border-rose-300';
+    case 'OBSERVE':
+      return 'bg-amber-500/10 text-amber-700 border-amber-300';
+    case 'HIDE':
+      return 'bg-slate-500/10 text-slate-700 border-slate-300';
+    case 'UPDATE':
+    default:
+      return 'bg-sky-500/10 text-sky-700 border-sky-300';
+  }
+};
+
+const actionLabels: Record<string, string> = {
+  CREATE: 'REGISTRO DIRECTO',
+  UPDATE: 'EDICIÓN',
+  APPROVE: 'APROBADO',
+  REJECT: 'RECHAZADO',
+  OBSERVE: 'OBSERVADO',
+  HIDE: 'OCULTADO',
 };
 
 export const VideoHistoryModal: React.FC<VideoHistoryModalProps> = ({
@@ -94,46 +121,74 @@ export const VideoHistoryModal: React.FC<VideoHistoryModalProps> = ({
             </div>
           ) : (
             <div className="relative border-l-2 border-slate-200 ml-4 space-y-6">
-              {logs.map((log) => (
-                <div key={log.id} className="relative pl-6">
-                  {/* Timeline dot */}
-                  <div className="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-white border-2 border-[#E85B49]" />
+              {logs.map((log) => {
+                const actionKey = log.action || 'UPDATE';
+                return (
+                  <div key={log.id} className="relative pl-6">
+                    {/* Timeline dot */}
+                    <div className="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-white border-2 border-[#E85B49]" />
 
-                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-3.5 space-y-2 shadow-2xs">
-                    <div className="flex items-center justify-between flex-wrap gap-2">
-                      <div className="flex items-center gap-1.5 font-mono text-[10px]">
-                        <span className={`px-2 py-0.5 rounded border font-semibold ${statusBadgeColor(log.previousStatus)}`}>
-                          {log.previousStatus}
-                        </span>
-                        <ArrowRight className="w-3 h-3 text-slate-400" />
-                        <span className={`px-2 py-0.5 rounded border font-semibold ${statusBadgeColor(log.newStatus)}`}>
-                          {log.newStatus}
+                    <div className="bg-slate-50 border border-slate-200 rounded-lg p-3.5 space-y-2 shadow-2xs">
+                      <div className="flex items-center justify-between flex-wrap gap-2">
+                        <div className="flex items-center gap-2 font-mono text-[10px]">
+                          <span className={`px-2 py-0.5 rounded font-bold border tracking-wider uppercase text-[9px] ${actionBadgeStyle(actionKey)}`}>
+                            {actionLabels[actionKey] || actionKey}
+                          </span>
+                          {log.previousStatus ? (
+                            <div className="flex items-center gap-1.5">
+                              <span className={`px-2 py-0.5 rounded border font-semibold ${statusBadgeColor(log.previousStatus)}`}>
+                                {log.previousStatus}
+                              </span>
+                              <ArrowRight className="w-3 h-3 text-slate-400" />
+                              <span className={`px-2 py-0.5 rounded border font-semibold ${statusBadgeColor(log.newStatus)}`}>
+                                {log.newStatus}
+                              </span>
+                            </div>
+                          ) : (
+                            <span className={`px-2 py-0.5 rounded border font-semibold ${statusBadgeColor(log.newStatus)}`}>
+                              Estado: {log.newStatus}
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[10px] text-slate-400 font-mono">
+                          {new Date(log.createdAt).toLocaleString('es-PE')}
                         </span>
                       </div>
-                      <span className="text-[10px] text-slate-400 font-mono">
-                        {new Date(log.createdAt).toLocaleString('es-PE')}
-                      </span>
-                    </div>
 
-                    {log.reason && (
-                      <p className="text-xs font-medium text-slate-800">
-                        {log.reason}
-                      </p>
-                    )}
+                      {log.changedFields && log.changedFields.length > 0 && (
+                        <div className="flex items-center gap-1.5 flex-wrap text-[11px] text-slate-600">
+                          <span className="font-semibold text-slate-700">Campos modificados:</span>
+                          {log.changedFields.map((field) => (
+                            <span
+                              key={field}
+                              className="px-1.5 py-0.5 rounded bg-sky-100 text-sky-800 border border-sky-200 font-mono text-[10px]"
+                            >
+                              {field}
+                            </span>
+                          ))}
+                        </div>
+                      )}
 
-                    {log.internalNotes && (
-                      <div className="text-[11px] bg-slate-100 rounded px-2.5 py-1.5 text-slate-600 font-mono">
-                        <span className="font-semibold text-slate-700">Nota interna:</span> {log.internalNotes}
+                      {log.reason && (
+                        <p className="text-xs font-medium text-slate-800">
+                          {log.reason}
+                        </p>
+                      )}
+
+                      {log.internalNotes && (
+                        <div className="text-[11px] bg-slate-100 rounded px-2.5 py-1.5 text-slate-600 font-mono">
+                          <span className="font-semibold text-slate-700">Nota interna:</span> {log.internalNotes}
+                        </div>
+                      )}
+
+                      <div className="flex items-center gap-1.5 text-[11px] text-slate-500 pt-1 border-t border-slate-100">
+                        <User className="w-3 h-3 text-slate-400" />
+                        <span>{log.adminName}</span>
                       </div>
-                    )}
-
-                    <div className="flex items-center gap-1.5 text-[11px] text-slate-500 pt-1 border-t border-slate-100">
-                      <User className="w-3 h-3 text-slate-400" />
-                      <span>{log.adminName}</span>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

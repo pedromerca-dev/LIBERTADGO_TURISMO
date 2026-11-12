@@ -202,7 +202,8 @@ describe('videoAdapter: Data Adaptation & Metrics Isolation', () => {
     assert.equal(adapted.externalComments, null);
     assert.equal(adapted.internalViews, 5);
     assert.equal(adapted.internalSaves, 2);
-    assert.equal(adapted.creator, 'Ana Torres');
+    // Prioritizes external creator identity (@nuevo from videoUrl) over userName (Ana Torres)
+    assert.equal(adapted.creator, '@nuevo');
     assert.equal(adapted.placeName, 'La Libertad');
     assert.equal(adapted.locality, 'Huanchaco');
   });

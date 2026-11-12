@@ -10,6 +10,8 @@ import {
   VideoModerationLog,
   VideoPlatform,
   ModerationStatus,
+  ModerationActionType,
+  ModerationAuditPayload,
 } from '../../types/creators.ts';
 import { Place } from '../../types/catalog.ts';
 
@@ -74,7 +76,8 @@ export interface ICreatorsRepository {
       externalCreatorAvatarUrl?: string | null;
     },
     placeIds?: string[],
-    primaryPlaceId?: string | null
+    primaryPlaceId?: string | null,
+    audit?: ModerationAuditPayload
   ): Promise<VideoSubmission>;
   updateSubmission(
     id: string,
@@ -92,13 +95,16 @@ export interface ICreatorsRepository {
       externalCreatorAvatarUrl: string | null;
     }>,
     placeIds?: string[],
-    primaryPlaceId?: string | null
+    primaryPlaceId?: string | null,
+    audit?: ModerationAuditPayload
   ): Promise<VideoSubmission | null>;
   updateSubmissionStatus(
     id: string,
     status: ModerationStatus,
     notes?: string | null,
-    adminUserId?: string
+    adminUserId?: string,
+    audit?: ModerationAuditPayload,
+    placeIds?: string[]
   ): Promise<VideoSubmission | null>;
   listApprovedVideos(
     filters?: VideoFilterOptions
@@ -111,10 +117,12 @@ export interface ICreatorsRepository {
     videoId: string;
     adminUserId: string;
     adminName: string;
-    previousStatus: ModerationStatus;
+    action?: ModerationActionType;
+    previousStatus?: ModerationStatus | null;
     newStatus: ModerationStatus;
     reason?: string | null;
     internalNotes?: string | null;
+    changedFields?: string[] | null;
   }): Promise<VideoModerationLog>;
   getModerationLogs(videoId: string): Promise<VideoModerationLog[]>;
 

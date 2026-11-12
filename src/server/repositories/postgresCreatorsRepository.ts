@@ -18,9 +18,101 @@ import {
   VideoModerationLog,
   VideoPlatform,
   ModerationStatus,
+  ModerationActionType,
+  ModerationAuditPayload,
 } from '../../types/creators.ts';
 import { Place } from '../../types/catalog.ts';
 import { INITIAL_PLACES } from '../../data/initialPlaces.ts';
+
+const AUDIT_META_PREFIX = '__AUDIT_META__:';
+const AUDIT_META_SUFFIX = ':__AUDIT_END__';
+
+export function serializeInternalNotes(
+  action: ModerationActionType,
+  changedFields?: string[] | null,
+  internalNotes?: string | null
+): string {
+  const meta = {
+    action,
+    changedFields: changedFields || null,
+  };
+  const metaStr = `${AUDIT_META_PREFIX}${JSON.stringify(meta)}${AUDIT_META_SUFFIX}`;
+  return internalNotes ? `${metaStr} ${internalNotes}` : metaStr;
+}
+
+export function parseModerationLogRow(row: any): VideoModerationLog {
+  let action: ModerationActionType = 'UPDATE';
+  let changedFields: string[] | null = null;
+  let cleanNotes = row.internalNotes;
+
+  if (row.action) {
+    action = row.action;
+    changedFields = row.changedFields || null;
+  } else if (typeof row.internalNotes === 'string' && row.internalNotes.includes(AUDIT_META_PREFIX)) {
+    try {
+      const start = row.internalNotes.indexOf(AUDIT_META_PREFIX);
+      const end = row.internalNotes.indexOf(AUDIT_META_SUFFIX, start);
+      if (start !== -1 && end !== -1) {
+        const jsonStr = row.internalNotes.substring(start + AUDIT_META_PREFIX.length, end);
+        const meta = JSON.parse(jsonStr);
+        if (meta.action) action = meta.action;
+        if (meta.changedFields) changedFields = meta.changedFields;
+        cleanNotes = (row.internalNotes.substring(0, start) + row.internalNotes.substring(end + AUDIT_META_SUFFIX.length)).trim() || null;
+      }
+    } catch {
+      // fallback
+    }
+  } else {
+    // Inference from status transition
+    if (row.previousStatus === 'NONE' || !row.previousStatus) {
+      action = 'CREATE';
+    } else if (row.previousStatus === row.newStatus) {
+      action = 'UPDATE';
+    } else if (row.newStatus === 'APPROVED') {
+      action = 'APPROVE';
+    } else if (row.newStatus === 'REJECTED') {
+      action = 'REJECT';
+    } else if (row.newStatus === 'OBSERVED') {
+      action = 'OBSERVE';
+    } else if (row.newStatus === 'HIDDEN') {
+      action = 'HIDE';
+    }
+  }
+
+  return {
+    id: row.id,
+    videoId: row.videoId,
+    adminUserId: row.adminUserId,
+    adminName: row.adminName,
+    action,
+    previousStatus: row.previousStatus === 'NONE' || !row.previousStatus ? null : row.previousStatus,
+    newStatus: row.newStatus,
+    reason: row.reason || null,
+    internalNotes: cleanNotes,
+    changedFields,
+    createdAt: row.createdAt instanceof Date ? row.createdAt.toISOString() : String(row.createdAt),
+  };
+}
+
+export function mapVideoSubmissionRow(row: any): VideoSubmission {
+  if (!row) return row;
+  let metrics = row.externalMetrics;
+  if (typeof metrics === 'string') {
+    try {
+      metrics = JSON.parse(metrics);
+    } catch {
+      metrics = null;
+    }
+  }
+
+  return {
+    ...row,
+    externalMetrics: metrics || null,
+    externalCreatorHandle: row.externalCreatorHandle || metrics?.creatorHandle || null,
+    externalCreatorDisplayName: row.externalCreatorDisplayName || metrics?.creatorDisplayName || null,
+    externalCreatorAvatarUrl: row.externalCreatorAvatarUrl || metrics?.creatorAvatarUrl || null,
+  };
+}
 
 export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRepository {
   private pool: Pool;
@@ -121,7 +213,7 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
        FROM video_submissions WHERE id = $1 LIMIT 1`,
       [id]
     );
-    return res.rows[0] || null;
+    return res.rows[0] ? mapVideoSubmissionRow(res.rows[0]) : null;
   }
 
   async findSubmissionByPlatformAndExternalId(
@@ -138,7 +230,7 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
        FROM video_submissions WHERE platform = $1 AND external_video_id = $2 LIMIT 1`,
       [platform, externalVideoId]
     );
-    return res.rows[0] || null;
+    return res.rows[0] ? mapVideoSubmissionRow(res.rows[0]) : null;
   }
 
   async createSubmission(
@@ -156,13 +248,24 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
       category: string;
       localityId?: string | null;
       status?: ModerationStatus;
+      externalCreatorHandle?: string | null;
+      externalCreatorDisplayName?: string | null;
+      externalCreatorAvatarUrl?: string | null;
     },
     placeIds: string[] = [],
-    primaryPlaceId?: string | null
+    primaryPlaceId?: string | null,
+    audit?: ModerationAuditPayload
   ): Promise<VideoSubmission> {
     const id = `vid_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
     const client = await this.pool.connect();
     const initialStatus = data.status || 'PENDING';
+
+    const externalMetrics = {
+      ...(data.externalCreatorHandle ? { creatorHandle: data.externalCreatorHandle } : {}),
+      ...(data.externalCreatorDisplayName ? { creatorDisplayName: data.externalCreatorDisplayName } : {}),
+      ...(data.externalCreatorAvatarUrl ? { creatorAvatarUrl: data.externalCreatorAvatarUrl } : {}),
+    };
+    const metricsParam = Object.keys(externalMetrics).length > 0 ? JSON.stringify(externalMetrics) : null;
 
     try {
       await client.query('BEGIN');
@@ -171,8 +274,8 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
         `INSERT INTO video_submissions (
           id, user_id, creator_profile_id, platform, external_video_id,
           video_url, embed_url, thumbnail_url, title, description,
-          content_type, category, locality_id, status
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+          content_type, category, locality_id, status, external_metrics
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15::jsonb)
         RETURNING id, user_id as "userId", creator_profile_id as "creatorProfileId", platform, external_video_id as "externalVideoId",
                   video_url as "videoUrl", embed_url as "embedUrl", thumbnail_url as "thumbnailUrl", title, description,
                   content_type as "contentType", category, locality_id as "localityId", status, moderation_notes as "moderationNotes",
@@ -194,10 +297,11 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
           data.category,
           data.localityId || null,
           initialStatus,
+          metricsParam,
         ]
       );
 
-      const submission: VideoSubmission = res.rows[0];
+      const submission: VideoSubmission = mapVideoSubmissionRow(res.rows[0]);
 
       // Associate places
       for (const pId of placeIds) {
@@ -208,6 +312,18 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
            VALUES ($1, $2, $3, $4)
            ON CONFLICT (video_id, place_id) DO NOTHING`,
           [vpId, id, pId, isPrimary]
+        );
+      }
+
+      // Record audit log within the SAME atomic transaction
+      if (audit) {
+        const logId = `mod_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+        const encodedNotes = serializeInternalNotes(audit.action, audit.changedFields, audit.internalNotes);
+        const dbPrevStatus = audit.previousStatus || 'NONE';
+        await client.query(
+          `INSERT INTO video_moderation_logs (id, video_id, admin_user_id, admin_name, previous_status, new_status, reason, internal_notes)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+          [logId, id, audit.adminUserId, audit.adminName, dbPrevStatus, audit.newStatus, audit.reason || null, encodedNotes]
         );
       }
 
@@ -232,74 +348,198 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
       thumbnailUrl: string | null;
       creatorProfileId: string | null;
       status: ModerationStatus;
+      externalCreatorHandle: string | null;
+      externalCreatorDisplayName: string | null;
+      externalCreatorAvatarUrl: string | null;
     }>,
     placeIds?: string[],
-    primaryPlaceId?: string | null
+    primaryPlaceId?: string | null,
+    audit?: ModerationAuditPayload
   ): Promise<VideoSubmission | null> {
-    const existing = await this.findSubmissionById(id);
-    if (!existing) return null;
+    const client = await this.pool.connect();
+    try {
+      await client.query('BEGIN');
 
-    const res = await this.pool.query(
-      `UPDATE video_submissions
-       SET title = COALESCE($1, title),
-           description = COALESCE($2, description),
-           content_type = COALESCE($3, content_type),
-           category = COALESCE($4, category),
-           locality_id = COALESCE($5, locality_id),
-           thumbnail_url = COALESCE($6, thumbnail_url),
-           creator_profile_id = COALESCE($7, creator_profile_id),
-           status = COALESCE($8, status),
-           updated_at = NOW()
-       WHERE id = $9
-       RETURNING id, user_id as "userId", creator_profile_id as "creatorProfileId", platform, external_video_id as "externalVideoId",
-                 video_url as "videoUrl", embed_url as "embedUrl", thumbnail_url as "thumbnailUrl", title, description,
-                 content_type as "contentType", category, locality_id as "localityId", status, moderation_notes as "moderationNotes",
-                 moderated_by as "moderatedBy", moderated_at as "moderatedAt", internal_views_count as "internalViewsCount",
-                 internal_saves_count as "internalSavesCount", external_metrics as "externalMetrics",
-                 created_at as "createdAt", updated_at as "updatedAt"`,
-      [
-        data.title,
-        data.description,
-        data.contentType,
-        data.category,
-        data.localityId,
-        data.thumbnailUrl,
-        data.creatorProfileId,
-        data.status,
-        id,
-      ]
-    );
+      const existingRes = await client.query(
+        `SELECT id, user_id as "userId", creator_profile_id as "creatorProfileId", platform, external_video_id as "externalVideoId",
+                video_url as "videoUrl", embed_url as "embedUrl", thumbnail_url as "thumbnailUrl", title, description,
+                content_type as "contentType", category, locality_id as "localityId", status, moderation_notes as "moderationNotes",
+                moderated_by as "moderatedBy", moderated_at as "moderatedAt", internal_views_count as "internalViewsCount",
+                internal_saves_count as "internalSavesCount", external_metrics as "externalMetrics",
+                created_at as "createdAt", updated_at as "updatedAt"
+         FROM video_submissions WHERE id = $1 FOR UPDATE`,
+        [id]
+      );
 
-    if (placeIds && Array.isArray(placeIds)) {
-      await this.associatePlaces(id, placeIds, primaryPlaceId);
+      if (existingRes.rows.length === 0) {
+        await client.query('ROLLBACK');
+        return null;
+      }
+
+      const existing = mapVideoSubmissionRow(existingRes.rows[0]);
+
+      let metricsJson: string | null = null;
+      if (
+        data.externalCreatorHandle !== undefined ||
+        data.externalCreatorDisplayName !== undefined ||
+        data.externalCreatorAvatarUrl !== undefined
+      ) {
+        const mergedMetrics = {
+          ...(existing.externalMetrics || {}),
+          ...(data.externalCreatorHandle !== undefined ? { creatorHandle: data.externalCreatorHandle } : {}),
+          ...(data.externalCreatorDisplayName !== undefined ? { creatorDisplayName: data.externalCreatorDisplayName } : {}),
+          ...(data.externalCreatorAvatarUrl !== undefined ? { creatorAvatarUrl: data.externalCreatorAvatarUrl } : {}),
+        };
+        metricsJson = JSON.stringify(mergedMetrics);
+      }
+
+      const res = await client.query(
+        `UPDATE video_submissions
+         SET title = COALESCE($1, title),
+             description = COALESCE($2, description),
+             content_type = COALESCE($3, content_type),
+             category = COALESCE($4, category),
+             locality_id = COALESCE($5, locality_id),
+             thumbnail_url = COALESCE($6, thumbnail_url),
+             creator_profile_id = COALESCE($7, creator_profile_id),
+             status = COALESCE($8, status),
+             external_metrics = CASE WHEN $9::text IS NOT NULL THEN $9::jsonb ELSE external_metrics END,
+             updated_at = NOW()
+         WHERE id = $10
+         RETURNING id, user_id as "userId", creator_profile_id as "creatorProfileId", platform, external_video_id as "externalVideoId",
+                   video_url as "videoUrl", embed_url as "embedUrl", thumbnail_url as "thumbnailUrl", title, description,
+                   content_type as "contentType", category, locality_id as "localityId", status, moderation_notes as "moderationNotes",
+                   moderated_by as "moderatedBy", moderated_at as "moderatedAt", internal_views_count as "internalViewsCount",
+                   internal_saves_count as "internalSavesCount", external_metrics as "externalMetrics",
+                   created_at as "createdAt", updated_at as "updatedAt"`,
+        [
+          data.title,
+          data.description,
+          data.contentType,
+          data.category,
+          data.localityId,
+          data.thumbnailUrl,
+          data.creatorProfileId,
+          data.status,
+          metricsJson,
+          id,
+        ]
+      );
+
+      // Associate places in the same transaction
+      if (placeIds && Array.isArray(placeIds)) {
+        await client.query(`DELETE FROM video_places WHERE video_id = $1`, [id]);
+        for (const pId of placeIds) {
+          const isPrimary = primaryPlaceId ? primaryPlaceId === pId : placeIds[0] === pId;
+          const vpId = `vp_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+          await client.query(
+            `INSERT INTO video_places (id, video_id, place_id, is_primary)
+             VALUES ($1, $2, $3, $4)
+             ON CONFLICT (video_id, place_id) DO NOTHING`,
+            [vpId, id, pId, isPrimary]
+          );
+        }
+      }
+
+      // Record audit log within the SAME atomic transaction
+      if (audit) {
+        const logId = `mod_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+        const encodedNotes = serializeInternalNotes(audit.action, audit.changedFields, audit.internalNotes);
+        const dbPrevStatus = audit.previousStatus || existing.status || 'NONE';
+        await client.query(
+          `INSERT INTO video_moderation_logs (id, video_id, admin_user_id, admin_name, previous_status, new_status, reason, internal_notes)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+          [logId, id, audit.adminUserId, audit.adminName, dbPrevStatus, audit.newStatus, audit.reason || null, encodedNotes]
+        );
+      }
+
+      await client.query('COMMIT');
+      return res.rows[0] ? mapVideoSubmissionRow(res.rows[0]) : null;
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
     }
-
-    return res.rows[0] || null;
   }
 
   async updateSubmissionStatus(
     id: string,
     status: ModerationStatus,
     notes?: string | null,
-    adminUserId?: string
+    adminUserId?: string,
+    audit?: ModerationAuditPayload,
+    placeIds?: string[]
   ): Promise<VideoSubmission | null> {
-    const res = await this.pool.query(
-      `UPDATE video_submissions
-       SET status = $1,
-           moderation_notes = $2,
-           moderated_by = $3,
-           moderated_at = NOW(),
-           updated_at = NOW()
-       WHERE id = $4
-       RETURNING id, user_id as "userId", creator_profile_id as "creatorProfileId", platform, external_video_id as "externalVideoId",
-                 video_url as "videoUrl", embed_url as "embedUrl", thumbnail_url as "thumbnailUrl", title, description,
-                 content_type as "contentType", category, locality_id as "localityId", status, moderation_notes as "moderationNotes",
-                 moderated_by as "moderatedBy", moderated_at as "moderatedAt", internal_views_count as "internalViewsCount",
-                 internal_saves_count as "internalSavesCount", external_metrics as "externalMetrics",
-                 created_at as "createdAt", updated_at as "updatedAt"`,
-      [status, notes || null, adminUserId || null, id]
-    );
-    return res.rows[0] || null;
+    const client = await this.pool.connect();
+    try {
+      await client.query('BEGIN');
+
+      const existingRes = await client.query(
+        `SELECT id, status FROM video_submissions WHERE id = $1 FOR UPDATE`,
+        [id]
+      );
+
+      if (existingRes.rows.length === 0) {
+        await client.query('ROLLBACK');
+        return null;
+      }
+
+      const prevStatus = existingRes.rows[0].status;
+
+      const res = await client.query(
+        `UPDATE video_submissions
+         SET status = $1,
+             moderation_notes = $2,
+             moderated_by = $3,
+             moderated_at = NOW(),
+             updated_at = NOW()
+         WHERE id = $4
+         RETURNING id, user_id as "userId", creator_profile_id as "creatorProfileId", platform, external_video_id as "externalVideoId",
+                   video_url as "videoUrl", embed_url as "embedUrl", thumbnail_url as "thumbnailUrl", title, description,
+                   content_type as "contentType", category, locality_id as "localityId", status, moderation_notes as "moderationNotes",
+                   moderated_by as "moderatedBy", moderated_at as "moderatedAt", internal_views_count as "internalViewsCount",
+                   internal_saves_count as "internalSavesCount", external_metrics as "externalMetrics",
+                   created_at as "createdAt", updated_at as "updatedAt"`,
+        [status, notes || null, adminUserId || null, id]
+      );
+
+      // Update places if verified places provided
+      if (placeIds && Array.isArray(placeIds)) {
+        await client.query(`DELETE FROM video_places WHERE video_id = $1`, [id]);
+        for (let i = 0; i < placeIds.length; i++) {
+          const pId = placeIds[i];
+          const isPrimary = i === 0;
+          const vpId = `vp_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+          await client.query(
+            `INSERT INTO video_places (id, video_id, place_id, is_primary)
+             VALUES ($1, $2, $3, $4)
+             ON CONFLICT (video_id, place_id) DO NOTHING`,
+            [vpId, id, pId, isPrimary]
+          );
+        }
+      }
+
+      // Record audit log within the SAME atomic transaction
+      if (audit) {
+        const logId = `mod_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+        const encodedNotes = serializeInternalNotes(audit.action, audit.changedFields, audit.internalNotes || notes);
+        const dbPrevStatus = audit.previousStatus || prevStatus || 'NONE';
+        await client.query(
+          `INSERT INTO video_moderation_logs (id, video_id, admin_user_id, admin_name, previous_status, new_status, reason, internal_notes)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+          [logId, id, audit.adminUserId, audit.adminName, dbPrevStatus, audit.newStatus, audit.reason || null, encodedNotes]
+        );
+      }
+
+      await client.query('COMMIT');
+      return res.rows[0] ? mapVideoSubmissionRow(res.rows[0]) : null;
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
+    }
   }
 
   async listApprovedVideos(
@@ -401,7 +641,7 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
     }
 
     const videosWithPlaces = res.rows.map((v: VideoSubmission) => ({
-      ...v,
+      ...mapVideoSubmissionRow(v),
       places: placesByVideoId[v.id] || [],
     }));
 
@@ -421,7 +661,7 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
        ORDER BY created_at DESC`,
       [userId]
     );
-    return res.rows;
+    return res.rows.map(mapVideoSubmissionRow);
   }
 
   async listModerationQueue(status: ModerationStatus = 'PENDING'): Promise<VideoSubmission[]> {
@@ -437,28 +677,50 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
        ORDER BY created_at ASC`,
       [status]
     );
-    return res.rows;
+    return res.rows.map(mapVideoSubmissionRow);
   }
 
   async addModerationLog(log: {
     videoId: string;
     adminUserId: string;
     adminName: string;
-    previousStatus: ModerationStatus;
+    previousStatus?: ModerationStatus | null;
     newStatus: ModerationStatus;
     reason?: string | null;
     internalNotes?: string | null;
+    action?: ModerationActionType;
+    changedFields?: string[] | null;
   }): Promise<VideoModerationLog> {
     const id = `mod_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+    let action = log.action;
+    if (!action) {
+      if (log.previousStatus === null || log.previousStatus === undefined) {
+        action = 'CREATE';
+      } else if (log.previousStatus === log.newStatus) {
+        action = 'UPDATE';
+      } else if (log.newStatus === 'APPROVED') {
+        action = 'APPROVE';
+      } else if (log.newStatus === 'REJECTED') {
+        action = 'REJECT';
+      } else if (log.newStatus === 'OBSERVED') {
+        action = 'OBSERVE';
+      } else if (log.newStatus === 'HIDDEN') {
+        action = 'HIDE';
+      } else {
+        action = 'UPDATE';
+      }
+    }
+    const encodedNotes = serializeInternalNotes(action, log.changedFields, log.internalNotes);
+    const dbPrevStatus = log.previousStatus || 'NONE';
     const res = await this.pool.query(
       `INSERT INTO video_moderation_logs (id, video_id, admin_user_id, admin_name, previous_status, new_status, reason, internal_notes)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
        RETURNING id, video_id as "videoId", admin_user_id as "adminUserId", admin_name as "adminName",
                  previous_status as "previousStatus", new_status as "newStatus", reason, internal_notes as "internalNotes",
                  created_at as "createdAt"`,
-      [id, log.videoId, log.adminUserId, log.adminName, log.previousStatus, log.newStatus, log.reason || null, log.internalNotes || null]
+      [id, log.videoId, log.adminUserId, log.adminName, dbPrevStatus, log.newStatus, log.reason || null, encodedNotes]
     );
-    return res.rows[0];
+    return parseModerationLogRow(res.rows[0]);
   }
 
   async getModerationLogs(videoId: string): Promise<VideoModerationLog[]> {
@@ -471,7 +733,7 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
        ORDER BY created_at DESC`,
       [videoId]
     );
-    return res.rows;
+    return res.rows.map(parseModerationLogRow);
   }
 
   async associatePlaces(
@@ -526,7 +788,7 @@ export class PostgresCreatorsRepository implements IAuthRepository, ICreatorsRep
        ORDER BY vs.created_at DESC`,
       [placeId]
     );
-    return res.rows;
+    return res.rows.map(mapVideoSubmissionRow);
   }
 
   async findCreatorProfileByUserId(userId: string): Promise<CreatorProfile | null> {

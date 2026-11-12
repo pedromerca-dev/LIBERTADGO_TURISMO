@@ -54,6 +54,9 @@ export const VideoEditorModal: React.FC<VideoEditorModalProps> = ({
   const [category, setCategory] = useState('restaurantes');
   const [localityId, setLocalityId] = useState('trujillo');
   const [creatorProfileId, setCreatorProfileId] = useState<string>('');
+  const [externalCreatorHandle, setExternalCreatorHandle] = useState('');
+  const [externalCreatorDisplayName, setExternalCreatorDisplayName] = useState('');
+  const [externalCreatorAvatarUrl, setExternalCreatorAvatarUrl] = useState('');
   const [thumbnailUrl, setThumbnailUrl] = useState('');
   const [selectedPlaceIds, setSelectedPlaceIds] = useState<string[]>([]);
   const [primaryPlaceId, setPrimaryPlaceId] = useState<string>('');
@@ -79,6 +82,21 @@ export const VideoEditorModal: React.FC<VideoEditorModalProps> = ({
       setCategory(initialVideo.category);
       setLocalityId(initialVideo.localityId || 'trujillo');
       setCreatorProfileId(initialVideo.creatorProfileId || '');
+      setExternalCreatorHandle(
+        initialVideo.externalCreatorHandle ||
+        (initialVideo.externalMetrics as any)?.creatorHandle ||
+        ''
+      );
+      setExternalCreatorDisplayName(
+        initialVideo.externalCreatorDisplayName ||
+        (initialVideo.externalMetrics as any)?.creatorDisplayName ||
+        ''
+      );
+      setExternalCreatorAvatarUrl(
+        initialVideo.externalCreatorAvatarUrl ||
+        (initialVideo.externalMetrics as any)?.creatorAvatarUrl ||
+        ''
+      );
       setThumbnailUrl(initialVideo.thumbnailUrl || '');
       setStatus(initialVideo.status);
 
@@ -94,6 +112,9 @@ export const VideoEditorModal: React.FC<VideoEditorModalProps> = ({
       setCategory('restaurantes');
       setLocalityId('trujillo');
       setCreatorProfileId('');
+      setExternalCreatorHandle('');
+      setExternalCreatorDisplayName('');
+      setExternalCreatorAvatarUrl('');
       setThumbnailUrl('');
       setSelectedPlaceIds([]);
       setPrimaryPlaceId('');
@@ -121,6 +142,10 @@ export const VideoEditorModal: React.FC<VideoEditorModalProps> = ({
       // Auto-fill title if empty
       if (!title && parsed.data.platform === 'tiktok') {
         setTitle(`Experiencia turística TikTok en La Libertad`);
+      }
+      // Auto-detect author handle if creatorProfileId is not assigned
+      if (parsed.data.authorHandle && !creatorProfileId && !externalCreatorHandle) {
+        setExternalCreatorHandle(parsed.data.authorHandle);
       }
     } else {
       setUrlValidation({
@@ -185,6 +210,9 @@ export const VideoEditorModal: React.FC<VideoEditorModalProps> = ({
         localityId: localityId || null,
         thumbnailUrl: thumbnailUrl.trim() || null,
         creatorProfileId: creatorProfileId || null,
+        externalCreatorHandle: externalCreatorHandle.trim() ? externalCreatorHandle.trim().replace(/^@+/, '') : null,
+        externalCreatorDisplayName: externalCreatorDisplayName.trim() || null,
+        externalCreatorAvatarUrl: externalCreatorAvatarUrl.trim() || null,
         placeIds: selectedPlaceIds,
         primaryPlaceId: primaryPlaceId || selectedPlaceIds[0] || null,
         status,
@@ -406,6 +434,53 @@ export const VideoEditorModal: React.FC<VideoEditorModalProps> = ({
               </select>
             </div>
           </div>
+
+          {/* External Creator Attribution Fields (when no registered profile is selected) */}
+          {!creatorProfileId && (
+            <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-bold text-slate-800">
+                  Identidad del Creador Original (TikTok / Instagram / YouTube)
+                </label>
+                <span className="text-[11px] text-slate-500">
+                  Conserva la autoría del creador sin atribuir al administrador
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="block text-[11px] font-semibold text-slate-700">
+                    Handle / Usuario Externo
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-bold">@</span>
+                    <input
+                      type="text"
+                      value={externalCreatorHandle.replace(/^@+/, '')}
+                      onChange={(e) => setExternalCreatorHandle(e.target.value.trim().replace(/^@+/, ''))}
+                      placeholder="viajerotrujillano"
+                      className="w-full text-xs p-2 pl-7 bg-white border border-slate-300 rounded-lg focus:outline-none focus:border-[#E85B49]"
+                    />
+                  </div>
+                  <p className="text-[10px] text-slate-400">Ejemplo: @viajerotrujillano (sin arroba)</p>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="block text-[11px] font-semibold text-slate-700">
+                    Nombre Público del Creador (Opcional)
+                  </label>
+                  <input
+                    type="text"
+                    value={externalCreatorDisplayName}
+                    onChange={(e) => setExternalCreatorDisplayName(e.target.value)}
+                    placeholder="Viajero Trujillano Oficial"
+                    className="w-full text-xs p-2 bg-white border border-slate-300 rounded-lg focus:outline-none focus:border-[#E85B49]"
+                  />
+                  <p className="text-[10px] text-slate-400">Si se omite, se mostrará el @handle o "Creador de contenido"</p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Place Association: Search & Multi-select */}
           <div className="space-y-2 pt-2 border-t border-slate-200">

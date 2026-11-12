@@ -188,6 +188,24 @@ export const AdminCreateVideoSchema = z.object({
     .optional()
     .nullable(),
   status: z.enum(['PENDING', 'APPROVED']).default('APPROVED'),
+  externalCreatorHandle: z
+    .string()
+    .trim()
+    .max(100, 'El handle no puede exceder 100 caracteres')
+    .optional()
+    .nullable(),
+  externalCreatorDisplayName: z
+    .string()
+    .trim()
+    .max(150, 'El nombre no puede exceder 150 caracteres')
+    .optional()
+    .nullable(),
+  externalCreatorAvatarUrl: z
+    .string()
+    .trim()
+    .url('La URL del avatar no es válida')
+    .optional()
+    .nullable(),
 });
 
 export const AdminUpdateVideoSchema = z.object({
@@ -239,6 +257,24 @@ export const AdminUpdateVideoSchema = z.object({
     .optional()
     .nullable(),
   status: z.enum(['PENDING', 'APPROVED', 'OBSERVED', 'REJECTED', 'HIDDEN']).optional(),
+  externalCreatorHandle: z
+    .string()
+    .trim()
+    .max(100, 'El handle no puede exceder 100 caracteres')
+    .optional()
+    .nullable(),
+  externalCreatorDisplayName: z
+    .string()
+    .trim()
+    .max(150, 'El nombre no puede exceder 150 caracteres')
+    .optional()
+    .nullable(),
+  externalCreatorAvatarUrl: z
+    .string()
+    .trim()
+    .url('La URL del avatar no es válida')
+    .optional()
+    .nullable(),
 });
 
 export const AdminCreateCreatorSchema = z.object({

@@ -17,6 +17,8 @@ import {
   VideoModerationLog,
   VideoPlatform,
   ModerationStatus,
+  ModerationActionType,
+  ModerationAuditPayload,
   VideoPlace,
   SavedVideo,
 } from '../../types/creators.ts';
@@ -118,7 +120,8 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
       externalCreatorAvatarUrl?: string | null;
     },
     placeIds: string[] = [],
-    primaryPlaceId?: string | null
+    primaryPlaceId?: string | null,
+    audit?: ModerationAuditPayload
   ): Promise<VideoSubmission> {
     const id = `vid_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
     const now = new Date().toISOString();
@@ -155,6 +158,20 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
       await this.associatePlaces(id, placeIds, primaryPlaceId);
     }
 
+    if (audit) {
+      await this.addModerationLog({
+        videoId: id,
+        adminUserId: audit.adminUserId,
+        adminName: audit.adminName,
+        action: audit.action || 'CREATE',
+        previousStatus: audit.previousStatus ?? null,
+        newStatus: audit.newStatus,
+        reason: audit.reason || null,
+        internalNotes: audit.internalNotes || null,
+        changedFields: audit.changedFields || null,
+      });
+    }
+
     return { ...submission };
   }
 
@@ -174,7 +191,8 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
       externalCreatorAvatarUrl: string | null;
     }>,
     placeIds?: string[],
-    primaryPlaceId?: string | null
+    primaryPlaceId?: string | null,
+    audit?: ModerationAuditPayload
   ): Promise<VideoSubmission | null> {
     const sub = this.videoSubmissions.get(id);
     if (!sub) return null;
@@ -192,6 +210,17 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
       externalCreatorHandle: data.externalCreatorHandle !== undefined ? data.externalCreatorHandle : sub.externalCreatorHandle,
       externalCreatorDisplayName: data.externalCreatorDisplayName !== undefined ? data.externalCreatorDisplayName : sub.externalCreatorDisplayName,
       externalCreatorAvatarUrl: data.externalCreatorAvatarUrl !== undefined ? data.externalCreatorAvatarUrl : sub.externalCreatorAvatarUrl,
+      externalMetrics:
+        data.externalCreatorHandle !== undefined ||
+        data.externalCreatorDisplayName !== undefined ||
+        data.externalCreatorAvatarUrl !== undefined
+          ? {
+              ...(sub.externalMetrics || {}),
+              ...(data.externalCreatorHandle !== undefined ? { creatorHandle: data.externalCreatorHandle } : {}),
+              ...(data.externalCreatorDisplayName !== undefined ? { creatorDisplayName: data.externalCreatorDisplayName } : {}),
+              ...(data.externalCreatorAvatarUrl !== undefined ? { creatorAvatarUrl: data.externalCreatorAvatarUrl } : {}),
+            }
+          : sub.externalMetrics,
       updatedAt: new Date().toISOString(),
     };
 
@@ -201,6 +230,20 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
       await this.associatePlaces(id, placeIds, primaryPlaceId);
     }
 
+    if (audit) {
+      await this.addModerationLog({
+        videoId: id,
+        adminUserId: audit.adminUserId,
+        adminName: audit.adminName,
+        action: audit.action || 'UPDATE',
+        previousStatus: audit.previousStatus ?? sub.status,
+        newStatus: audit.newStatus ?? (data.status ?? sub.status),
+        reason: audit.reason || null,
+        internalNotes: audit.internalNotes || null,
+        changedFields: audit.changedFields || null,
+      });
+    }
+
     return { ...updated };
   }
 
@@ -208,11 +251,14 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
     id: string,
     status: ModerationStatus,
     notes?: string | null,
-    adminUserId?: string
+    adminUserId?: string,
+    audit?: ModerationAuditPayload,
+    placeIds?: string[]
   ): Promise<VideoSubmission | null> {
     const sub = this.videoSubmissions.get(id);
     if (!sub) return null;
 
+    const prevStatus = sub.status;
     const updated: VideoSubmission = {
       ...sub,
       status,
@@ -223,6 +269,25 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
     };
 
     this.videoSubmissions.set(id, updated);
+
+    if (placeIds && Array.isArray(placeIds)) {
+      await this.associatePlaces(id, placeIds);
+    }
+
+    if (audit) {
+      await this.addModerationLog({
+        videoId: id,
+        adminUserId: audit.adminUserId,
+        adminName: audit.adminName,
+        action: audit.action || (status === 'APPROVED' ? 'APPROVE' : status === 'REJECTED' ? 'REJECT' : status === 'OBSERVED' ? 'OBSERVE' : status === 'HIDDEN' ? 'HIDE' : 'UPDATE'),
+        previousStatus: audit.previousStatus ?? prevStatus,
+        newStatus: audit.newStatus ?? status,
+        reason: audit.reason || null,
+        internalNotes: audit.internalNotes || notes || null,
+        changedFields: audit.changedFields || null,
+      });
+    }
+
     return { ...updated };
   }
 
@@ -286,7 +351,7 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
         const places = await this.getPlacesForVideo(v.id);
         const creatorProfile = v.creatorProfileId
           ? Array.from(this.creatorProfiles.values()).find((cp) => cp.id === v.creatorProfileId)
-          : null;
+          : (this.creatorProfiles.get(v.userId) || null);
         const user = this.users.get(v.userId);
 
         return {
@@ -332,17 +397,43 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
     videoId: string;
     adminUserId: string;
     adminName: string;
-    previousStatus: ModerationStatus;
+    action?: ModerationActionType;
+    previousStatus?: ModerationStatus | null;
     newStatus: ModerationStatus;
     reason?: string | null;
     internalNotes?: string | null;
+    changedFields?: string[] | null;
   }): Promise<VideoModerationLog> {
     const id = `mod_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+    let action = log.action;
+    if (!action) {
+      if (log.previousStatus === null || log.previousStatus === undefined) {
+        action = 'CREATE';
+      } else if (log.previousStatus === log.newStatus) {
+        action = 'UPDATE';
+      } else if (log.newStatus === 'APPROVED') {
+        action = 'APPROVE';
+      } else if (log.newStatus === 'REJECTED') {
+        action = 'REJECT';
+      } else if (log.newStatus === 'OBSERVED') {
+        action = 'OBSERVE';
+      } else if (log.newStatus === 'HIDDEN') {
+        action = 'HIDE';
+      } else {
+        action = 'UPDATE';
+      }
+    }
     const newLog: VideoModerationLog = {
-      ...log,
       id,
+      videoId: log.videoId,
+      adminUserId: log.adminUserId,
+      adminName: log.adminName,
+      action,
+      previousStatus: log.previousStatus === undefined ? null : log.previousStatus,
+      newStatus: log.newStatus,
       reason: log.reason || null,
       internalNotes: log.internalNotes || null,
+      changedFields: log.changedFields || null,
       createdAt: new Date().toISOString(),
     };
     this.moderationLogs.unshift(newLog);
@@ -454,6 +545,14 @@ export class MemoryCreatorsRepository implements IAuthRepository, ICreatorsRepos
     };
 
     this.creatorProfiles.set(data.userId, profile);
+
+    // Link any submissions belonging to this user that were created prior to profile creation
+    for (const sub of this.videoSubmissions.values()) {
+      if (sub.userId === data.userId && !sub.creatorProfileId) {
+        sub.creatorProfileId = profile.id;
+      }
+    }
+
     return { ...profile };
   }
 
