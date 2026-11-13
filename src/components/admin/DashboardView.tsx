@@ -14,19 +14,21 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { AdminDashboardMetrics } from '../../types/adminCatalog.ts';
-import { useAuth } from '../../context/AuthContext.tsx';
+
 import { AdminSection } from './AdminSidebar.tsx';
 
 interface DashboardViewProps {
   onNavigateSection: (section: AdminSection) => void;
   onOpenCreatePlaceModal: () => void;
+  refreshKey: number;
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({
   onNavigateSection,
   onOpenCreatePlaceModal,
+  refreshKey,
 }) => {
-  const { token } = useAuth();
+  
   const [metrics, setMetrics] = useState<AdminDashboardMetrics | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,9 +38,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     setError(null);
     try {
       const res = await fetch('/api/admin/dashboard', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        credentials: 'include',
       });
 
       if (!res.ok) {
@@ -60,7 +60,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
   useEffect(() => {
     fetchDashboardData();
-  }, [token]);
+  }, [refreshKey]);
 
   if (isLoading && !metrics) {
     return (

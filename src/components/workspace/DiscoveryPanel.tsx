@@ -286,8 +286,7 @@ export const DiscoveryPanel: React.FC<DiscoveryPanelProps> = ({
                 title="Videos de este lugar"
                 description="Conoce este destino a través de sus creadores."
                 showFilters={false}
-                showSearch={false}
-                videos={[
+                showSearch={false}videos={[
                   {
                     id: 'video-demo-1',
                     videoUrl:
@@ -296,6 +295,10 @@ export const DiscoveryPanel: React.FC<DiscoveryPanelProps> = ({
                     creator: '@tiocuyitope',
                     placeName: selectedPlace.name,
                     category: 'Hospedaje',
+                    views: 0,
+                    likes: 0,
+                    rating: 0,
+                    updatedAt: new Date().toISOString(),
                   },
                 ]}
               />

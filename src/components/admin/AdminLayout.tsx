@@ -24,6 +24,11 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onGoToPublicApp }) => 
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editingPlace, setEditingPlace] = useState<AdminPlaceRecord | null>(null);
 
+  const [placesRefreshKey, setPlacesRefreshKey] = useState(0);
+  const handlePlaceSaved = () => {
+  setPlacesRefreshKey((current) => current + 1);
+};
+
   // Place history audit modal state
   const [historyPlace, setHistoryPlace] = useState<{ id: string; name: string } | null>(null);
 
@@ -70,6 +75,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onGoToPublicApp }) => 
             <DashboardView
               onNavigateSection={setActiveSection}
               onOpenCreatePlaceModal={handleOpenCreateModal}
+              refreshKey={placesRefreshKey}
             />
           )}
 
@@ -78,6 +84,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onGoToPublicApp }) => 
               onEditPlace={handleOpenEditModal}
               onCreatePlace={handleOpenCreateModal}
               onViewPlaceHistory={handleViewPlaceHistory}
+              refreshKey={placesRefreshKey}
             />
           )}
 
@@ -103,9 +110,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onGoToPublicApp }) => 
       <PlaceEditorModal
         isOpen={isEditorOpen}
         onClose={() => setIsEditorOpen(false)}
-        onPlaceSaved={() => {
-          // Trigger refresh if needed
-        }}
+        onPlaceSaved={handlePlaceSaved}
         initialPlace={editingPlace}
       />
 
