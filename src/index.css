@@ -1,19 +1,55 @@
 @import "tailwindcss";
 
-@layer base {
-  :root {
-    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-    --font-display: 'Outfit', system-ui, -apple-system, sans-serif;
-    --font-mono: 'JetBrains Mono', monospace;
-  }
+@custom-variant dark (&:where(.dark, .dark *));
 
-  body {
-    font-family: var(--font-sans);
-  }
+@theme {
+  --color-primary: #E85B49;
+  --color-primary-hover: #D94C3C;
+  --color-forest: #263B35;
+  --color-sand: #F7F2E8;
+  --color-moche-gold: #D9B66F;
+  --color-nature: #71958B;
+  --color-border-warm: #E9E7E1;
+  --color-nav-blue: #17243A;
+}
 
-  h1, h2, h3, .font-display {
-    font-family: var(--font-display);
-  }
+:root {
+  --color-primary: #E85B49;
+  --color-primary-hover: #D94C3C;
+  --color-forest: #263B35;
+
+  --color-sand: #F7F2E8;
+  --color-moche-gold: #D9B66F;
+  --color-nature: #71958B;
+
+  --color-background: #FFFFFF;
+  --color-surface: #FFFFFF;
+  --color-surface-muted: #F7F2E8;
+  --color-border: #E9E7E1;
+
+  --color-text: #263B35;
+  --color-text-secondary: #64748B;
+  --color-text-inverse: #FFFFFF;
+
+  --color-navigation: #263B35;
+  --color-navigation-active: #E85B49;
+
+  --color-map-route: #71958B;
+  --color-map-highlight: #E85B49;
+
+  --font-sans: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+
+h1, h2, h3, .font-display {
+  font-family: var(--font-display);
 }
 
 /* Custom scrollbars for clean travel workspace panels */

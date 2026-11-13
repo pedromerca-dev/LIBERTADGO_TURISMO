@@ -127,4 +127,28 @@ test('Creators Flow: Video Submission, URL parsing, Duplicate prevention and Pla
   assert.equal(saveRes.saved, true);
   const updatedSave = await creatorsRepo.findSubmissionById(submission.id);
   assert.equal(updatedSave?.internalSavesCount, 1);
+
+  // 9. Verify listApprovedVideos returns enriched creator info and associated places
+  await creatorsRepo.saveCreatorProfile({
+    userId: creatorUser.id,
+    handle: 'arqueologianorte',
+    displayName: 'Arqueología del Norte',
+    bio: 'Difundiendo el patrimonio liberteño',
+    avatarUrl: 'https://example.com/avatar.jpg',
+    primaryPlatform: 'tiktok',
+    tiktokUrl: 'https://www.tiktok.com/@arqueologianorte',
+    instagramUrl: null,
+    youtubeUrl: null,
+    isPublic: true,
+  });
+
+  const listRes = await creatorsRepo.listApprovedVideos({ localityId: 'trujillo' });
+  assert.equal(listRes.total >= 1, true);
+  const found = listRes.videos.find((v) => v.id === submission.id);
+  assert.notEqual(found, undefined);
+  assert.equal(found?.creatorHandle, 'arqueologianorte');
+  assert.equal(found?.creatorDisplayName, 'Arqueología del Norte');
+  assert.equal(found?.userName, 'Guía Arqueológico');
+  assert.equal(found?.places.length, 1);
+  assert.equal(found?.places[0].id, 'place_chan_chan');
 });

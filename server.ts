@@ -1,3 +1,4 @@
+process.env.DISABLE_HMR = 'true';
 import 'dotenv/config';
 import fs from 'fs';
 import express from 'express';
@@ -71,16 +72,34 @@ async function startServer() {
   const app = express();
 
   // AI Studio and development dev-server port handling
-  const portArgIndex = process.argv.indexOf('--port');
-  const cliPort = portArgIndex !== -1 && process.argv[portArgIndex + 1] ? Number(process.argv[portArgIndex + 1]) : null;
-  const hostArgIndex = process.argv.indexOf('--host');
-  const cliHost = hostArgIndex !== -1 && process.argv[hostArgIndex + 1] ? process.argv[hostArgIndex + 1] : null;
+  let cliPort: number | null = null;
+  let cliHost: string = '0.0.0.0';
+
+  for (let i = 2; i < process.argv.length; i++) {
+    const arg = process.argv[i];
+    if (arg === '--port' && process.argv[i + 1]) {
+      cliPort = Number(process.argv[i + 1]);
+      i++;
+    } else if (arg.startsWith('--port=')) {
+      cliPort = Number(arg.split('=')[1]);
+    } else if (arg === '--host' && process.argv[i + 1]) {
+      cliHost = process.argv[i + 1];
+      i++;
+    } else if (arg.startsWith('--host=')) {
+      cliHost = arg.split('=')[1];
+    }
+  }
 
   // In AI Studio or development, use port 3000. In production (Cloud Run), honor process.env.PORT (8080).
   const PORT = (cliPort && !isNaN(cliPort))
     ? cliPort
     : (process.env.NODE_ENV === 'production' && process.env.PORT ? Number(process.env.PORT) : 3000);
   const HOST = cliHost || '0.0.0.0';
+
+  const distPath = path.resolve(__dirname, 'dist');
+  const isProduction =
+    process.env.NODE_ENV === 'production' &&
+    fs.existsSync(path.join(distPath, 'index.html'));
 
   let configError: string | null = null;
 
@@ -96,19 +115,18 @@ async function startServer() {
     await bootstrapAdminFromEnv();
   } catch (err: unknown) {
     const errorMsg = err instanceof Error ? err.message : String(err);
-    configError = errorMsg;
-    console.error(`[LibertadGO Configuration Alert] ${errorMsg}`);
-    console.warn(
-      `[LibertadGO] The server will listen on ${HOST}:${PORT} to maintain Cloud Run service health. Database-dependent endpoints will return 503 until configuration is set.`
-    );
+    if (isProduction) {
+      configError = errorMsg;
+      console.error(`[LibertadGO Configuration Alert] ${errorMsg}`);
+      console.warn(
+        `[LibertadGO] The server will listen on ${HOST}:${PORT} to maintain Cloud Run service health. Database-dependent endpoints will return 503 until configuration is set.`
+      );
+    } else {
+      console.log(`[LibertadGO Dev Startup Note] ${errorMsg}`);
+    }
   }
 
-  const distPath = path.resolve(__dirname, 'dist');
-  const isProduction =
-    process.env.NODE_ENV === 'production' &&
-    fs.existsSync(path.join(distPath, 'index.html'));
-
-  app.use(express.json());
+  app.use(express.json({ limit: '200kb' }));
   app.use(csrfProtectionMiddleware);
 
   // High-priority Health Endpoints for Cloud Run & Uptime Monitoring
@@ -116,8 +134,8 @@ async function startServer() {
     res.setHeader('Content-Type', 'application/json');
     const dbHealth = await checkDatabaseHealth();
     res.json({
-      status: dbHealth.connected ? 'healthy' : 'degraded',
-      database: dbHealth.connected ? 'connected' : 'not_configured',
+      status: dbHealth.connected || !isProduction ? 'healthy' : 'degraded',
+      database: dbHealth.connected ? 'connected' : (isProduction ? 'not_configured' : 'in_memory'),
       environment: isProduction ? 'production' : 'development',
       timestamp: new Date().toISOString(),
     });
@@ -194,7 +212,12 @@ async function startServer() {
     console.error('[LibertadGO] HTTP server error:', err.message);
     if (err.code === 'EADDRINUSE') {
       console.error(`[LibertadGO] Port ${PORT} is already in use.`);
+      process.exit(1);
     }
+  });
+
+  process.on('unhandledRejection', (reason) => {
+    console.warn('[LibertadGO Warning] Unhandled Rejection:', reason);
   });
 
   // 4. Register orderly shutdown handlers for Cloud Run SIGTERM / SIGINT

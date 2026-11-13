@@ -38,8 +38,8 @@ const sectionTitles: Record<AdminSection, { title: string; subtitle: string }> =
     subtitle: 'Registro inmutable de todas las mutaciones realizadas por administradores',
   },
   creators: {
-    title: 'Moderación de Creadores',
-    subtitle: 'Revisión y aprobación de videos sobre lugares turísticos de La Libertad',
+    title: 'Videos y Creadores',
+    subtitle: 'Gestión editorial de videos turísticos y directorio regional de creadores',
   },
 };
 

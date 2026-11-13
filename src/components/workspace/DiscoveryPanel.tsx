@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { Place, PlaceCategory, TripItinerary } from '../../types/catalog.ts';
 import { HorizontalScrollContainer } from '../common/HorizontalScrollContainer.tsx';
-import { TikTokVideoGallery } from '../common/TikTokVideoGallery';
+import { PlaceVideosSection } from '../common/PlaceVideosSection.tsx';
 
 interface DiscoveryPanelProps {
   trip: TripItinerary;
@@ -279,162 +279,78 @@ export const DiscoveryPanel: React.FC<DiscoveryPanelProps> = ({
               </div>
             </div>
           </div>
-             {/* Galería de videos turísticos del lugar seleccionado */}
-             {selectedPlace.name === 'Hostal Paraíso' && (
+            {/* Galería de videos reales del lugar seleccionado */}
             <div className="mt-4">
-              <TikTokVideoGallery
-                title="Videos de este lugar"
-                description="Conoce este destino a través de sus creadores."
-                showFilters={false}
-                showSearch={false}videos={[
-                  {
-                    id: 'video-demo-1',
-                    videoUrl:
-                      'https://www.tiktok.com/@tiocuyitope/video/7621230431219830037',
-                    title: 'Descubre este lugar en Trujillo',
-                    creator: '@tiocuyitope',
-                    placeName: selectedPlace.name,
-                    category: 'Hospedaje',
-                    views: 0,
-                    likes: 0,
-                    rating: 0,
-                    updatedAt: new Date().toISOString(),
-                  },
-                ]}
+              <PlaceVideosSection
+                placeId={selectedPlace.id}
+                placeName={selectedPlace.name}
+                compact={true}
               />
             </div>
-          )}
         </div>
         
       ) : (
-        /* Places Cards List */
-        <div className="flex-1 overflow-y-auto p-3 space-y-2.5">
+        /* Lista de Tarjetas de Lugares estilo Google Maps (limpio y directo) */
+        <div className="flex-1 overflow-y-auto p-3 space-y-2">
           {filteredPlaces.map((place) => {
             const activity = getPlaceItineraryInfo(place.id);
-            const isDaySelectorOpen = activeDaySelectorPlaceId === place.id;
+            const isRealVerified = place.verification?.isVerified === true;
+            const categoryLabel = place.subcategory || place.category;
 
             return (
               <div
                 key={place.id}
                 onClick={() => onSelectPlace(place)}
-                className={`bg-white rounded-xl border transition-all overflow-hidden cursor-pointer group ${
-                  activity
-                    ? 'border-emerald-200 bg-emerald-50/10'
-                    : 'border-slate-200 hover:border-[#E05A47]/40 hover:shadow-xs'
-                }`}
+                className="bg-white rounded-lg border border-[#E9E7E1] hover:border-slate-300 p-3 transition-colors cursor-pointer group flex gap-3 select-none"
               >
-                <div className="flex gap-3 p-3">
-                  <img
-                    src={place.images[0]?.url || ''}
-                    alt={place.name}
-                    referrerPolicy="no-referrer"
-                    className="w-20 h-20 rounded-lg object-cover shrink-0 bg-slate-100 group-hover:scale-105 transition-transform duration-300"
-                  />
+                <img
+                  src={place.images[0]?.url || ''}
+                  alt={place.name}
+                  referrerPolicy="no-referrer"
+                  className="w-20 h-20 rounded-md object-cover shrink-0 bg-slate-100 group-hover:scale-105 transition-transform duration-200"
+                />
 
-                  <div className="flex-1 min-w-0 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between gap-1">
-                        <h4 className="text-xs font-bold text-slate-900 group-hover:text-[#E05A47] transition-colors truncate">
-                          {place.name}
-                        </h4>
-                        {activity && (
-                          <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100/70 px-1.5 py-0.2 rounded shrink-0">
-                            Día {activity.dayNumber}
-                          </span>
-                        )}
+                <div className="flex-1 min-w-0 flex flex-col justify-between">
+                  <div>
+                    <h4 className="text-sm font-semibold text-[#263B35] group-hover:text-[#E85B49] transition-colors leading-snug truncate">
+                      {place.name}
+                    </h4>
+
+                    <p className="text-xs text-[#64748B] mt-0.5 truncate capitalize">
+                      {categoryLabel} · {place.localityName}, La Libertad
+                    </p>
+
+                    {place.rating && (
+                      <div className="flex items-center gap-1 text-xs text-[#64748B] mt-1">
+                        <span className="text-amber-600 font-medium">★ {place.rating}</span>
+                        {place.reviewsCount ? <span>· {place.reviewsCount} opiniones</span> : null}
                       </div>
+                    )}
 
-                      <div className="flex items-center gap-1.5 mt-0.5 text-[11px] text-slate-500">
-                        {place.rating && (
-                          <span className="flex items-center gap-0.5 text-amber-600 font-semibold">
-                            <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
-                            <span>{place.rating}</span>
-                          </span>
-                        )}
-                        <span>·</span>
-                        <span className="capitalize truncate text-slate-600">
-                          {place.subcategory || place.category}
-                        </span>
+                    {isRealVerified && (
+                      <div className="text-[11px] text-emerald-700 mt-1 flex items-center gap-1">
+                        <ShieldCheck className="w-3 h-3" />
+                        <span>Verificado por RiyMo</span>
                       </div>
+                    )}
+                  </div>
 
-                      <p className="text-[11px] text-slate-500 mt-1 line-clamp-2 leading-relaxed">
-                        {place.shortDescription}
-                      </p>
-                    </div>
+                  <div className="flex items-center justify-between pt-2 border-t border-[#E9E7E1]/60 mt-1.5" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      type="button"
+                      onClick={() => onSelectPlace(place)}
+                      className="text-xs font-medium text-[#E85B49] hover:text-[#D94C3C] cursor-pointer"
+                    >
+                      Ver lugar
+                    </button>
 
-                    <div className="flex items-center justify-between pt-2 border-t border-slate-50">
-                      <span className="text-[10px] text-slate-400 truncate">
-                        {place.address.split(',')[0]}
+                    {activity && (
+                      <span className="text-[11px] text-emerald-700 font-medium">
+                        Día {activity.dayNumber}
                       </span>
-
-                      {activity ? (
-                        <span className="text-[11px] font-semibold text-emerald-700 flex items-center gap-0.5">
-                          <Check className="w-3 h-3" />
-                          <span>Agregado</span>
-                        </span>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setActiveDaySelectorPlaceId(isDaySelectorOpen ? null : place.id);
-                          }}
-                          className="text-xs font-bold text-[#E05A47] hover:underline flex items-center gap-0.5 cursor-pointer"
-                        >
-                          <span>Agregar</span>
-                          <ChevronRight className="w-3 h-3" />
-                        </button>
-                      )}
-                    </div>
+                    )}
                   </div>
                 </div>
-
-                {/* Day selector popdown */}
-                {isDaySelectorOpen && (
-                  <div
-                    className="px-3 pb-3 pt-1 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-1.5 animate-in fade-in"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <span className="text-[11px] text-slate-600 font-medium shrink-0">Asignar a:</span>
-                    <HorizontalScrollContainer
-                      containerClassName="flex-1 min-w-0"
-                      className="gap-1"
-                      gradientTheme="slate"
-                      arrowSize="sm"
-                      ariaLabel="Asignar lugar a día"
-                    >
-                      {Array.from({ length: trip.totalDays }).map((_, i) => {
-                        const dayNum = i + 1;
-                        const inThisDay = trip.activities.some(
-                          (a) => a.placeId === place.id && a.dayNumber === dayNum
-                        );
-                        return (
-                          <button
-                            key={dayNum}
-                            type="button"
-                            onClick={() => {
-                              if (inThisDay) {
-                                const act = trip.activities.find(
-                                  (a) => a.placeId === place.id && a.dayNumber === dayNum
-                                );
-                                if (act && onRemoveActivity) onRemoveActivity(act.id);
-                              } else {
-                                onAddPlaceToDay(place, dayNum);
-                              }
-                            }}
-                            className={`text-[10px] px-2 py-1 font-mono font-semibold rounded cursor-pointer transition-colors shrink-0 flex-shrink-0 whitespace-nowrap ${
-                              inThisDay
-                                ? 'bg-emerald-600 text-white hover:bg-emerald-700'
-                                : 'bg-white hover:bg-[#E05A47] hover:text-white border border-slate-200 text-slate-700'
-                            }`}
-                          >
-                            {inThisDay ? `✓ D${dayNum}` : `D${dayNum}`}
-                          </button>
-                        );
-                      })}
-                    </HorizontalScrollContainer>
-                  </div>
-                )}
               </div>
             );
           })}

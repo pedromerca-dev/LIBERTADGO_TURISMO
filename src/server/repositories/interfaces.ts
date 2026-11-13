@@ -10,6 +10,9 @@ import {
   VideoModerationLog,
   VideoPlatform,
   ModerationStatus,
+  ModerationActionType,
+  ModerationAuditPayload,
+  VideoExternalMetrics,
 } from '../../types/creators.ts';
 import { Place } from '../../types/catalog.ts';
 
@@ -44,6 +47,7 @@ export interface IAuthRepository {
     avatarUrl?: string | null;
   }): Promise<User>;
   countUsers(): Promise<number>;
+  listUsers(): Promise<Omit<User, 'passwordHash'>[]>;
 }
 
 export interface ICreatorsRepository {
@@ -67,20 +71,50 @@ export interface ICreatorsRepository {
       contentType: 'PLACE' | 'ROUTE' | 'GENERAL';
       category: string;
       localityId?: string | null;
+      status?: ModerationStatus;
+      externalCreatorHandle?: string | null;
+      externalCreatorDisplayName?: string | null;
+      externalCreatorAvatarUrl?: string | null;
     },
     placeIds?: string[],
-    primaryPlaceId?: string | null
+    primaryPlaceId?: string | null,
+    audit?: ModerationAuditPayload
   ): Promise<VideoSubmission>;
+  updateSubmission(
+    id: string,
+    data: Partial<{
+      title: string;
+      description: string | null;
+      contentType: 'PLACE' | 'ROUTE' | 'GENERAL';
+      category: string;
+      localityId: string | null;
+      thumbnailUrl: string | null;
+      creatorProfileId: string | null;
+      status: ModerationStatus;
+      externalCreatorHandle: string | null;
+      externalCreatorDisplayName: string | null;
+      externalCreatorAvatarUrl: string | null;
+      externalMetrics?: VideoExternalMetrics | null;
+    }>,
+    placeIds?: string[],
+    primaryPlaceId?: string | null,
+    audit?: ModerationAuditPayload
+  ): Promise<VideoSubmission | null>;
   updateSubmissionStatus(
     id: string,
     status: ModerationStatus,
     notes?: string | null,
-    adminUserId?: string
+    adminUserId?: string,
+    audit?: ModerationAuditPayload,
+    placeIds?: string[]
   ): Promise<VideoSubmission | null>;
   listApprovedVideos(
     filters?: VideoFilterOptions
   ): Promise<{ videos: (VideoSubmission & { places: Place[] })[]; total: number }>;
   listSubmissionsByUser(userId: string): Promise<VideoSubmission[]>;
+  listSubmissionsByCreatorProfileId(
+    creatorProfileId: string
+  ): Promise<VideoSubmission[]>;
   listModerationQueue(status?: ModerationStatus): Promise<VideoSubmission[]>;
 
   // Moderation & Audit
@@ -88,10 +122,12 @@ export interface ICreatorsRepository {
     videoId: string;
     adminUserId: string;
     adminName: string;
-    previousStatus: ModerationStatus;
+    action?: ModerationActionType;
+    previousStatus?: ModerationStatus | null;
     newStatus: ModerationStatus;
     reason?: string | null;
     internalNotes?: string | null;
+    changedFields?: string[] | null;
   }): Promise<VideoModerationLog>;
   getModerationLogs(videoId: string): Promise<VideoModerationLog[]>;
 
@@ -102,13 +138,37 @@ export interface ICreatorsRepository {
     primaryPlaceId?: string | null
   ): Promise<void>;
   getPlacesForVideo(videoId: string): Promise<Place[]>;
+  getPlacesForVideos?(videoIds: string[]): Promise<Record<string, Place[]>>;
   getVideosForPlace(placeId: string): Promise<VideoSubmission[]>;
 
+ 
   // Creator Profiles
+
   findCreatorProfileByUserId(userId: string): Promise<CreatorProfile | null>;
+  findCreatorProfileById(id: string): Promise<CreatorProfile | null>;
   findCreatorProfileByHandle(handle: string): Promise<CreatorProfile | null>;
-  saveCreatorProfile(data: {
-    userId: string;
+  // Crear o actualizar un perfil vinculado a una cuenta de usuario.
+saveCreatorProfile(data: {
+  userId: string;
+  handle: string;
+  displayName: string;
+  bio?: string | null;
+  avatarUrl?: string | null;
+  primaryPlatform: VideoPlatform;
+  tiktokUrl?: string | null;
+  instagramUrl?: string | null;
+  youtubeUrl?: string | null;
+  tiktokFollowers?: number | null;
+  instagramFollowers?: number | null;
+  youtubeSubscribers?: number | null;
+  audienceUpdatedAt?: string | null;
+  isPublic: boolean;
+  isVerified?: boolean;
+}): Promise<CreatorProfile>;
+
+  // Crear un perfil independiente, sin exigir una cuenta de usuario.
+  createCreatorProfile(data: {
+    userId?: string | null;
     handle: string;
     displayName: string;
     bio?: string | null;
@@ -117,13 +177,44 @@ export interface ICreatorsRepository {
     tiktokUrl?: string | null;
     instagramUrl?: string | null;
     youtubeUrl?: string | null;
+    tiktokFollowers?: number | null;
+    instagramFollowers?: number | null;
+    youtubeSubscribers?: number | null;
+    audienceUpdatedAt?: string | null;
     isPublic: boolean;
+    isVerified?: boolean;
   }): Promise<CreatorProfile>;
+
+  // Actualizar un perfil existente mediante su ID.
+  updateCreatorProfile(
+    id: string,
+    data: Partial<{
+      userId: string | null;
+      handle: string;
+      displayName: string;
+      bio: string | null;
+      avatarUrl: string | null;
+      primaryPlatform: VideoPlatform;
+      tiktokUrl: string | null;
+      instagramUrl: string | null;
+      youtubeUrl: string | null;
+      tiktokFollowers: number | null;
+      instagramFollowers: number | null;
+      youtubeSubscribers: number | null;
+      audienceUpdatedAt: string | null;
+      isPublic: boolean;
+      isVerified: boolean;
+    }>
+  ): Promise<CreatorProfile | null>;
+
   listPublicCreators(): Promise<CreatorProfile[]>;
+  listAllCreators(): Promise<CreatorProfile[]>;
+
 
   // Metrics & Engagement
   incrementInternalViews(videoId: string): Promise<void>;
   toggleSaveVideo(userId: string, videoId: string): Promise<{ saved: boolean }>;
   isSavedByUser(userId: string, videoId: string): Promise<boolean>;
+  listSavedVideosByUser(userId: string): Promise<(VideoSubmission & { places?: Place[] })[]>;
   getAdminMetrics(): Promise<AdminMetrics>;
 }

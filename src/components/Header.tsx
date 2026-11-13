@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { TripItinerary } from '../types/catalog.ts';
 import { formatDateRange } from '../utils/dateUtils.ts';
+import { RiyMoLogo } from './common/RiyMoLogo.tsx';
 
 interface HeaderProps {
   currentTrip: TripItinerary | null;
@@ -83,19 +84,14 @@ export const Header: React.FC<HeaderProps> = ({
         <header className="flex flex-col lg:hidden w-full bg-white border-b border-[#E9EEF4] shrink-0 select-none z-30 min-w-0">
           {/* Fila 1: Logo + Selector compacto de viaje + Botón Crear Viaje */}
           <div className="h-12 px-3 flex items-center justify-between gap-2 border-b border-[#F1F5F9] min-w-0">
-            {/* Logo compacto */}
+            {/* Logo compacto RIYMO */}
             <button
               type="button"
               onClick={() => setActiveView('workspace')}
-              className="flex items-center gap-1.5 shrink-0 group cursor-pointer text-left focus:outline-none"
-              title="LibertadGO - Inicio"
+              className="flex items-center shrink-0 group cursor-pointer text-left focus:outline-none"
+              title="RIYMO - Inicio"
             >
-              <div className="w-7 h-7 rounded-lg bg-[#17243A] text-white flex items-center justify-center shadow-2xs group-hover:bg-[#1E293B] transition-colors">
-                <Compass className="w-4 h-4 stroke-[2.2]" />
-              </div>
-              <span className="text-sm font-bold font-display tracking-tight text-[#17243A] leading-none">
-                Libertad<span className="text-[#E85B49]">GO</span>
-              </span>
+              <RiyMoLogo variant="compact" size="sm" showSubtitle={false} />
             </button>
 
             {/* Selector compacto y legible del viaje activo */}
@@ -223,35 +219,25 @@ export const Header: React.FC<HeaderProps> = ({
       <header
         className={`${
           isInWorkspace && currentTrip ? 'hidden lg:flex' : 'flex'
-        } h-14 bg-white border-b border-[#E9EEF4] px-3 sm:px-4 lg:px-6 items-center justify-between shrink-0 select-none z-30 min-w-0`}
+        } h-14 bg-white border-b border-[#E9E7E1] px-3 sm:px-4 lg:px-6 items-center justify-between shrink-0 select-none z-30 min-w-0`}
       >
         {/* ============================================================ */}
         {/* 1. ZONA IZQUIERDA: Logo + Contexto del Viaje Activo           */}
         {/* ============================================================ */}
-        <div className="flex items-center gap-2 sm:gap-3.5 min-w-0">
-          {/* Logo LibertadGO */}
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          {/* Logo RIYMO */}
           <button
             type="button"
             onClick={() => setActiveView('workspace')}
-            className="flex items-center gap-1.5 sm:gap-2 shrink-0 group cursor-pointer text-left focus:outline-none"
-            title="LibertadGO - Inicio"
+            className="flex items-center shrink-0 group cursor-pointer text-left focus:outline-none"
+            title="RIYMO - Inicio"
           >
-            <div className="w-8 h-8 rounded-lg bg-[#17243A] text-white flex items-center justify-center group-hover:bg-[#1E293B] transition-colors shadow-2xs">
-              <Compass className="w-5 h-5 stroke-[2.2]" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-base font-bold font-display tracking-tight text-[#17243A] leading-none">
-                Libertad<span className="text-[#E85B49]">GO</span>
-              </span>
-              <span className="text-[10px] text-[#64748B] tracking-wider uppercase mt-0.5 hidden sm:inline font-medium">
-                La Libertad · Perú
-              </span>
-            </div>
+            <RiyMoLogo variant="full" size="md" />
           </button>
 
           {/* Datos contextuales del viaje activo (Desktop) */}
           {isInWorkspace && currentTrip && (
-            <div className="flex items-center gap-1.5 sm:gap-2 pl-1.5 sm:pl-3 border-l border-[#E9EEF4] min-w-0">
+            <div className="flex items-center gap-1.5 sm:gap-2.5 pl-2 sm:pl-3 border-l border-[#E9E7E1] min-w-0">
               {/* Nombre editable del viaje */}
               <div className="min-w-0 truncate">
                 {isEditingTitle ? (
@@ -260,12 +246,12 @@ export const Header: React.FC<HeaderProps> = ({
                       type="text"
                       value={titleInput}
                       onChange={(e) => setTitleInput(e.target.value)}
-                      className="px-2 py-0.5 text-xs font-bold text-[#17243A] border border-[#E85B49] rounded-md focus:outline-none max-w-[100px] sm:max-w-none"
+                      className="px-2 py-0.5 text-xs font-semibold text-[#263B35] border border-[#E85B49] rounded-md focus:outline-none max-w-[120px] sm:max-w-none"
                       autoFocus
                     />
                     <button
                       type="submit"
-                      className="p-1 text-[#27856C] hover:bg-[#F7F8FA] rounded cursor-pointer"
+                      className="p-1 text-emerald-600 hover:bg-slate-100 rounded cursor-pointer"
                       title="Guardar"
                     >
                       <Check className="w-3.5 h-3.5" />
@@ -276,7 +262,7 @@ export const Header: React.FC<HeaderProps> = ({
                         setTitleInput(currentTrip.title);
                         setIsEditingTitle(false);
                       }}
-                      className="p-1 text-[#64748B] hover:bg-[#F7F8FA] rounded cursor-pointer"
+                      className="p-1 text-[#64748B] hover:bg-slate-100 rounded cursor-pointer"
                       title="Cancelar"
                     >
                       <X className="w-3.5 h-3.5" />
@@ -289,10 +275,10 @@ export const Header: React.FC<HeaderProps> = ({
                       setTitleInput(currentTrip.title);
                       setIsEditingTitle(true);
                     }}
-                    className="flex items-center gap-1 text-left group truncate cursor-pointer hover:bg-[#F7F8FA] px-1 py-0.5 rounded-md transition-colors"
+                    className="flex items-center gap-1 text-left group truncate cursor-pointer hover:bg-slate-50 px-1.5 py-0.5 rounded-md transition-colors"
                     title="Clic para renombrar este viaje"
                   >
-                    <h1 className="text-xs sm:text-sm font-bold font-display text-[#17243A] truncate max-w-[170px] md:max-w-xs">
+                    <h1 className="text-xs sm:text-sm font-semibold text-[#263B35] truncate max-w-[180px] md:max-w-xs">
                       {currentTrip.title}
                     </h1>
                     <Edit2 className="w-3 h-3 text-[#64748B] opacity-40 group-hover:opacity-100 transition-opacity shrink-0 hidden sm:inline" />
@@ -306,7 +292,7 @@ export const Header: React.FC<HeaderProps> = ({
                 <button
                   type="button"
                   onClick={onEditTrip || onOpenCreateModal}
-                  className="flex items-center gap-1 px-2 py-0.5 rounded-md hover:bg-[#F7F8FA] text-[#17243A] font-semibold transition-colors cursor-pointer"
+                  className="flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-slate-50 text-[#263B35] font-medium transition-colors cursor-pointer"
                   title="Cambiar destino del viaje"
                 >
                   <MapPin className="w-3.5 h-3.5 text-[#E85B49] shrink-0" />
@@ -317,13 +303,13 @@ export const Header: React.FC<HeaderProps> = ({
                 <button
                   type="button"
                   onClick={onEditTrip || onOpenCreateModal}
-                  className="flex items-center gap-1.5 px-2 py-0.5 rounded-md hover:bg-[#F7F8FA] text-[#64748B] font-medium transition-colors cursor-pointer"
+                  className="flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-slate-50 text-[#64748B] transition-colors cursor-pointer"
                   title="Editar fechas del viaje"
                 >
                   <Calendar className="w-3.5 h-3.5 text-[#64748B] shrink-0" />
                   <span>{formattedDates}</span>
-                  <span className="font-mono text-[10px] text-[#17243A] font-semibold bg-[#F7F8FA] px-1.5 py-0.5 rounded border border-[#E9EEF4]">
-                    {currentTrip.totalDays}d / {currentTrip.totalNights}n
+                  <span className="text-[11px] text-slate-500 ml-0.5 font-normal">
+                    ({currentTrip.totalDays}d / {currentTrip.totalNights}n)
                   </span>
                 </button>
               </div>
@@ -379,21 +365,21 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               type="button"
               onClick={onToggleMapCollapse}
-              className={`hidden lg:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
+              className={`hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md border transition-colors cursor-pointer ${
                 isMapCollapsed
-                  ? 'bg-[#E85B49]/10 text-[#E85B49] border-[#E85B49]/30 hover:bg-[#E85B49]/20'
-                  : 'bg-[#F7F8FA] text-[#17243A] border-[#E9EEF4] hover:bg-[#E9EEF4]'
+                  ? 'bg-[#E85B49]/10 text-[#E85B49] border-[#E85B49]/30 hover:bg-[#E85B49]/15'
+                  : 'bg-white text-[#263B35] border-[#E9E7E1] hover:bg-slate-50'
               }`}
-              title={isMapCollapsed ? 'Ver mapa interactivo' : 'Ocultar mapa para ampliar vista de lista'}
+              title={isMapCollapsed ? 'Mostrar mapa' : 'Ocultar mapa'}
             >
               {isMapCollapsed ? (
                 <>
-                  <PanelRightOpen className="w-4 h-4 text-[#E85B49]" />
+                  <PanelRightOpen className="w-3.5 h-3.5 text-[#E85B49]" />
                   <span>Ver mapa</span>
                 </>
               ) : (
                 <>
-                  <PanelRightClose className="w-4 h-4 text-[#64748B]" />
+                  <PanelRightClose className="w-3.5 h-3.5 text-[#64748B]" />
                   <span>Ocultar mapa</span>
                 </>
               )}
@@ -405,97 +391,23 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               type="button"
               onClick={handleShare}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#17243A] bg-[#F7F8FA] hover:bg-[#E9EEF4] border border-[#E9EEF4] rounded-lg transition-colors cursor-pointer"
-              title="Copiar enlace directo de este viaje"
+              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-[#263B35] bg-white hover:bg-slate-50 border border-[#E9E7E1] rounded-md transition-colors cursor-pointer"
+              title="Copiar enlace de este viaje"
             >
               <Share2 className="w-3.5 h-3.5 text-[#64748B]" />
-              <span>{copyFeedback ? '¡Copiado!' : 'Compartir'}</span>
+              <span>{copyFeedback ? 'Copiado' : 'Compartir'}</span>
             </button>
           )}
 
-          {/* Menú contextual "Más" en workspace */}
-          {isInWorkspace && (
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setIsMoreMenuOpen((prev) => !prev)}
-                className="p-1.5 text-xs text-[#64748B] hover:text-[#17243A] hover:bg-[#F7F8FA] rounded-lg border border-transparent hover:border-[#E9EEF4] transition-colors cursor-pointer flex items-center gap-1"
-                title="Más opciones del sistema"
-              >
-                <span className="text-xs font-medium hidden xl:inline">Explorar más</span>
-                <ChevronDown className="w-3.5 h-3.5" />
-              </button>
-
-              {isMoreMenuOpen && (
-                <>
-                  <div
-                    className="fixed inset-0 z-40"
-                    onClick={() => setIsMoreMenuOpen(false)}
-                  />
-                  <div className="absolute right-0 mt-1 w-48 bg-white rounded-xl shadow-lg border border-[#E9EEF4] py-1.5 z-50 animate-in fade-in zoom-in-95 duration-100">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setActiveView('destinations');
-                        setIsMoreMenuOpen(false);
-                      }}
-                      className="w-full px-3 py-2 text-left text-xs text-[#17243A] hover:bg-[#F7F8FA] flex items-center gap-2 cursor-pointer"
-                    >
-                      <MapPin className="w-3.5 h-3.5 text-[#E85B49]" />
-                      <span>Destinos Liberteños</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onOpenArchitectureModal();
-                        setIsMoreMenuOpen(false);
-                      }}
-                      className="w-full px-3 py-2 text-left text-xs text-[#17243A] hover:bg-[#F7F8FA] flex items-center gap-2 cursor-pointer"
-                    >
-                      <Layers className="w-3.5 h-3.5 text-[#64748B]" />
-                      <span>Arquitectura MVP</span>
-                    </button>
-                    {onOpenAdmin && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          onOpenAdmin();
-                          setIsMoreMenuOpen(false);
-                        }}
-                        className="w-full px-3 py-2 text-left text-xs text-[#17243A] hover:bg-[#F7F8FA] flex items-center gap-2 cursor-pointer border-t border-[#E9EEF4]"
-                      >
-                        <Shield className="w-3.5 h-3.5 text-[#E85B49]" />
-                        <span className="font-semibold text-slate-800">Panel Admin</span>
-                      </button>
-                    )}
-                  </div>
-                </>
-              )}
-            </div>
-          )}
-
-          {/* Botón directo de Acceso al Panel Admin */}
-          {onOpenAdmin && (
-            <button
-              type="button"
-              onClick={onOpenAdmin}
-              className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg transition-colors cursor-pointer"
-              title="Acceder al Panel de Administración del Catálogo"
-            >
-              <Shield className="w-3.5 h-3.5 text-[#E85B49]" />
-              <span>Admin</span>
-            </button>
-          )}
-
-          {/* Botón Primario: Crear / Nuevo Viaje */}
+          {/* Botón Primario: Nuevo Viaje */}
           <button
             type="button"
             onClick={onOpenCreateModal}
-            className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 text-xs font-semibold text-white bg-[#E85B49] hover:bg-[#D94C3A] active:scale-[0.98] rounded-lg transition-all cursor-pointer shadow-xs whitespace-nowrap shrink-0"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#E85B49] hover:bg-[#D94C3C] active:scale-[0.99] rounded-md transition-colors cursor-pointer whitespace-nowrap shrink-0"
             aria-label={currentTrip ? 'Crear un nuevo viaje' : 'Crear viaje'}
           >
-            <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-            <span className="hidden sm:inline">{currentTrip ? 'Nuevo Viaje' : 'Crear Viaje'}</span>
+            <Plus className="w-3.5 h-3.5 stroke-[2.2]" />
+            <span className="hidden sm:inline">{currentTrip ? 'Nuevo viaje' : 'Crear viaje'}</span>
             <span className="sm:hidden">{currentTrip ? 'Nuevo' : 'Crear'}</span>
           </button>
         </div>

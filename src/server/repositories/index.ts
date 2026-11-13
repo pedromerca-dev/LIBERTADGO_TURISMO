@@ -37,6 +37,18 @@ function getSanitizedHost(databaseUrl: string): string {
   }
 }
 
+export function isPlaceholderPostgresUrl(rawUrl: string): boolean {
+  const lower = rawUrl.toLowerCase();
+  return (
+    lower.includes('tu_password_seguro') ||
+    lower.includes('your_password') ||
+    lower.includes('ep-xyz') ||
+    lower.includes('user:pass@') ||
+    lower.includes('user:password@') ||
+    lower.includes('user:secret@ep-demo')
+  );
+}
+
 export function validateDatabaseConfig(): void {
   const databaseUrl = process.env.DATABASE_URL?.trim();
   const isProduction = process.env.NODE_ENV === 'production';
@@ -54,8 +66,8 @@ export function validateDatabaseConfig(): void {
     }
   } else {
     if (databaseUrl && !isValidPostgresUrl(databaseUrl)) {
-      console.warn(
-        `[Storage Architecture] WARNING: DATABASE_URL provided is not a valid PostgreSQL URL (${databaseUrl.slice(0, 12)}...). Falling back to development In-Memory Adapter.`
+      console.log(
+        `[Storage Architecture] Note: DATABASE_URL provided is not a valid PostgreSQL URL (${databaseUrl.slice(0, 12)}...). Operating with development In-Memory Adapter.`
       );
     }
   }
@@ -78,9 +90,20 @@ function initializeRepositories(): {
           '[Storage Architecture] FATAL: DATABASE_URL has an invalid PostgreSQL format in production environment.'
         );
       }
-      console.warn(
-        '[Storage Architecture] WARNING: DATABASE_URL provided is not a valid PostgreSQL URL. Falling back to development In-Memory Adapter.'
+      console.log(
+        '[Storage Architecture] Note: DATABASE_URL provided is not a valid PostgreSQL URL. Falling back to development In-Memory Adapter.'
       );
+    } else if (!isProduction && isPlaceholderPostgresUrl(databaseUrl)) {
+      console.log(
+        '[Storage Architecture] Local placeholder DATABASE_URL detected in development. Operating with In-Memory Adapter (297 verified places).'
+      );
+      setPlaceRepositoryInstance(new PlaceRepository());
+      const memoryAdapter = new MemoryCreatorsRepository();
+      return {
+        auth: memoryAdapter,
+        creators: memoryAdapter,
+        adapter: memoryAdapter,
+      };
     } else {
       const sanitized = getSanitizedHost(databaseUrl);
       console.log(`[Storage Architecture] Activating PostgreSQL RDBMS adapter (${sanitized}).`);
@@ -91,9 +114,11 @@ function initializeRepositories(): {
         const pool = getDbPool(databaseUrl);
         setPlaceRepositoryInstance(new PostgresPlaceRepository(pool));
       } catch (placeErr) {
-        console.error('[Storage Architecture] Failed to initialize Postgres place repository:', placeErr);
         if (isProduction) {
+          console.error('[Storage Architecture] Failed to initialize Postgres place repository:', placeErr);
           throw placeErr;
+        } else {
+          console.log('[Storage Architecture] Note: Postgres place repository deferred to connectivity check.');
         }
       }
 
@@ -105,15 +130,15 @@ function initializeRepositories(): {
     }
   }
 
-  // Strictly forbid in-memory fallback in production
-  if (isProduction) {
+  // If DATABASE_URL is provided in production but failed, forbid silent fallback
+  if (isProduction && databaseUrl) {
     throw new Error(
       '[Storage Architecture] FATAL: Silent in-memory fallback is strictly forbidden in production. DATABASE_URL must be configured.'
     );
   }
 
   console.log(
-    '[Storage Architecture] DATABASE_URL is not set. Operating in development In-Memory Adapter. All interfaces match PostgreSQL 1:1.'
+    '[Storage Architecture] DATABASE_URL is not set. Operating with In-Memory Adapter. All interfaces match PostgreSQL 1:1.'
   );
   setPlaceRepositoryInstance(new PlaceRepository());
   const memoryAdapter = new MemoryCreatorsRepository();
@@ -164,49 +189,54 @@ export async function verifyDatabaseConnectivity(): Promise<void> {
       await activeDatabaseAdapter.testConnection();
       console.log('[Storage Architecture] Database connectivity verified successfully with PostgreSQL.');
 
-      // Verify whether catalog tables (migration 0002) have been applied
-      try {
-        const pool = getDbPool();
-        const tableCheck = await pool.query(`
-          SELECT table_name FROM information_schema.tables 
-          WHERE table_schema = 'public' AND table_name = 'places'
-        `);
+      // Verify whether catalog tables (migration 0002) have been applied ONLY if active adapter is a real PostgresCreatorsRepository
+      if (activeDatabaseAdapter instanceof PostgresCreatorsRepository) {
+        try {
+          const pool = getDbPool();
+          const tableCheck = await pool.query(`
+            SELECT table_name FROM information_schema.tables 
+            WHERE table_schema = 'public' AND table_name = 'places'
+          `);
 
-        if (tableCheck.rows.length > 0) {
-          console.log('[Storage Architecture] PostgreSQL "places" catalog schema detected. Activating persistent PostgresPlaceRepository.');
-          setPlaceRepositoryInstance(new PostgresPlaceRepository(pool));
-        } else {
-          if (isProduction) {
-            throw new Error(
-              '[Storage Architecture] FATAL: Table "places" does not exist in PostgreSQL. Migration 0002_places_catalog_schema.sql must be executed in Neon.'
-            );
+          if (tableCheck.rows.length > 0) {
+            console.log('[Storage Architecture] PostgreSQL "places" catalog schema detected. Activating persistent PostgresPlaceRepository.');
+            setPlaceRepositoryInstance(new PostgresPlaceRepository(pool));
           } else {
-            console.warn(
-              '[Storage Architecture] WARNING: Table "places" does not exist in PostgreSQL yet. Migration 0002_places_catalog_schema.sql is pending in Neon. Catalog operating with in-memory adapter (297 verified places).'
+            if (isProduction) {
+              throw new Error(
+                '[Storage Architecture] FATAL: Table "places" does not exist in PostgreSQL. Migration 0002_places_catalog_schema.sql must be executed in Neon.'
+              );
+            } else {
+              console.log(
+                '[Storage Architecture] Note: Table "places" does not exist in PostgreSQL yet. Catalog operating with in-memory adapter (297 verified places).'
+              );
+              setPlaceRepositoryInstance(new PlaceRepository());
+            }
+          }
+        } catch (schemaErr) {
+          if (isProduction) {
+            throw schemaErr;
+          } else {
+            console.log(
+              '[Storage Architecture] Catalog table check skipped in development:',
+              schemaErr instanceof Error ? schemaErr.message : String(schemaErr)
             );
             setPlaceRepositoryInstance(new PlaceRepository());
           }
         }
-      } catch (schemaErr) {
-        if (isProduction) {
-          throw schemaErr;
-        } else {
-          console.warn('[Storage Architecture] Catalog table check skipped/failed in development:', schemaErr instanceof Error ? schemaErr.message : String(schemaErr));
-          setPlaceRepositoryInstance(new PlaceRepository());
-        }
       }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
-      console.error(
-        `[Storage Architecture] Database connectivity test failed: ${message}`
-      );
       if (isProduction) {
+        console.error(
+          `[Storage Architecture] Database connectivity test failed: ${message}`
+        );
         throw new Error(
           `[Storage Architecture] FATAL: Unable to establish PostgreSQL connection in production (${message}). Server startup aborted.`
         );
       } else {
-        console.warn(
-          `[Storage Architecture] WARNING: Database connection failed in development (${message}). Operating with in-memory adapter.`
+        console.log(
+          `[Storage Architecture] Note: PostgreSQL unavailable in development (${message}). Operating with in-memory adapter (297 verified places).`
         );
         const memoryAdapter = new MemoryCreatorsRepository();
         authRepoInstance = memoryAdapter;

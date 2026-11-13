@@ -3,6 +3,7 @@ import { Compass, MapPin, Calendar, ArrowRight, Check, AlertCircle } from 'lucid
 import { LA_LIBERTAD_LOCALITIES, Locality } from '../types/geo.ts';
 import { calculateTripDuration, formatDateRange } from '../utils/dateUtils.ts';
 import { TripItinerary } from '../types/catalog.ts';
+import { RiyMoLogo } from './common/RiyMoLogo.tsx';
 
 interface TripCreationScreenProps {
   onTripCreated: (trip: TripItinerary) => void;
@@ -117,18 +118,18 @@ export const TripCreationScreen: React.FC<TripCreationScreenProps> = ({
   };
 
   return (
-    <div className="h-full min-h-0 flex flex-col justify-between bg-[#F8F9FA] overflow-y-auto lg:overflow-hidden py-3 sm:py-4 px-4 sm:px-6">
+    <div className="h-full min-h-0 flex flex-col justify-between bg-[#F7F2E8]/40 overflow-y-auto lg:overflow-hidden py-3 sm:py-4 px-4 sm:px-6">
       <div className="max-w-xl mx-auto w-full my-auto">
-        {/* Cabecera simplificada */}
-        <div className="text-center mb-2.5 sm:mb-3">
-          <div className="w-9 h-9 mx-auto rounded-xl bg-[#17243A] text-white flex items-center justify-center shadow-xs mb-1.5">
-            <Compass className="w-5 h-5 stroke-[2.2]" />
+        {/* Cabecera simplificada RIYMO */}
+        <div className="text-center mb-3 sm:mb-4">
+          <div className="inline-block mb-2">
+            <RiyMoLogo variant="full" size="lg" />
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold font-display text-[#17243A] tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-bold font-display text-[#263B35] tracking-tight">
             Planifica tu viaje
           </h1>
-          <p className="text-xs text-[#64748B] mt-0.5">
-            Organiza itinerarios, descubre lugares y recorre La Libertad, Perú.
+          <p className="text-xs text-[#64748B] mt-1 max-w-md mx-auto">
+            Organiza itinerarios por días, descubre lugares en el mapa y explora los tesoros del norte peruano.
           </p>
         </div>
 
@@ -324,7 +325,7 @@ export const TripCreationScreen: React.FC<TripCreationScreenProps> = ({
       </div>
 
       <div className="text-center text-[11px] text-[#64748B] py-1 shrink-0">
-        LibertadGO · Región La Libertad, Perú
+        RIYMO · Exploración y Planificación Turística del Perú
       </div>
     </div>
   );

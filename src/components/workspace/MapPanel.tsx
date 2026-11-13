@@ -47,8 +47,7 @@ import { getDayColor } from '../../utils/itineraryUtils.ts';
 import { calculateRealRoute, RouteData } from '../../utils/routingService.ts';
 import { WorkspaceSection } from './WorkspaceSidebar.tsx';
 import { HorizontalScrollContainer } from '../common/HorizontalScrollContainer.tsx';
-import { TikTokVideoGallery } from '../common/TikTokVideoGallery.tsx';
-import { demoTikTokVideos } from '../../data/demoTikTokVideos';
+import { PlaceVideosSection } from '../common/PlaceVideosSection.tsx';
 
 interface MapPanelProps {
   trip: TripItinerary;
@@ -74,15 +73,15 @@ interface MapPanelProps {
   onSearchChange?: (query: string) => void;
 }
 
-// Categorías del catálogo con iconos y colores representativos
+// Categorías del catálogo con iconos y colores de la paleta oficial RIYMO
 const CATEGORY_STYLES: Record<string, { bg: string; icon: string; label: string }> = {
-  restaurantes: { bg: '#D97706', icon: '🍴', label: 'Gastronomía' },
-  gastronomia: { bg: '#D97706', icon: '🍴', label: 'Gastronomía' },
-  arqueologia: { bg: '#9A3412', icon: '🏛️', label: 'Arqueología' },
-  playas: { bg: '#0284C7', icon: '🌊', label: 'Playas' },
-  museos: { bg: '#7C3AED', icon: '🎨', label: 'Museos' },
-  atractivos: { bg: '#059669', icon: '⭐', label: 'Atractivos' },
-  hoteles: { bg: '#4338CA', icon: '🏨', label: 'Hoteles' },
+  restaurantes: { bg: '#E85B49', icon: '🍴', label: 'Gastronomía' },
+  gastronomia: { bg: '#E85B49', icon: '🍴', label: 'Gastronomía' },
+  arqueologia: { bg: '#D9B66F', icon: '🏛️', label: 'Arqueología' },
+  playas: { bg: '#71958B', icon: '🌊', label: 'Playas' },
+  museos: { bg: '#263B35', icon: '🎨', label: 'Museos' },
+  atractivos: { bg: '#263B35', icon: '⭐', label: 'Atractivos' },
+  hoteles: { bg: '#17243A', icon: '🏨', label: 'Hoteles' },
 };
 
 export const MapPanel: React.FC<MapPanelProps> = ({
@@ -349,7 +348,7 @@ export const MapPanel: React.FC<MapPanelProps> = ({
               ],
               tileSize: 256,
               attribution:
-                '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> | LibertadGO',
+                '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> | RIYMO',
             },
           },
           layers: [
@@ -415,7 +414,7 @@ export const MapPanel: React.FC<MapPanelProps> = ({
             },
           });
 
-          // Route line (Coral #E85B49)
+          // Route line (Nature Green #71958B with Coral highlight)
           map.addLayer({
             id: 'itinerary-route-line',
             type: 'line',
@@ -425,7 +424,7 @@ export const MapPanel: React.FC<MapPanelProps> = ({
               'line-cap': 'round',
             },
             paint: {
-              'line-color': ['coalesce', ['get', 'color'], '#E85B49'],
+              'line-color': ['coalesce', ['get', 'color'], '#71958B'],
               'line-width': 3.5,
               'line-dasharray': [1, 0],
             },
@@ -710,7 +709,7 @@ export const MapPanel: React.FC<MapPanelProps> = ({
         const dayColor = getDayColor(act.dayNumber);
 
         const el = document.createElement('div');
-        el.className = 'libertadgo-map-marker-hitbox';
+        el.className = 'riymo-map-marker-hitbox';
         el.style.width = '44px';
         el.style.height = '44px';
         el.style.display = 'flex';
@@ -719,13 +718,13 @@ export const MapPanel: React.FC<MapPanelProps> = ({
         el.style.cursor = 'pointer';
         el.style.userSelect = 'none';
         el.style.pointerEvents = 'auto';
-        el.style.zIndex = isSelected ? '60' : '30';
+        el.style.zIndex = isSelected ? '20' : '10';
         el.setAttribute('role', 'button');
         el.setAttribute('tabindex', '0');
         el.setAttribute('aria-label', `${place.name} · Día ${act.dayNumber} · #${act.order}`);
 
         const inner = document.createElement('div');
-        inner.className = 'libertadgo-map-marker-badge';
+        inner.className = 'riymo-map-marker-badge';
         inner.style.transition = 'transform 160ms cubic-bezier(0.16, 1, 0.3, 1), filter 160ms ease';
         inner.style.display = 'flex';
         inner.style.alignItems = 'center';
@@ -820,7 +819,7 @@ export const MapPanel: React.FC<MapPanelProps> = ({
         const inTrip = trip.activities.find((a) => a.placeId === place.id);
 
         const el = document.createElement('div');
-        el.className = 'libertadgo-map-marker-hitbox';
+        el.className = 'riymo-map-marker-hitbox';
         el.style.width = '44px';
         el.style.height = '44px';
         el.style.display = 'flex';
@@ -829,10 +828,10 @@ export const MapPanel: React.FC<MapPanelProps> = ({
         el.style.cursor = 'pointer';
         el.style.userSelect = 'none';
         el.style.pointerEvents = 'auto';
-        el.style.zIndex = isSelected ? '55' : '20';
+        el.style.zIndex = isSelected ? '20' : '10';
 
         const inner = document.createElement('div');
-        inner.className = 'libertadgo-map-marker-badge';
+        inner.className = 'riymo-map-marker-badge';
         inner.style.transition = 'transform 160ms cubic-bezier(0.16, 1, 0.3, 1), filter 160ms ease';
 
         if (isSaved) {
@@ -999,7 +998,7 @@ export const MapPanel: React.FC<MapPanelProps> = ({
           }
 
           const el = document.createElement('div');
-          el.className = 'libertadgo-user-pulse-marker';
+          el.className = 'riymo-user-pulse-marker';
           el.innerHTML = `
             <div style="position: relative; width: 22px; height: 22px; pointer-events: none;">
               <div style="position: absolute; inset: -4px; border-radius: 50%; background: rgba(37, 99, 235, 0.35); animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
@@ -1295,55 +1294,55 @@ export const MapPanel: React.FC<MapPanelProps> = ({
           ) : (
             /* ================= MODO EXPLORAR (CATÁLOGO COMPLETO) ================= */
             <>
-              {/* Barra de Búsqueda Flotante */}
+              {/* Barra de Búsqueda Flotante tipo Google Maps */}
               <div className="relative pointer-events-auto">
-                <div className="flex items-center bg-white rounded-2xl shadow-md border border-[#E2E8F0] px-3.5 py-2.5 transition-all focus-within:ring-2 focus-within:ring-[#E85B49]/20 focus-within:border-[#E85B49]">
-                  <Search className="w-4 h-4 text-[#64748B] shrink-0 mr-2.5" />
+                <div className="flex items-center bg-white rounded-lg shadow-sm border border-[#E9E7E1] px-3 py-2 transition-all focus-within:border-[#263B35]">
+                  <Search className="w-4 h-4 text-[#64748B] shrink-0 mr-2" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => onSearchChange?.(e.target.value)}
                     onFocus={() => setIsSearchFocused(true)}
                     placeholder="Buscar restaurantes, playas, museos..."
-                    className="w-full text-xs sm:text-sm text-[#17243A] placeholder:text-[#94A3B8] bg-transparent outline-none"
+                    className="w-full text-xs text-[#263B35] placeholder:text-[#94A3B8] bg-transparent outline-none"
                   />
 
                   {searchQuery && (
                     <button
                       type="button"
                       onClick={() => onSearchChange?.('')}
-                      className="p-1 text-[#94A3B8] hover:text-[#17243A] cursor-pointer"
+                      className="p-1 text-[#94A3B8] hover:text-[#263B35] cursor-pointer"
                       title="Limpiar búsqueda"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
                   )}
 
-                  <div className="h-4 w-px bg-[#E2E8F0] mx-2" />
+                  <div className="h-4 w-px bg-[#E9E7E1] mx-1.5" />
 
-                  {/* Botón de Filtros Avanzados (Sliders) */}
+                  {/* Botón de Filtros Avanzados */}
                   <button
                     type="button"
                     onClick={() => setIsAdvancedFiltersOpen(true)}
-                    className={`p-1.5 rounded-lg transition-colors cursor-pointer relative ${
+                    className={`p-1 rounded-md transition-colors cursor-pointer relative ${
                       onlySavedFilter || minRatingFilter > 0 || onlyMinceturFilter
                         ? 'bg-[#E85B49] text-white'
-                        : 'text-[#64748B] hover:text-[#17243A] hover:bg-[#F1F5F9]'
+                        : 'text-[#64748B] hover:text-[#263B35] hover:bg-[#F7F2E8]'
                     }`}
                     title="Filtros avanzados"
                     aria-label="Filtros avanzados"
                   >
-                    <SlidersHorizontal className="w-4 h-4" />
+                    <SlidersHorizontal className="w-3.5 h-3.5" />
                     {(onlySavedFilter || minRatingFilter > 0 || onlyMinceturFilter) && (
-                      <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#17243A] border-2 border-white" />
+                      <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#263B35] border border-white" />
                     )}
                   </button>
                 </div>
 
                 {/* Menú de Sugerencias en tiempo real */}
                 {searchSuggestions.length > 0 && isSearchFocused && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-lg border border-[#E2E8F0] overflow-hidden z-30 animate-in fade-in zoom-in-95 duration-100">
-                    <div className="p-1.5 space-y-0.5">
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-md border border-[#E9E7E1] overflow-hidden z-30 animate-in fade-in duration-100">
+                    <div className="p-1 space-y-0.5">
                       {searchSuggestions.map((sug) => {
                         const style = CATEGORY_STYLES[sug.category];
                         const inTrip = trip.activities.find((a) => a.placeId === sug.id);
@@ -1360,12 +1359,12 @@ export const MapPanel: React.FC<MapPanelProps> = ({
                                 duration: 700,
                               });
                             }}
-                            className="flex items-center justify-between p-2 rounded-lg hover:bg-[#F8FAFC] cursor-pointer transition-colors"
+                            className="flex items-center justify-between p-2 rounded-md hover:bg-[#F7F2E8] cursor-pointer transition-colors"
                           >
-                            <div className="flex items-center gap-2.5 truncate">
-                              <span className="text-sm shrink-0">{style?.icon || '📍'}</span>
+                            <div className="flex items-center gap-2 truncate">
+                              <span className="text-xs shrink-0">{style?.icon || '📍'}</span>
                               <div className="truncate">
-                                <span className="text-xs font-bold text-[#17243A] block truncate">
+                                <span className="text-xs font-semibold text-[#263B35] block truncate">
                                   {sug.name}
                                 </span>
                                 <span className="text-[11px] text-[#64748B] block truncate">
@@ -1375,7 +1374,7 @@ export const MapPanel: React.FC<MapPanelProps> = ({
                             </div>
 
                             {inTrip && (
-                              <span className="text-[10px] font-semibold text-white bg-[#E85B49] px-1.5 py-0.5 rounded shrink-0 ml-2">
+                              <span className="text-[10px] font-medium text-white bg-[#E85B49] px-1.5 py-0.5 rounded shrink-0 ml-2">
                                 Día {inTrip.dayNumber}
                               </span>
                             )}
@@ -1387,7 +1386,7 @@ export const MapPanel: React.FC<MapPanelProps> = ({
                 )}
               </div>
 
-              {/* Carrusel Desplazable de Filtros por Localidad en el mapa */}
+              {/* Filtros por Localidad en el mapa */}
               {onLocalityChange && (
                 <HorizontalScrollContainer
                   containerClassName="w-full pointer-events-auto"
@@ -1403,14 +1402,14 @@ export const MapPanel: React.FC<MapPanelProps> = ({
                         key={loc.id}
                         type="button"
                         onClick={() => onLocalityChange?.(loc.id)}
-                        className={`px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 flex-shrink-0 shadow-xs transition-all cursor-pointer flex items-center gap-1.5 ${
+                        className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap shrink-0 flex-shrink-0 transition-colors cursor-pointer flex items-center gap-1 border ${
                           isLocActive
-                            ? 'bg-[#E85B49] text-white ring-2 ring-[#E85B49]/30'
-                            : 'bg-white/95 text-[#475569] hover:bg-white hover:text-[#0F172A] border border-[#E2E8F0]/80'
+                            ? 'bg-[#263B35] text-white border-[#263B35]'
+                            : 'bg-white text-[#263B35] hover:bg-[#F7F2E8] border-[#E9E7E1]'
                         }`}
                         title={`Filtrar mapa por ${loc.name}`}
                       >
-                        <MapPin className={`w-3 h-3 ${isLocActive ? 'text-white' : 'text-[#E85B49]'}`} />
+                        <MapPin className={`w-3 h-3 ${isLocActive ? 'text-white' : 'text-[#64748B]'}`} />
                         <span>{loc.name}</span>
                       </button>
                     );
@@ -1418,7 +1417,7 @@ export const MapPanel: React.FC<MapPanelProps> = ({
                 </HorizontalScrollContainer>
               )}
 
-              {/* Carrusel Desplazable de Filtros por Categoría con soporte táctil fluido, degradados y flechas en desktop */}
+              {/* Filtros por Categoría */}
               <HorizontalScrollContainer
                 innerRef={categoryScrollRef}
                 containerClassName="w-full pointer-events-auto"
@@ -1438,10 +1437,10 @@ export const MapPanel: React.FC<MapPanelProps> = ({
                       key={cat.id}
                       type="button"
                       onClick={() => onCategoryChange?.(cat.id)}
-                      className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 flex-shrink-0 shadow-xs transition-all cursor-pointer flex items-center gap-1.5 ${
+                      className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap shrink-0 flex-shrink-0 transition-colors cursor-pointer flex items-center gap-1.5 border ${
                         isActive
-                          ? 'bg-[#17243A] text-white ring-2 ring-[#17243A]/20'
-                          : 'bg-white/95 text-[#475569] hover:bg-white hover:text-[#0F172A] border border-[#E2E8F0]/80'
+                          ? 'bg-[#263B35] text-white border-[#263B35]'
+                          : 'bg-white text-[#263B35] hover:bg-[#F7F2E8] border-[#E9E7E1]'
                       }`}
                     >
                       <span className="text-[11px]">{cat.icon}</span>
@@ -1600,18 +1599,18 @@ export const MapPanel: React.FC<MapPanelProps> = ({
         {/* ============================================================ */}
         {selectedPlace && (
           <div
-            className={`absolute bottom-3 left-3 right-3 sm:right-auto sm:max-w-md z-30 transition-all duration-300 ease-in-out ${
+            className={`absolute bottom-3 left-3 right-3 sm:right-auto sm:max-w-md z-40 transition-all duration-300 ease-in-out ${
               isCardExpanded ? 'max-h-[80vh]' : 'max-h-56'
             }`}
           >
-            <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-xl overflow-hidden flex flex-col">
-              {/* Barra de agarre para arrastrar o alternar estado expandido */}
+            <div className="bg-white rounded-lg border border-[#E9E7E1] shadow-md overflow-hidden flex flex-col">
+              {/* Barra de agarre para alternar estado */}
               <div
                 onClick={() => setIsCardExpanded(!isCardExpanded)}
-                className="w-full py-1.5 flex items-center justify-center cursor-pointer hover:bg-[#F8FAFC] transition-colors"
+                className="w-full py-1.5 flex items-center justify-center cursor-pointer hover:bg-[#F7F2E8] transition-colors"
                 title={isCardExpanded ? 'Contraer ficha' : 'Expandir ficha'}
               >
-                <div className="w-9 h-1 rounded-full bg-slate-300" />
+                <div className="w-8 h-1 rounded-full bg-[#E9E7E1]" />
               </div>
 
               {/* Mensaje de confirmación visual */}
@@ -1624,14 +1623,14 @@ export const MapPanel: React.FC<MapPanelProps> = ({
 
               {/* MODO EXPANDIDO */}
               {isCardExpanded ? (
-                <div className="p-4 space-y-3.5 overflow-y-auto max-h-[72vh]">
+                <div className="p-3.5 space-y-3 overflow-y-auto max-h-[72vh]">
                   {/* Cabecera expandida */}
                   <div className="flex items-start justify-between">
                     <div>
-                      <span className="text-[10px] font-bold text-[#E85B49] uppercase tracking-wider block">
+                      <span className="text-[11px] font-medium text-[#64748B] block">
                         {selectedPlace.category} · {selectedPlace.localityName}
                       </span>
-                      <h3 className="text-base font-bold font-display text-[#17243A] leading-snug">
+                      <h3 className="text-base font-bold text-[#263B35] leading-snug">
                         {selectedPlace.name}
                       </h3>
                     </div>
@@ -1640,7 +1639,7 @@ export const MapPanel: React.FC<MapPanelProps> = ({
                       <button
                         type="button"
                         onClick={() => setIsCardExpanded(false)}
-                        className="p-1 text-[#64748B] hover:text-[#17243A] rounded cursor-pointer"
+                        className="p-1 text-[#64748B] hover:text-[#263B35] rounded cursor-pointer"
                         title="Contraer"
                       >
                         <ChevronDown className="w-4 h-4" />
@@ -1648,7 +1647,7 @@ export const MapPanel: React.FC<MapPanelProps> = ({
                       <button
                         type="button"
                         onClick={() => onSelectPlace(null)}
-                        className="p-1 text-[#64748B] hover:text-[#17243A] rounded cursor-pointer"
+                        className="p-1 text-[#64748B] hover:text-[#263B35] rounded cursor-pointer"
                         title="Cerrar"
                       >
                         <X className="w-4 h-4" />
@@ -1657,7 +1656,7 @@ export const MapPanel: React.FC<MapPanelProps> = ({
                   </div>
 
                   {/* Imagen completa */}
-                  <div className="relative h-44 sm:h-52 rounded-xl overflow-hidden bg-slate-100 border border-slate-100">
+                  <div className="relative h-44 sm:h-48 rounded-md overflow-hidden bg-slate-100 border border-[#E9E7E1]">
                     <PlaceImage
                       src={selectedPlace.images[0]?.url}
                       alt={selectedPlace.name}
@@ -1666,37 +1665,37 @@ export const MapPanel: React.FC<MapPanelProps> = ({
                     />
                   </div>
 
-                  {/* Metadatos (Calificación y MINCETUR) */}
+                  {/* Metadatos (Calificación y Verificación auténtica) */}
                   <div className="flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2">
                       {selectedPlace.rating && (
-                        <div className="flex items-center gap-1 text-amber-600 font-bold">
-                          <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+                        <div className="flex items-center gap-1 text-[#263B35] font-medium">
+                          <Star className="w-3.5 h-3.5 fill-[#D9B66F] text-[#D9B66F]" />
                           <span>{selectedPlace.rating}</span>
                           {selectedPlace.reviewsCount && (
-                            <span className="text-[#64748B] font-normal">
-                              ({selectedPlace.reviewsCount})
+                            <span className="text-[#64748B]">
+                              · {selectedPlace.reviewsCount} opiniones
                             </span>
                           )}
                         </div>
                       )}
                     </div>
 
-                    <span className="text-[10px] text-[#27856C] bg-[#27856C]/10 px-2 py-0.5 rounded-md font-semibold flex items-center gap-1">
-                      <ShieldCheck className="w-3 h-3" />
-                      {selectedPlace.verification.verificationLevel === 'official_mincetur'
-                        ? 'MINCETUR Oficial'
-                        : 'Verificado'}
-                    </span>
+                    {selectedPlace.verification?.isVerified && (
+                      <span className="text-[11px] text-[#263B35] font-medium flex items-center gap-1">
+                        <ShieldCheck className="w-3.5 h-3.5 text-[#263B35]" />
+                        Verificado por RiyMo
+                      </span>
+                    )}
                   </div>
 
                   {/* Descripción */}
-                  <p className="text-xs text-[#475569] leading-relaxed">
+                  <p className="text-xs text-[#263B35] leading-relaxed">
                     {selectedPlace.fullDescription || selectedPlace.shortDescription}
                   </p>
 
                   {/* Dirección y Teléfono */}
-                  <div className="pt-2 border-t border-[#E9EEF4] space-y-1.5 text-xs text-[#64748B]">
+                  <div className="pt-2 border-t border-[#E9E7E1] space-y-1 text-xs text-[#64748B]">
                     <div className="flex items-center gap-2">
                       <MapPin className="w-3.5 h-3.5 text-[#E85B49] shrink-0" />
                       <span>{selectedPlace.address}</span>
@@ -1708,19 +1707,16 @@ export const MapPanel: React.FC<MapPanelProps> = ({
                       </div>
                     )}
                   </div>
-                  <div className="mt-4">
-                  <TikTokVideoGallery
-  title="Videos de este lugar"
-  description="Conoce este destino a través de sus creadores."
-  showFilters={false}
-  showSearch={false}
-  compact={true}
-  videos={demoTikTokVideos}
-/>
-</div>
-                  {/* Asignación directa a días del viaje con toggle independiente */}
-                  <div className="pt-3 border-t border-[#E9EEF4] space-y-2">
-                    <span className="text-xs font-bold text-[#17243A] block">
+                  <div className="mt-3">
+                    <PlaceVideosSection
+                      placeId={selectedPlace.id}
+                      placeName={selectedPlace.name}
+                      compact={true}
+                    />
+                  </div>
+                  {/* Asignación directa a días del viaje con toggle */}
+                  <div className="pt-2.5 border-t border-[#E9E7E1] space-y-2">
+                    <span className="text-xs font-medium text-[#263B35] block">
                       Organizar en el Itinerario:
                     </span>
                     <div className="grid grid-cols-3 gap-1.5">
@@ -1733,15 +1729,15 @@ export const MapPanel: React.FC<MapPanelProps> = ({
                             key={d.dayNumber}
                             type="button"
                             onClick={() => handleToggleDay(selectedPlace, d.dayNumber)}
-                            className={`p-2 rounded-xl text-xs font-semibold flex flex-col items-center justify-center transition-all cursor-pointer ${
+                            className={`p-2 rounded-md text-xs font-medium flex flex-col items-center justify-center transition-all cursor-pointer ${
                               inThisDay
-                                ? 'bg-emerald-600 text-white shadow-xs hover:bg-emerald-700'
-                                : 'bg-[#F8FAFC] text-[#17243A] hover:bg-[#E85B49] hover:text-white border border-[#E2E8F0]'
+                                ? 'bg-[#263B35] text-white shadow-2xs'
+                                : 'bg-[#F7F2E8] text-[#263B35] hover:bg-[#E85B49] hover:text-white border border-[#E9E7E1]'
                             }`}
-                            title={inThisDay ? `Día ${d.dayNumber} asignado (Pulsar para desasignar)` : `Añadir a Día ${d.dayNumber}`}
+                            title={inThisDay ? `Día ${d.dayNumber} asignado` : `Añadir a Día ${d.dayNumber}`}
                           >
                             <span>{inThisDay ? `✓ Día ${d.dayNumber}` : `Día ${d.dayNumber}`}</span>
-                            <span className="text-[10px] font-normal opacity-80">{d.weekdayShort}</span>
+                            <span className="text-[10px] opacity-75">{d.weekdayShort}</span>
                           </button>
                         );
                       })}
@@ -1753,21 +1749,21 @@ export const MapPanel: React.FC<MapPanelProps> = ({
                     <button
                       type="button"
                       onClick={() => onSwitchToContent()}
-                      className="w-full py-2 text-xs font-semibold text-[#17243A] bg-[#F1F5F9] hover:bg-[#E2E8F0] rounded-xl transition-colors cursor-pointer text-center"
+                      className="w-full py-1.5 text-xs font-medium text-[#263B35] bg-[#F7F2E8] hover:bg-[#E9E7E1] rounded-md transition-colors cursor-pointer text-center"
                     >
                       Abrir ficha completa en el Planificador →
                     </button>
                   )}
                 </div>
               ) : (
-                /* MODO COMPACTO (Default) */
-                <div className="p-3.5 flex flex-col gap-2.5">
+                /* MODO COMPACTO (Default tipo Google Maps) */
+                <div className="p-3 flex flex-col gap-2">
                   <div className="flex items-start justify-between gap-3">
                     <div
-                      className="flex gap-3 flex-1 min-w-0 cursor-pointer"
+                      className="flex gap-2.5 flex-1 min-w-0 cursor-pointer"
                       onClick={() => setIsCardExpanded(true)}
                     >
-                      <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-slate-100 border border-slate-100">
+                      <div className="w-16 h-16 rounded-md overflow-hidden shrink-0 bg-slate-100 border border-[#E9E7E1]">
                         <PlaceImage
                           src={selectedPlace.images[0]?.url}
                           alt={selectedPlace.name}
@@ -1777,44 +1773,44 @@ export const MapPanel: React.FC<MapPanelProps> = ({
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-1.5 text-[10px] text-[#64748B] uppercase font-semibold">
-                          <span>{selectedPlace.category}</span>
+                        <div className="flex items-center gap-1.5 text-[11px] text-[#64748B]">
+                          <span>{selectedPlace.category} · {selectedPlace.localityName}</span>
                           {selectedPlaceActivities.length > 0 && (
-                            <span className="text-[#E85B49] font-bold">
+                            <span className="text-[#E85B49] font-medium">
                               · {selectedPlaceActivities.map((a) => `Día ${a.dayNumber}`).join(', ')}
                             </span>
                           )}
                         </div>
 
-                        <h4 className="text-xs sm:text-sm font-bold text-[#17243A] truncate mt-0.5 leading-snug">
+                        <h4 className="text-xs sm:text-sm font-semibold text-[#263B35] truncate mt-0.5 leading-snug">
                           {selectedPlace.name}
                         </h4>
 
-                        <p className="text-[11px] text-[#64748B] truncate mt-0.5">
-                          {selectedPlace.address.split(',')[0]}
-                        </p>
-
                         <div className="flex items-center gap-2 mt-1 text-[11px]">
                           {selectedPlace.rating && (
-                            <span className="flex items-center gap-0.5 text-amber-600 font-bold">
-                              <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
+                            <span className="flex items-center gap-0.5 text-[#263B35] font-medium">
+                              <Star className="w-3 h-3 fill-[#D9B66F] text-[#D9B66F]" />
                               <span>{selectedPlace.rating}</span>
+                              {selectedPlace.reviewsCount && (
+                                <span className="text-[#64748B]">· {selectedPlace.reviewsCount} opiniones</span>
+                              )}
                             </span>
                           )}
-                          <span className="text-[10px] text-[#27856C] bg-[#27856C]/10 px-1.5 py-0.2 rounded font-medium">
-                            {selectedPlace.verification.verificationLevel === 'official_mincetur'
-                              ? 'MINCETUR'
-                              : 'Verificado'}
-                          </span>
+                          {selectedPlace.verification?.isVerified && (
+                            <span className="text-[10px] text-[#263B35] font-medium flex items-center gap-0.5">
+                              <ShieldCheck className="w-3 h-3 text-[#263B35]" />
+                              Verificado
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1 shrink-0 -mt-1">
+                    <div className="flex items-center gap-1 shrink-0">
                       <button
                         type="button"
                         onClick={() => setIsCardExpanded(true)}
-                        className="p-1 text-[#64748B] hover:text-[#17243A] cursor-pointer"
+                        className="p-1 text-[#64748B] hover:text-[#263B35] cursor-pointer"
                         title="Ver detalles completos"
                       >
                         <ChevronUp className="w-4 h-4" />
@@ -1822,7 +1818,7 @@ export const MapPanel: React.FC<MapPanelProps> = ({
                       <button
                         type="button"
                         onClick={() => onSelectPlace(null)}
-                        className="p-1 text-[#64748B] hover:text-[#17243A] cursor-pointer"
+                        className="p-1 text-[#64748B] hover:text-[#263B35] cursor-pointer"
                         title="Cerrar ficha"
                       >
                         <X className="w-4 h-4" />
@@ -1831,34 +1827,34 @@ export const MapPanel: React.FC<MapPanelProps> = ({
                   </div>
 
                   {/* Acciones directas sobre el lugar seleccionado */}
-                  <div className="flex items-center justify-between pt-2 border-t border-[#F1F5F9] text-xs">
+                  <div className="flex items-center justify-between pt-2 border-t border-[#E9E7E1] text-xs">
                     {/* Botón Guardar en Wishlist */}
                     {onToggleSavePlace && (
                       <button
                         type="button"
                         onClick={() => onToggleSavePlace(selectedPlace.id)}
-                        className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-semibold transition-all cursor-pointer ${
+                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-xs font-medium transition-all cursor-pointer ${
                           isSelectedSaved
-                            ? 'bg-amber-50 border-amber-200 text-amber-800'
-                            : 'bg-white border-[#E2E8F0] text-[#64748B] hover:text-[#17243A]'
+                            ? 'bg-[#F7F2E8] border-[#D9B66F] text-[#263B35]'
+                            : 'bg-white border-[#E9E7E1] text-[#64748B] hover:text-[#263B35]'
                         }`}
                         title={isSelectedSaved ? 'Quitar de guardados' : 'Guardar en Por visitar'}
                       >
                         <Bookmark
                           className={`w-3.5 h-3.5 ${
-                            isSelectedSaved ? 'fill-[#D97706] text-[#D97706]' : ''
+                            isSelectedSaved ? 'fill-[#D9B66F] text-[#D9B66F]' : ''
                           }`}
                         />
                         <span>{isSelectedSaved ? 'Guardado' : 'Guardar'}</span>
                       </button>
                     )}
 
-                    {/* Botones de asignación de días con toggle independiente y scroll suave con flechas */}
-                    <div className="flex-1 min-w-0 flex items-center gap-1.5 pl-2">
-                      <span className="text-[11px] text-[#64748B] shrink-0 font-medium">Añadir a:</span>
+                    {/* Botones de asignación de días */}
+                    <div className="flex-1 min-w-0 flex items-center gap-1 pl-2">
+                      <span className="text-[11px] text-[#64748B] shrink-0">Añadir a:</span>
                       <HorizontalScrollContainer
                         containerClassName="flex-1 min-w-0"
-                        className="gap-1.5 py-0.5"
+                        className="gap-1 py-0.5"
                         gradientTheme="white"
                         arrowSize="sm"
                         ariaLabel="Asignar lugar a día"
@@ -1872,12 +1868,12 @@ export const MapPanel: React.FC<MapPanelProps> = ({
                               key={d.dayNumber}
                               type="button"
                               onClick={() => handleToggleDay(selectedPlace, d.dayNumber)}
-                              className={`px-2.5 py-1.5 text-xs rounded-lg font-mono font-semibold shrink-0 flex-shrink-0 whitespace-nowrap transition-all cursor-pointer ${
+                              className={`px-2 py-1 text-xs rounded-md font-medium shrink-0 whitespace-nowrap transition-all cursor-pointer ${
                                 inThisDay
-                                  ? 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-2xs'
-                                  : 'bg-[#17243A] text-white hover:bg-[#E85B49] active:scale-95 shadow-2xs'
+                                  ? 'bg-[#263B35] text-white'
+                                  : 'bg-[#F7F2E8] text-[#263B35] hover:bg-[#E85B49] hover:text-white border border-[#E9E7E1]'
                               }`}
-                              title={inThisDay ? `Día ${d.dayNumber} asignado (Pulsar para desasignar)` : `Añadir a Día ${d.dayNumber}`}
+                              title={inThisDay ? `Día ${d.dayNumber} asignado` : `Añadir a Día ${d.dayNumber}`}
                             >
                               {inThisDay ? `✓ Día ${d.dayNumber}` : `Día ${d.dayNumber}`}
                             </button>
@@ -1895,13 +1891,13 @@ export const MapPanel: React.FC<MapPanelProps> = ({
         {/* ============================================================ */}
         {/* HERRAMIENTAS FLOTANTES DE CONTROL (INFERIOR DERECHA)         */}
         {/* ============================================================ */}
-        <div className="absolute bottom-4 right-3 z-20 flex flex-col gap-1.5">
+        <div className="absolute bottom-4 right-3 z-20 flex flex-col gap-1">
           {/* Botón de Geolocalización Actual */}
           <button
             type="button"
             onClick={handleLocateUser}
-            className={`p-2.5 bg-white hover:bg-[#F8FAFC] rounded-xl border border-[#E2E8F0] shadow-md transition-all cursor-pointer ${
-              isLocatingUser ? 'animate-pulse text-[#E85B49]' : 'text-[#17243A]'
+            className={`p-2 bg-white hover:bg-[#F7F2E8] rounded-md border border-[#E9E7E1] shadow-xs transition-colors cursor-pointer ${
+              isLocatingUser ? 'text-[#E85B49]' : 'text-[#263B35]'
             }`}
             title="Mi ubicación actual"
             aria-label="Mi ubicación actual"
@@ -1910,11 +1906,11 @@ export const MapPanel: React.FC<MapPanelProps> = ({
           </button>
 
           {/* Controles de Zoom */}
-          <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-md overflow-hidden flex flex-col">
+          <div className="bg-white rounded-md border border-[#E9E7E1] shadow-xs overflow-hidden flex flex-col">
             <button
               type="button"
               onClick={handleZoomIn}
-              className="p-2 text-[#17243A] hover:bg-[#F8FAFC] transition-colors cursor-pointer border-b border-[#F1F5F9]"
+              className="p-2 text-[#263B35] hover:bg-[#F7F2E8] transition-colors cursor-pointer border-b border-[#E9E7E1]"
               title="Acercar mapa"
               aria-label="Acercar mapa"
             >
@@ -1923,7 +1919,7 @@ export const MapPanel: React.FC<MapPanelProps> = ({
             <button
               type="button"
               onClick={handleZoomOut}
-              className="p-2 text-[#17243A] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
+              className="p-2 text-[#263B35] hover:bg-[#F7F2E8] transition-colors cursor-pointer"
               title="Alejar mapa"
               aria-label="Alejar mapa"
             >
@@ -1935,7 +1931,7 @@ export const MapPanel: React.FC<MapPanelProps> = ({
           <button
             type="button"
             onClick={handleFitAllMarkers}
-            className="p-2.5 bg-white hover:bg-[#F8FAFC] text-[#17243A] rounded-xl border border-[#E2E8F0] shadow-md transition-colors cursor-pointer"
+            className="p-2 bg-white hover:bg-[#F7F2E8] text-[#263B35] rounded-md border border-[#E9E7E1] shadow-xs transition-colors cursor-pointer"
             title="Ajustar vista a los lugares visibles"
           >
             <Layers className="w-4 h-4" />
@@ -1945,7 +1941,7 @@ export const MapPanel: React.FC<MapPanelProps> = ({
           <button
             type="button"
             onClick={handleResetCenter}
-            className="p-2.5 bg-white hover:bg-[#F8FAFC] text-[#17243A] rounded-xl border border-[#E2E8F0] shadow-md transition-colors cursor-pointer"
+            className="p-2 bg-white hover:bg-[#F7F2E8] text-[#263B35] rounded-md border border-[#E9E7E1] shadow-xs transition-colors cursor-pointer"
             title={`Centrar en ${trip.destinationName}`}
           >
             <RotateCcw className="w-4 h-4" />

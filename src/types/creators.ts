@@ -27,7 +27,7 @@ export type ModerationStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'OBSERVED' 
 
 export interface CreatorProfile {
   id: string;
-  userId: string;
+  userId: string | null;
   handle: string;                       // Unique handle, e.g. "trujillofoodie"
   displayName: string;
   bio?: string | null;
@@ -36,6 +36,11 @@ export interface CreatorProfile {
   tiktokUrl?: string | null;
   instagramUrl?: string | null;
   youtubeUrl?: string | null;
+  // Audience self-declared metrics
+  tiktokFollowers?: number | null;
+  instagramFollowers?: number | null;
+  youtubeSubscribers?: number | null;
+  audienceUpdatedAt?: string | null;
   isPublic: boolean;                    // Creator profiles are optional and can be private/public
   isVerified: boolean;
   totalApprovedVideos: number;
@@ -48,6 +53,9 @@ export interface VideoExternalMetrics {
   likes?: number;
   comments?: number;
   recordedAt?: string;
+  creatorHandle?: string | null;
+  creatorDisplayName?: string | null;
+  creatorAvatarUrl?: string | null;
 }
 
 export interface VideoSubmission {
@@ -72,6 +80,20 @@ export interface VideoSubmission {
   internalViewsCount: number;           // Times played/viewed within LibertadGO
   internalSavesCount: number;           // Times bookmarked by users within LibertadGO
   externalMetrics?: VideoExternalMetrics | null; // Real external social metrics if provided by verified creator
+  // External creator identity when creatorProfileId is NULL
+  externalCreatorHandle?: string | null;
+  externalCreatorDisplayName?: string | null;
+  externalCreatorAvatarUrl?: string | null;
+  // Creator enrichment (joined from creator_profiles and users)
+  creatorDisplayName?: string | null;
+  creatorHandle?: string | null;
+  creatorAvatarUrl?: string | null;
+  // Audience metrics (inherited from creator_profile)
+  tiktokFollowers?: number | null;
+  instagramFollowers?: number | null;
+  youtubeSubscribers?: number | null;
+  audienceUpdatedAt?: string | null;
+  userName?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -85,15 +107,30 @@ export interface VideoPlace {
   createdAt: string;
 }
 
+export type ModerationActionType = 'CREATE' | 'UPDATE' | 'APPROVE' | 'REJECT' | 'OBSERVE' | 'HIDE';
+
+export interface ModerationAuditPayload {
+  adminUserId: string;
+  adminName: string;
+  action: ModerationActionType;
+  previousStatus?: ModerationStatus | null;
+  newStatus: ModerationStatus;
+  reason?: string | null;
+  internalNotes?: string | null;
+  changedFields?: string[] | null;
+}
+
 export interface VideoModerationLog {
   id: string;
   videoId: string;
   adminUserId: string;
   adminName: string;
-  previousStatus: ModerationStatus;
+  action: ModerationActionType;
+  previousStatus: ModerationStatus | null;
   newStatus: ModerationStatus;
   reason?: string | null;
   internalNotes?: string | null;
+  changedFields?: string[] | null;
   createdAt: string;
 }
 

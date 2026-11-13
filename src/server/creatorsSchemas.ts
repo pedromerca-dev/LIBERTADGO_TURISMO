@@ -8,16 +8,45 @@ import { parseAndValidateVideoUrl } from '../utils/videoUrlParser.ts';
 
 const validLocalityIds = new Set(LA_LIBERTAD_LOCALITIES.map((l) => l.id));
 
+export const safeUrlSchema = z
+  .string()
+  .trim()
+  .min(1, 'La URL no puede estar vacía')
+  .max(500, 'La URL no puede exceder 500 caracteres')
+  .refine(
+    (u) => {
+      if (u.startsWith('/uploads/')) {
+        return !u.includes('..') && /^\/uploads\/[a-zA-Z0-9_\-\.\/]+$/.test(u);
+      }
+      try {
+        const parsed = new URL(u);
+        return parsed.protocol === 'https:' || parsed.protocol === 'http:';
+      } catch {
+        return false;
+      }
+    },
+    {
+      message: 'Debe ser una URL válida (HTTP/HTTPS) o una ruta de subida (/uploads/...)',
+    }
+  );
+
+export const optionalUrlOrEmptySchema = safeUrlSchema
+  .or(z.literal(''))
+  .optional()
+  .nullable();
+
 export const RegisterUserSchema = z.object({
   email: z
     .string()
     .trim()
     .toLowerCase()
+    .max(255, 'El correo electrónico no puede exceder 255 caracteres')
     .email('El correo electrónico no es válido'),
   password: z
     .string()
     .min(8, 'La contraseña debe contener al menos 8 caracteres')
-    .max(100, 'La contraseña no puede exceder 100 caracteres'),
+    .max(100, 'La contraseña no puede exceder 100 caracteres')
+    .refine((p) => p.trim().length >= 8, 'La contraseña no puede contener solo espacios en blanco'),
   name: z
     .string()
     .trim()
@@ -30,10 +59,12 @@ export const LoginUserSchema = z.object({
     .string()
     .trim()
     .toLowerCase()
+    .max(255, 'El correo electrónico no puede exceder 255 caracteres')
     .email('El correo electrónico no es válido'),
   password: z
     .string()
-    .min(1, 'La contraseña es requerida'),
+    .min(1, 'La contraseña es requerida')
+    .max(100, 'La contraseña no puede exceder 100 caracteres'),
 });
 
 export const CreatorProfileSchema = z.object({
@@ -53,17 +84,55 @@ export const CreatorProfileSchema = z.object({
     .max(300, 'La biografía no puede exceder 300 caracteres')
     .optional()
     .nullable(),
-  avatarUrl: z
-    .string()
-    .url('La URL del avatar no es válida')
+  avatarUrl: optionalUrlOrEmptySchema,
+  primaryPlatform: z.enum(['tiktok', 'instagram', 'youtube']),
+  tiktokUrl: optionalUrlOrEmptySchema,
+  instagramUrl: optionalUrlOrEmptySchema,
+  youtubeUrl: optionalUrlOrEmptySchema,
+  tiktokFollowers: z
+    .number()
+    .int('Los seguidores de TikTok deben ser un número entero')
+    .nonnegative('Los seguidores de TikTok no pueden ser negativos')
     .optional()
     .nullable(),
-  primaryPlatform: z.enum(['tiktok', 'instagram', 'youtube']),
-  tiktokUrl: z.string().url().optional().nullable(),
-  instagramUrl: z.string().url().optional().nullable(),
-  youtubeUrl: z.string().url().optional().nullable(),
+  instagramFollowers: z
+    .number()
+    .int('Los seguidores de Instagram deben ser un número entero')
+    .nonnegative('Los seguidores de Instagram no pueden ser negativos')
+    .optional()
+    .nullable(),
+  youtubeSubscribers: z
+    .number()
+    .int('Los suscriptores de YouTube deben ser un número entero')
+    .nonnegative('Los suscriptores de YouTube no pueden ser negativos')
+    .optional()
+    .nullable(),
+  audienceUpdatedAt: z.string().optional().nullable(),
   isPublic: z.boolean().default(true),
 });
+
+export const AdminUpdateVideoPlacesSchema = z.object({
+  placeIds: z
+    .array(z.string().trim().max(100))
+    .max(10, 'No puedes vincular más de 10 lugares por video'),
+  primaryPlaceId: z
+    .string()
+    .trim()
+    .max(100)
+    .optional()
+    .nullable(),
+}).refine(
+  (data) => {
+    if (data.primaryPlaceId && data.placeIds && data.placeIds.length > 0) {
+      return data.placeIds.includes(data.primaryPlaceId);
+    }
+    return true;
+  },
+  {
+    message: 'El lugar principal debe pertenecer a la lista de lugares asociados',
+    path: ['primaryPlaceId'],
+  }
+);
 
 export const SubmitVideoSchema = z.object({
   videoUrl: z
@@ -98,22 +167,29 @@ export const SubmitVideoSchema = z.object({
     .refine((locId) => !locId || validLocalityIds.has(locId), {
       message: 'La localidad especificada debe pertenecer a la región La Libertad',
     }),
-  thumbnailUrl: z
-    .string()
-    .trim()
-    .url('La URL de la miniatura debe ser válida')
-    .optional()
-    .nullable(),
+  thumbnailUrl: safeUrlSchema.optional().nullable(),
   placeIds: z
-    .array(z.string().trim())
+    .array(z.string().trim().max(100))
     .max(10, 'No puedes vincular más de 10 lugares por video')
     .default([]),
   primaryPlaceId: z
     .string()
     .trim()
+    .max(100)
     .optional()
     .nullable(),
-});
+}).refine(
+  (data) => {
+    if (data.primaryPlaceId && data.placeIds) {
+      return data.placeIds.includes(data.primaryPlaceId);
+    }
+    return true;
+  },
+  {
+    message: 'El lugar principal (primaryPlaceId) debe pertenecer a la lista de lugares asociados (placeIds)',
+    path: ['primaryPlaceId'],
+  }
+);
 
 export const ModerationActionSchema = z.object({
   action: z.enum(['APPROVE', 'REJECT', 'OBSERVE', 'HIDE']),
@@ -130,6 +206,200 @@ export const ModerationActionSchema = z.object({
     .optional()
     .nullable(),
   verifiedPlaceIds: z
-    .array(z.string().trim())
+    .array(z.string().trim().max(100))
+    .max(10, 'No puedes vincular más de 10 lugares verificados')
     .optional(),
 });
+
+export const AdminCreateVideoSchema = z.object({
+  videoUrl: z
+    .string()
+    .trim()
+    .url('La URL del video debe ser un enlace válido')
+    .refine((url) => parseAndValidateVideoUrl(url).isValid, {
+      message: 'La URL debe corresponder a un video válido de TikTok, Instagram o YouTube',
+    }),
+  title: z
+    .string()
+    .trim()
+    .min(5, 'El título debe tener al menos 5 caracteres')
+    .max(140, 'El título no puede exceder 140 caracteres'),
+  description: z
+    .string()
+    .trim()
+    .max(1000, 'La descripción no puede exceder 1000 caracteres')
+    .optional()
+    .nullable(),
+  contentType: z.enum(['PLACE', 'ROUTE', 'GENERAL']).default('PLACE'),
+  category: z
+    .string()
+    .trim()
+    .min(2, 'La categoría es requerida')
+    .max(50, 'La categoría no puede exceder 50 caracteres'),
+  localityId: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .optional()
+    .nullable()
+    .refine((locId) => !locId || validLocalityIds.has(locId), {
+      message: 'La localidad especificada debe pertenecer a la región La Libertad',
+    }),
+  thumbnailUrl: safeUrlSchema.optional().nullable(),
+  creatorProfileId: z
+    .string()
+    .trim()
+    .optional()
+    .nullable(),
+  placeIds: z
+    .array(z.string().trim().max(100))
+    .max(10, 'No puedes vincular más de 10 lugares por video')
+    .default([]),
+  primaryPlaceId: z
+    .string()
+    .trim()
+    .max(100)
+    .optional()
+    .nullable(),
+  status: z.enum(['PENDING', 'APPROVED']).default('APPROVED'),
+  externalCreatorHandle: z
+    .string()
+    .trim()
+    .max(100, 'El handle no puede exceder 100 caracteres')
+    .optional()
+    .nullable(),
+  externalCreatorDisplayName: z
+    .string()
+    .trim()
+    .max(150, 'El nombre no puede exceder 150 caracteres')
+    .optional()
+    .nullable(),
+  externalCreatorAvatarUrl: safeUrlSchema.optional().nullable(),
+}).refine(
+  (data) => {
+    if (data.primaryPlaceId && data.placeIds) {
+      return data.placeIds.includes(data.primaryPlaceId);
+    }
+    return true;
+  },
+  {
+    message: 'El lugar principal (primaryPlaceId) debe pertenecer a la lista de lugares asociados (placeIds)',
+    path: ['primaryPlaceId'],
+  }
+);
+
+export const AdminUpdateVideoSchema = z.object({
+  title: z
+    .string()
+    .trim()
+    .min(5, 'El título debe tener al menos 5 caracteres')
+    .max(140, 'El título no puede exceder 140 caracteres')
+    .optional(),
+  description: z
+    .string()
+    .trim()
+    .max(1000, 'La descripción no puede exceder 1000 caracteres')
+    .optional()
+    .nullable(),
+  contentType: z.enum(['PLACE', 'ROUTE', 'GENERAL']).optional(),
+  category: z
+    .string()
+    .trim()
+    .min(2, 'La categoría es requerida')
+    .max(50, 'La categoría no puede exceder 50 caracteres')
+    .optional(),
+  localityId: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .optional()
+    .nullable()
+    .refine((locId) => !locId || validLocalityIds.has(locId), {
+      message: 'La localidad especificada debe pertenecer a la región La Libertad',
+    }),
+  thumbnailUrl: safeUrlSchema.optional().nullable(),
+  creatorProfileId: z
+    .string()
+    .trim()
+    .optional()
+    .nullable(),
+  placeIds: z
+    .array(z.string().trim().max(100))
+    .max(10, 'No puedes vincular más de 10 lugares por video')
+    .optional(),
+  primaryPlaceId: z
+    .string()
+    .trim()
+    .max(100)
+    .optional()
+    .nullable(),
+  status: z.enum(['PENDING', 'APPROVED', 'OBSERVED', 'REJECTED', 'HIDDEN']).optional(),
+  externalCreatorHandle: z
+    .string()
+    .trim()
+    .max(100, 'El handle no puede exceder 100 caracteres')
+    .optional()
+    .nullable(),
+  externalCreatorDisplayName: z
+    .string()
+    .trim()
+    .max(150, 'El nombre no puede exceder 150 caracteres')
+    .optional()
+    .nullable(),
+  externalCreatorAvatarUrl: safeUrlSchema.optional().nullable(),
+}).refine(
+  (data) => {
+    if (data.primaryPlaceId && data.placeIds) {
+      return data.placeIds.includes(data.primaryPlaceId);
+    }
+    return true;
+  },
+  {
+    message: 'El lugar principal (primaryPlaceId) debe pertenecer a la lista de lugares asociados (placeIds)',
+    path: ['primaryPlaceId'],
+  }
+);
+
+export const AdminCreateCreatorSchema = z.object({
+  userId: z.string().trim().optional(),
+  handle: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .regex(/^[a-z0-9_]{3,30}$/, 'El handle solo puede contener minúsculas, números y guiones bajos (3-30 caracteres)'),
+  displayName: z
+    .string()
+    .trim()
+    .min(2, 'El nombre debe tener al menos 2 caracteres')
+    .max(60, 'El nombre no puede exceder 60 caracteres'),
+  bio: z.string().trim().max(300).optional().nullable(),
+  avatarUrl: optionalUrlOrEmptySchema,
+  primaryPlatform: z.enum(['tiktok', 'instagram', 'youtube']),
+  tiktokUrl: optionalUrlOrEmptySchema,
+  instagramUrl: optionalUrlOrEmptySchema,
+  youtubeUrl: optionalUrlOrEmptySchema,
+  tiktokFollowers: z
+    .number()
+    .int('Los seguidores de TikTok deben ser un número entero')
+    .nonnegative('Los seguidores de TikTok no pueden ser negativos')
+    .optional()
+    .nullable(),
+  instagramFollowers: z
+    .number()
+    .int('Los seguidores de Instagram deben ser un número entero')
+    .nonnegative('Los seguidores de Instagram no pueden ser negativos')
+    .optional()
+    .nullable(),
+  youtubeSubscribers: z
+    .number()
+    .int('Los suscriptores de YouTube deben ser un número entero')
+    .nonnegative('Los suscriptores de YouTube no pueden ser negativos')
+    .optional()
+    .nullable(),
+  audienceUpdatedAt: z.string().optional().nullable(),
+  isPublic: z.boolean().default(true),
+  isVerified: z.boolean().default(false),
+});
+
+export const AdminUpdateCreatorSchema = AdminCreateCreatorSchema.partial();
+

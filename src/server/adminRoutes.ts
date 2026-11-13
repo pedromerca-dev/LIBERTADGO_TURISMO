@@ -4,12 +4,32 @@
  * Zero trust: Every administrative mutation is verified on the backend and logged in VideoModerationLog.
  */
 
-import { Router, Request, Response } from 'express';
-import { ModerationActionSchema } from './creatorsSchemas.ts';
-import { getCreatorsRepository } from './repositories/index.ts';
+import express, { Router, Request, Response } from 'express';
+import {
+  ModerationActionSchema,
+  AdminCreateVideoSchema,
+  AdminUpdateVideoSchema,
+  AdminCreateCreatorSchema,
+  AdminUpdateCreatorSchema,
+  AdminUpdateVideoPlacesSchema,
+} from './creatorsSchemas.ts';
+import { getCreatorsRepository, getAuthRepository } from './repositories/index.ts';
 import { requireAuth, requireAdmin } from './authService.ts';
-import { ModerationStatus } from '../types/creators.ts';
+import {
+  ModerationStatus,
+  ModerationActionType,
+  ModerationAuditPayload,
+} from '../types/creators.ts';
 import { INITIAL_PLACES } from '../data/initialPlaces.ts';
+import { parseAndValidateVideoUrl } from '../utils/videoUrlParser.ts';
+import {
+  uploadCreatorAvatar,
+  deleteAvatar,
+  deleteLocalAvatar,
+  getR2ConfigStatus,
+  MAX_AVATAR_SIZE_BYTES,
+  ALLOWED_MIME_TYPES,
+} from './services/storageService.ts';
 
 export const adminRouter = Router();
 
@@ -32,7 +52,7 @@ adminRouter.get('/metrics', async (_req: Request, res: Response) => {
   }
 });
 
-// 2. GET /api/admin/moderation/queue - Moderation queue
+// 2. GET /api/admin/moderation/queue - Moderation queue (batch place lookup)
 adminRouter.get('/moderation/queue', async (req: Request, res: Response) => {
   const repo = getCreatorsRepository();
   const statusFilter = (req.query.status as ModerationStatus) || 'PENDING';
@@ -40,10 +60,15 @@ adminRouter.get('/moderation/queue', async (req: Request, res: Response) => {
   try {
     const queue = await repo.listModerationQueue(statusFilter);
 
-    // Enrich with place names for quick admin inspection
+    // Batch enrich with place names for quick admin inspection without N+1 queries
+    const videoIds = queue.map((v) => v.id);
+    const placesMap = typeof repo.getPlacesForVideos === 'function'
+      ? await repo.getPlacesForVideos(videoIds)
+      : null;
+
     const enriched = await Promise.all(
       queue.map(async (v) => {
-        const places = await repo.getPlacesForVideo(v.id);
+        const places = placesMap ? (placesMap[v.id] || []) : await repo.getPlacesForVideo(v.id);
         return {
           ...v,
           places,
@@ -96,32 +121,29 @@ adminRouter.post('/moderation/:id/action', async (req: Request, res: Response) =
     };
     const newStatus: ModerationStatus = actionToStatusMap[action];
 
-    // If verified places are provided by admin, update associations
-    if (verifiedPlaceIds && Array.isArray(verifiedPlaceIds)) {
-      const validIds = verifiedPlaceIds.filter((pId) =>
-        INITIAL_PLACES.some((p) => p.id === pId)
-      );
-      await repo.associatePlaces(submission.id, validIds);
-    }
+    const validPlaceIds = verifiedPlaceIds && Array.isArray(verifiedPlaceIds)
+      ? verifiedPlaceIds.filter((pId) => INITIAL_PLACES.some((p) => p.id === pId))
+      : undefined;
 
-    // Update status
-    const updated = await repo.updateSubmissionStatus(
-      submission.id,
-      newStatus,
-      reason || null,
-      req.user.userId
-    );
-
-    // Record immutable audit log
-    await repo.addModerationLog({
-      videoId: submission.id,
+    const auditPayload: ModerationAuditPayload = {
       adminUserId: req.user.userId,
       adminName: req.user.name,
+      action,
       previousStatus,
       newStatus,
       reason: reason || null,
       internalNotes: internalNotes || null,
-    });
+    };
+
+    // Update status and record audit log atomically
+    const updated = await repo.updateSubmissionStatus(
+      submission.id,
+      newStatus,
+      reason || null,
+      req.user.userId,
+      auditPayload,
+      validPlaceIds
+    );
 
     res.json({
       success: true,
@@ -148,19 +170,38 @@ adminRouter.get('/moderation/:id/history', async (req: Request, res: Response) =
 
 // 5. PUT /api/admin/moderation/:id/places - Link/unlink tourist directory places
 adminRouter.put('/moderation/:id/places', async (req: Request, res: Response) => {
-  const { placeIds, primaryPlaceId } = req.body;
-  if (!Array.isArray(placeIds)) {
-    res.status(400).json({ success: false, error: 'placeIds debe ser un array de identificadores' });
+  const parseResult = AdminUpdateVideoPlacesSchema.safeParse(req.body);
+  if (!parseResult.success) {
+    const errorMsg = parseResult.error.issues.map((i) => i.message).join(', ');
+    res.status(400).json({ success: false, error: errorMsg });
+    return;
+  }
+
+  const { placeIds, primaryPlaceId } = parseResult.data;
+
+  const invalidPlaceIds = placeIds.filter((pId) =>
+    !INITIAL_PLACES.some((p) => p.id === pId)
+  );
+  if (invalidPlaceIds.length > 0) {
+    res.status(400).json({
+      success: false,
+      error: `Los siguientes lugares no existen en el catálogo turístico: ${invalidPlaceIds.join(', ')}`,
+    });
+    return;
+  }
+
+  const uniquePlaceIds = Array.from(new Set(placeIds));
+  if (primaryPlaceId && uniquePlaceIds.length > 0 && !uniquePlaceIds.includes(primaryPlaceId)) {
+    res.status(400).json({
+      success: false,
+      error: 'El lugar principal debe pertenecer a la lista de lugares asociados',
+    });
     return;
   }
 
   const repo = getCreatorsRepository();
   try {
-    const validIds = placeIds.filter((pId) =>
-      INITIAL_PLACES.some((p) => p.id === pId)
-    );
-
-    await repo.associatePlaces(req.params.id, validIds, primaryPlaceId);
+    await repo.associatePlaces(req.params.id, uniquePlaceIds, primaryPlaceId);
     const updatedPlaces = await repo.getPlacesForVideo(req.params.id);
 
     res.json({
@@ -171,6 +212,499 @@ adminRouter.put('/moderation/:id/places', async (req: Request, res: Response) =>
   } catch (err) {
     console.error('[Admin Error] Error updating linked places:', err);
     res.status(500).json({ success: false, error: 'Error al actualizar lugares asociados' });
+  }
+});
+
+// 5a. POST /api/admin/videos - Register new video directly from Admin
+adminRouter.post('/videos', async (req: Request, res: Response) => {
+  if (!req.user) {
+    res.status(401).json({ success: false, error: 'No autorizado' });
+    return;
+  }
+
+  const parseResult = AdminCreateVideoSchema.safeParse(req.body);
+  if (!parseResult.success) {
+    const errorMsg = parseResult.error.issues.map((i) => i.message).join(', ');
+    res.status(400).json({ success: false, error: errorMsg });
+    return;
+  }
+
+  const {
+    videoUrl,
+    title,
+    description,
+    contentType,
+    category,
+    localityId,
+    thumbnailUrl,
+    creatorProfileId,
+    placeIds,
+    primaryPlaceId,
+    status,
+    externalCreatorHandle,
+    externalCreatorDisplayName,
+    externalCreatorAvatarUrl,
+  } = parseResult.data;
+
+  const parsed = parseAndValidateVideoUrl(videoUrl);
+  if (!parsed.isValid || !parsed.data) {
+    res.status(400).json({ success: false, error: parsed.error || 'URL no soportada' });
+    return;
+  }
+
+  const repo = getCreatorsRepository();
+
+  try {
+    const existing = await repo.findSubmissionByPlatformAndExternalId(
+      parsed.data.platform,
+      parsed.data.externalVideoId
+    );
+
+    if (existing) {
+      res.status(409).json({
+        success: false,
+        error: `Este video ya se encuentra registrado con estado: ${existing.status}`,
+      });
+      return;
+    }
+
+    // Verify places against valid tourist catalog
+    const invalidPlaceIds = placeIds.filter((pId) =>
+      !INITIAL_PLACES.some((p) => p.id === pId)
+    );
+    if (invalidPlaceIds.length > 0) {
+      res.status(400).json({
+        success: false,
+        error: `Los siguientes lugares no existen en el catálogo turístico: ${invalidPlaceIds.join(', ')}`,
+      });
+      return;
+    }
+
+    const uniquePlaceIds = Array.from(new Set(placeIds));
+    if (primaryPlaceId && uniquePlaceIds.length > 0 && !uniquePlaceIds.includes(primaryPlaceId)) {
+      res.status(400).json({
+        success: false,
+        error: 'El lugar principal debe pertenecer a la lista de lugares asociados',
+      });
+      return;
+    }
+
+    const resultingStatus = status || 'APPROVED';
+    const auditPayload: ModerationAuditPayload = {
+      adminUserId: req.user.userId,
+      adminName: req.user.name,
+      action: 'CREATE',
+      previousStatus: null,
+      newStatus: resultingStatus,
+      reason: 'Registro y publicación directa desde el panel de administración',
+      internalNotes: `Creado por administrador ${req.user.name}`,
+    };
+
+    const submission = await repo.createSubmission(
+      {
+        userId: req.user.userId,
+        creatorProfileId: creatorProfileId || null,
+        platform: parsed.data.platform,
+        externalVideoId: parsed.data.externalVideoId,
+        videoUrl: parsed.data.canonicalUrl,
+        embedUrl: parsed.data.embedUrl,
+        thumbnailUrl: thumbnailUrl || null,
+        title,
+        description: description || null,
+        contentType,
+        category,
+        localityId: localityId || null,
+        status: resultingStatus,
+        externalCreatorHandle: externalCreatorHandle || (!creatorProfileId ? parsed.data.authorHandle || null : null),
+        externalCreatorDisplayName: externalCreatorDisplayName || null,
+        externalCreatorAvatarUrl: externalCreatorAvatarUrl || null,
+      },
+      uniquePlaceIds,
+      primaryPlaceId || (uniquePlaceIds[0] || null),
+      auditPayload
+    );
+
+    res.status(201).json({
+      success: true,
+      data: submission,
+      message: 'Video registrado y catalogado exitosamente',
+    });
+  } catch (err) {
+    console.error('[Admin Error] Error creating video:', err);
+    res.status(500).json({ success: false, error: 'Error interno al registrar el video' });
+  }
+});
+
+// 5b. PUT /api/admin/videos/:id - Update existing video metadata and places
+adminRouter.put('/videos/:id', async (req: Request, res: Response) => {
+  if (!req.user) {
+    res.status(401).json({ success: false, error: 'No autorizado' });
+    return;
+  }
+
+  const parseResult = AdminUpdateVideoSchema.safeParse(req.body);
+  if (!parseResult.success) {
+    const errorMsg = parseResult.error.issues.map((i) => i.message).join(', ');
+    res.status(400).json({ success: false, error: errorMsg });
+    return;
+  }
+
+  const repo = getCreatorsRepository();
+  try {
+    const existing = await repo.findSubmissionById(req.params.id);
+    if (!existing) {
+      res.status(404).json({ success: false, error: 'Publicación de video no encontrada' });
+      return;
+    }
+
+    const { placeIds, primaryPlaceId, ...updateFields } = parseResult.data;
+
+    if (placeIds !== undefined) {
+      const invalidPlaceIds = placeIds.filter((pId) =>
+        !INITIAL_PLACES.some((p) => p.id === pId)
+      );
+      if (invalidPlaceIds.length > 0) {
+        res.status(400).json({
+          success: false,
+          error: `Los siguientes lugares no existen en el catálogo turístico: ${invalidPlaceIds.join(', ')}`,
+        });
+        return;
+      }
+    }
+
+    const uniquePlaceIds = placeIds !== undefined ? Array.from(new Set(placeIds)) : undefined;
+
+    if (uniquePlaceIds !== undefined && primaryPlaceId) {
+      if (!uniquePlaceIds.includes(primaryPlaceId)) {
+        res.status(400).json({
+          success: false,
+          error: 'El lugar principal debe pertenecer a la lista de lugares asociados',
+        });
+        return;
+      }
+    } else if (uniquePlaceIds === undefined && primaryPlaceId) {
+      const currentPlaces = await repo.getPlacesForVideo(req.params.id);
+      if (!currentPlaces.some((p) => p.id === primaryPlaceId)) {
+        res.status(400).json({
+          success: false,
+          error: 'El lugar principal debe pertenecer a los lugares actualmente asociados al video',
+        });
+        return;
+      }
+    }
+
+    // Detect changed fields for precise traceability
+    const changedFields: string[] = [];
+    for (const [key, val] of Object.entries(updateFields)) {
+      if (val !== undefined && (existing as any)[key] !== val) {
+        changedFields.push(key);
+      }
+    }
+    if (uniquePlaceIds !== undefined) {
+      changedFields.push('placeIds');
+    }
+    if (primaryPlaceId !== undefined) {
+      changedFields.push('primaryPlaceId');
+    }
+
+    const resultingStatus = updateFields.status || existing.status;
+    const auditPayload: ModerationAuditPayload = {
+      adminUserId: req.user.userId,
+      adminName: req.user.name,
+      action: 'UPDATE',
+      previousStatus: existing.status,
+      newStatus: resultingStatus,
+      reason: 'Edición administrativa de metadatos o lugares asociados',
+      internalNotes: `Modificado por ${req.user.name}`,
+      changedFields: changedFields.length > 0 ? changedFields : null,
+    };
+
+    const updated = await repo.updateSubmission(
+      req.params.id,
+      updateFields,
+      uniquePlaceIds,
+      primaryPlaceId,
+      auditPayload
+    );
+
+    res.json({
+      success: true,
+      data: updated,
+      message: 'Metadatos de video actualizados exitosamente',
+    });
+  } catch (err) {
+    console.error('[Admin Error] Error updating video:', err);
+    res.status(500).json({ success: false, error: 'Error interno al actualizar el video' });
+  }
+});
+
+// 5c. GET /api/admin/creators - List all creators for admin management
+adminRouter.get('/creators', async (_req: Request, res: Response) => {
+  const repo = getCreatorsRepository();
+  try {
+    const creators = await repo.listAllCreators();
+    res.json({
+      success: true,
+      data: creators,
+      total: creators.length,
+    });
+  } catch (err) {
+    console.error('[Admin Error] Error listing creators for admin:', err);
+    res.status(500).json({ success: false, error: 'Error al consultar directorio de creadores' });
+  }
+});
+
+// 5d. POST /api/admin/creators - Create/Register creator profile from Admin
+adminRouter.post('/creators', async (req: Request, res: Response) => {
+  if (!req.user) {
+    res.status(401).json({ success: false, error: 'No autorizado' });
+    return;
+  }
+
+  const parseResult = AdminCreateCreatorSchema.safeParse(req.body);
+  if (!parseResult.success) {
+    const errorMsg = parseResult.error.issues.map((i) => i.message).join(', ');
+    res.status(400).json({ success: false, error: errorMsg });
+    return;
+  }
+
+  const repo = getCreatorsRepository();
+
+  try {
+    // Los perfiles creados desde administración son independientes.
+    // No deben vincularse automáticamente a la cuenta del administrador.
+    const targetUserId = null;
+
+    // Un handle debe ser único entre todos los perfiles.
+    const existing = await repo.findCreatorProfileByHandle(parseResult.data.handle);
+
+    if (existing) {
+      res.status(409).json({
+        success: false,
+        error: `El identificador @${parseResult.data.handle} ya está registrado`,
+      });
+      return;
+    }
+
+    const hasAudienceData =
+      parseResult.data.tiktokFollowers !== undefined ||
+      parseResult.data.instagramFollowers !== undefined ||
+      parseResult.data.youtubeSubscribers !== undefined;
+
+    const audienceUpdatedAt =
+      parseResult.data.audienceUpdatedAt ||
+      (hasAudienceData ? new Date().toISOString() : null);
+
+    const profile = await repo.createCreatorProfile({
+      userId: targetUserId,
+      handle: parseResult.data.handle,
+      displayName: parseResult.data.displayName,
+      bio: parseResult.data.bio || null,
+      avatarUrl: parseResult.data.avatarUrl || null,
+      primaryPlatform: parseResult.data.primaryPlatform,
+      tiktokUrl: parseResult.data.tiktokUrl || null,
+      instagramUrl: parseResult.data.instagramUrl || null,
+      youtubeUrl: parseResult.data.youtubeUrl || null,
+      tiktokFollowers: parseResult.data.tiktokFollowers ?? null,
+      instagramFollowers: parseResult.data.instagramFollowers ?? null,
+      youtubeSubscribers: parseResult.data.youtubeSubscribers ?? null,
+      audienceUpdatedAt,
+      isPublic: parseResult.data.isPublic ?? true,
+      isVerified: parseResult.data.isVerified ?? false,
+    });
+
+    res.status(201).json({
+      success: true,
+      data: profile,
+      message: 'Perfil de creador registrado exitosamente',
+    });
+  } catch (err) {
+    console.error('[Admin Error] Error registering creator profile:', err);
+    res.status(500).json({
+      success: false,
+      error: 'Error interno al registrar perfil de creador',
+    });
+  }
+});
+
+// 5e. PUT /api/admin/creators/:id - Update creator profile
+adminRouter.put('/creators/:id', async (req: Request, res: Response) => {
+  if (!req.user) {
+    res.status(401).json({ success: false, error: 'No autorizado' });
+    return;
+  }
+
+  const parseResult = AdminUpdateCreatorSchema.safeParse(req.body);
+
+  if (!parseResult.success) {
+    const errorMsg = parseResult.error.issues.map((i) => i.message).join(', ');
+    res.status(400).json({ success: false, error: errorMsg });
+    return;
+  }
+
+  const repo = getCreatorsRepository();
+
+  try {
+    const existing = await repo.findCreatorProfileById(req.params.id);
+
+    if (!existing) {
+      res.status(404).json({
+        success: false,
+        error: 'Perfil de creador no encontrado',
+      });
+      return;
+    }
+
+    // Evitar que el handle actualizado pertenezca a otro creador.
+    if (
+      parseResult.data.handle &&
+      parseResult.data.handle !== existing.handle
+    ) {
+      const handleOwner = await repo.findCreatorProfileByHandle(
+        parseResult.data.handle
+      );
+
+      if (handleOwner && handleOwner.id !== existing.id) {
+        res.status(409).json({
+          success: false,
+          error: `El identificador @${parseResult.data.handle} ya está registrado`,
+        });
+        return;
+      }
+    }
+
+    const updatedProfile = await repo.updateCreatorProfile(
+      req.params.id,
+      parseResult.data
+    );
+
+    if (!updatedProfile) {
+      res.status(404).json({
+        success: false,
+        error: 'No se pudo actualizar el perfil de creador',
+      });
+      return;
+    }
+
+    res.json({
+      success: true,
+      data: updatedProfile,
+      message: 'Perfil de creador actualizado exitosamente',
+    });
+  } catch (err) {
+    console.error('[Admin Error] Error updating creator profile:', err);
+    res.status(500).json({
+      success: false,
+      error: 'Error interno al actualizar perfil de creador',
+    });
+  }
+});
+
+// 5e. GET /api/admin/users - List users for creator profile association
+adminRouter.get('/users', async (_req: Request, res: Response) => {
+  try {
+    const authRepo = getAuthRepository();
+    if (typeof authRepo.listUsers === 'function') {
+      const users = await authRepo.listUsers();
+      res.json({ success: true, data: users });
+      return;
+    }
+    res.json({ success: true, data: [] });
+  } catch (err) {
+    console.error('[Admin Error] Error listing users for admin:', err);
+    res.status(500).json({ success: false, error: 'Error al consultar lista de usuarios' });
+  }
+});
+
+// 5f. GET /api/admin/storage/status - Check Cloudflare R2 and storage configuration
+adminRouter.get('/storage/status', async (_req: Request, res: Response) => {
+  try {
+    const r2Status = getR2ConfigStatus();
+    res.json({
+      success: true,
+      storage: r2Status.mode,
+      r2Configured: r2Status.isConfigured,
+      missingConfig: r2Status.missingVariables,
+      bucketName: r2Status.bucketName,
+      publicUrl: r2Status.publicUrl,
+      endpoint: r2Status.endpoint,
+      maxSizeBytes: MAX_AVATAR_SIZE_BYTES,
+      allowedMimeTypes: ALLOWED_MIME_TYPES,
+    });
+  } catch (err) {
+    console.error('[Admin Error] Error querying storage status:', err);
+    res.status(500).json({ success: false, error: 'Error al consultar estado de almacenamiento' });
+  }
+});
+
+// 5g. POST /api/admin/uploads/avatar - Upload creator profile photograph
+adminRouter.post(
+  '/uploads/avatar',
+  express.raw({ type: ['image/jpeg', 'image/png', 'image/webp', 'application/octet-stream'], limit: '6mb' }),
+  express.json({ limit: '8mb' }),
+  async (req: Request, res: Response) => {
+    try {
+      let fileBuffer: Buffer | null = null;
+      let filename: string = 'avatar.jpg';
+      let mimeType: string = 'image/jpeg';
+
+      if (Buffer.isBuffer(req.body) && req.body.length > 0) {
+        fileBuffer = req.body;
+        const rawFilename = req.headers['x-filename'] as string | undefined;
+        if (rawFilename) {
+          try {
+            filename = decodeURIComponent(rawFilename);
+          } catch {
+            filename = rawFilename;
+          }
+        }
+        mimeType = (req.headers['content-type'] as string) || 'image/jpeg';
+      } else if (req.body && typeof req.body.imageBase64 === 'string') {
+        const cleanBase64 = req.body.imageBase64.replace(/^data:image\/[a-zA-Z]+;base64,/, '');
+        fileBuffer = Buffer.from(cleanBase64, 'base64');
+        filename = req.body.filename || 'avatar.jpg';
+        mimeType = req.body.mimeType || 'image/jpeg';
+      }
+
+      if (!fileBuffer || fileBuffer.length === 0) {
+        res.status(400).json({
+          success: false,
+          error: 'No se recibió ningún archivo de imagen para cargar',
+        });
+        return;
+      }
+
+      const result = await uploadCreatorAvatar(fileBuffer, filename, mimeType);
+
+      res.status(201).json({
+        success: true,
+        data: result,
+        message: 'Fotografía de perfil de creador cargada exitosamente',
+      });
+    } catch (err) {
+      console.error('[Admin Error] Error uploading creator avatar:', err);
+      res.status(400).json({
+        success: false,
+        error: err instanceof Error ? err.message : 'Error al procesar la imagen',
+      });
+    }
+  }
+);
+
+// 5h. DELETE /api/admin/uploads/avatar - Remove creator avatar (R2 or local)
+adminRouter.delete('/uploads/avatar', async (req: Request, res: Response) => {
+  const { url } = req.body;
+  if (!url || typeof url !== 'string') {
+    res.status(400).json({ success: false, error: 'URL requerida para eliminar la imagen' });
+    return;
+  }
+
+  try {
+    const deleted = await deleteAvatar(url);
+    res.json({ success: true, deleted });
+  } catch (err) {
+    console.error('[Admin Error] Error deleting avatar:', err);
+    res.status(500).json({ success: false, error: 'Error al eliminar imagen' });
   }
 });
 

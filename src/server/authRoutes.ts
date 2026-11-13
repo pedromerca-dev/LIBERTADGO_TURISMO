@@ -7,6 +7,7 @@ import { Router, Request, Response } from 'express';
 import { RegisterUserSchema, LoginUserSchema } from './creatorsSchemas.ts';
 import { getAuthRepository, getCreatorsRepository } from './repositories/index.ts';
 import { hashPassword, verifyPassword, createToken, requireAuth, revokeToken } from './authService.ts';
+import { authRateLimiter } from './rateLimiter.ts';
 
 export const authRouter = Router();
 
@@ -21,7 +22,7 @@ const COOKIE_OPTIONS = {
 };
 
 // POST /api/auth/register
-authRouter.post('/register', async (req: Request, res: Response) => {
+authRouter.post('/register', authRateLimiter, async (req: Request, res: Response) => {
   const parseResult = RegisterUserSchema.safeParse(req.body);
   if (!parseResult.success) {
     const errorMsg = parseResult.error.issues.map((i) => i.message).join(', ');
@@ -82,7 +83,7 @@ authRouter.post('/register', async (req: Request, res: Response) => {
 });
 
 // POST /api/auth/login
-authRouter.post('/login', async (req: Request, res: Response) => {
+authRouter.post('/login', authRateLimiter, async (req: Request, res: Response) => {
   const parseResult = LoginUserSchema.safeParse(req.body);
   if (!parseResult.success) {
     const errorMsg = parseResult.error.issues.map((i) => i.message).join(', ');

@@ -331,28 +331,19 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({
             }}
             type="button"
             onClick={() => onSelectDayNumber(null)}
-            className={`px-3 py-2 rounded-xl text-xs font-semibold shrink-0 flex-shrink-0 transition-all cursor-pointer flex flex-col items-start border whitespace-nowrap ${
+            className={`px-3 py-1.5 rounded-md text-xs font-medium shrink-0 flex-shrink-0 transition-colors cursor-pointer flex items-center gap-1.5 border whitespace-nowrap ${
               selectedDayNumber === null
-                ? 'bg-[#17243A] text-white border-[#17243A] shadow-xs'
-                : 'bg-[#F8FAFC] text-[#475569] hover:bg-[#F1F5F9] hover:text-[#0F172A] border-[#E2E8F0]'
+                ? 'bg-[#263B35] text-white border-[#263B35]'
+                : 'bg-white text-[#263B35] hover:bg-[#F7F2E8] border-[#E9E7E1]'
             }`}
           >
-            <div className="flex items-center gap-1.5">
-              <span>Todos los días</span>
-              <span
-                className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
-                  selectedDayNumber === null ? 'bg-white/20 text-white' : 'bg-[#E2E8F0] text-[#475569]'
-                }`}
-              >
-                {trip.activities.length}
-              </span>
-            </div>
+            <span>Todos los días</span>
             <span
-              className={`text-[10px] font-normal ${
-                selectedDayNumber === null ? 'text-white/70' : 'text-[#64748B]'
+              className={`text-[10px] font-mono px-1.5 py-0.2 rounded ${
+                selectedDayNumber === null ? 'bg-white/20 text-white' : 'bg-[#E9E7E1] text-[#263B35]'
               }`}
             >
-              Planificación global
+              {trip.activities.length}
             </span>
           </button>
 
@@ -361,11 +352,6 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({
             const dayCount = trip.activities.filter((a) => a.dayNumber === day.dayNumber).length;
             const isSelected = selectedDayNumber === day.dayNumber;
             const dayColor = getDayColor(day.dayNumber);
-
-            // Extraer día de la semana y fecha limpia (ej. "Lun", "12 may")
-            const parts = day.formattedDate.split(',');
-            const weekDay = parts[0] || '';
-            const dayMonth = parts[1] ? parts[1].trim() : '';
 
             return (
               <button
@@ -376,38 +362,29 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({
                 key={day.dayNumber}
                 type="button"
                 onClick={() => onSelectDayNumber(day.dayNumber)}
-                className={`px-3 py-2 rounded-xl text-xs font-semibold shrink-0 flex-shrink-0 transition-all cursor-pointer flex flex-col items-start border min-w-[90px] whitespace-nowrap ${
+                className={`px-3 py-1.5 rounded-md text-xs font-medium shrink-0 flex-shrink-0 transition-colors cursor-pointer flex items-center gap-1.5 border whitespace-nowrap ${
                   isSelected
-                    ? 'bg-[#17243A] text-white border-[#17243A] shadow-xs ring-2 ring-[#E85B49]/30'
-                    : 'bg-[#F8FAFC] text-[#475569] hover:bg-[#F1F5F9] hover:text-[#0F172A] border-[#E2E8F0]'
+                    ? 'bg-[#263B35] text-white border-[#263B35]'
+                    : 'bg-white text-[#263B35] hover:bg-[#F7F2E8] border-[#E9E7E1]'
                 }`}
               >
-                <div className="flex items-center justify-between w-full gap-1.5">
-                  <div className="flex items-center gap-1">
-                    <span
-                      className="w-2 h-2 rounded-full shrink-0"
-                      style={{ backgroundColor: dayColor.bg }}
-                    />
-                    <span>{day.label}</span>
-                  </div>
-                  <span
-                    className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full leading-none ${
-                      isSelected
-                        ? 'bg-white/20 text-white'
-                        : dayCount > 0
-                        ? 'bg-emerald-100 text-emerald-800'
-                        : 'bg-[#E2E8F0] text-[#64748B]'
-                    }`}
-                  >
-                    {dayCount}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1 text-[10px] font-normal mt-0.5">
-                  <span className="font-semibold uppercase tracking-wider">{weekDay}</span>
-                  <span className={isSelected ? 'text-white/70' : 'text-[#64748B]'}>
-                    {dayMonth}
-                  </span>
-                </div>
+                <span
+                  className="w-2 h-2 rounded-full shrink-0"
+                  style={{ backgroundColor: dayColor.bg }}
+                />
+                <span>{day.label}</span>
+                <span className="text-[10px] opacity-75">
+                  ({day.weekdayShort})
+                </span>
+                <span
+                  className={`text-[10px] font-mono px-1.5 py-0.2 rounded leading-none ${
+                    isSelected
+                      ? 'bg-white/20 text-white'
+                      : 'bg-[#E9E7E1] text-[#263B35]'
+                  }`}
+                >
+                  {dayCount}
+                </span>
               </button>
             );
           })}
@@ -419,7 +396,7 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({
         CONTENIDO PRINCIPAL DEL ITINERARIO (POR DÍA O TODOS)
         ==================================================
       */}
-      <div className="flex-1 min-h-0 overflow-y-auto p-3.5 sm:p-5 space-y-4">
+      <div className="flex-1 min-h-0 overflow-y-auto p-3 sm:p-4 space-y-3.5">
         {daysToShow.map((day) => {
           const dayActs = getActivitiesForDay(trip.activities, day.dayNumber);
           const dayColor = getDayColor(day.dayNumber);
@@ -431,23 +408,23 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({
               key={day.dayNumber}
               onDragOver={(e) => handleDragOverEmptyDay(e, day.dayNumber)}
               onDrop={(e) => handleDropOnDayContainer(e, day.dayNumber)}
-              className={`border rounded-2xl overflow-hidden bg-white shadow-xs transition-all ${
+              className={`border rounded-lg overflow-hidden bg-white shadow-xs transition-all ${
                 isDropTargetDay
-                  ? 'border-[#E85B49] ring-2 ring-[#E85B49]/20 bg-rose-50/20'
-                  : 'border-[#E9EEF4]'
+                  ? 'border-[#E85B49] bg-rose-50/20'
+                  : 'border-[#E9E7E1]'
               }`}
             >
               {/* Cabecera de la jornada */}
-              <div className="flex items-center justify-between p-3.5 bg-[#F8FAFC] border-b border-[#E9EEF4]">
+              <div className="flex items-center justify-between p-3 bg-[#F7F2E8] border-b border-[#E9E7E1]">
                 <div className="flex items-center gap-2.5">
                   <span
-                    className="w-7 h-7 rounded-xl flex items-center justify-center text-xs font-bold font-mono text-white shadow-2xs shrink-0"
+                    className="w-6 h-6 rounded-md flex items-center justify-center text-xs font-semibold text-white shrink-0"
                     style={{ backgroundColor: dayColor.bg }}
                   >
                     D{day.dayNumber}
                   </span>
                   <div>
-                    <h3 className="text-xs sm:text-sm font-bold text-[#17243A]">
+                    <h3 className="text-xs sm:text-sm font-semibold text-[#263B35]">
                       {day.label} · {day.formattedDate}
                     </h3>
                     <div className="flex items-center gap-2 mt-0.5 flex-wrap">
@@ -457,19 +434,19 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({
                           : `${dayActs.length} ${dayActs.length === 1 ? 'actividad' : 'actividades'}`}
                       </p>
                       {currentDayRoute?.data && (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                        <span className="inline-flex items-center gap-1 text-[11px] font-medium text-[#263B35] bg-white px-2 py-0.5 rounded border border-[#E9E7E1]">
                           <span>🚗</span>
                           <span>{currentDayRoute.data.distanceFormatted}</span>
-                          <span className="text-emerald-300">·</span>
+                          <span className="text-[#64748B]">·</span>
                           <span>~{currentDayRoute.data.durationFormatted}</span>
                         </span>
                       )}
                       {currentDayRoute?.isUnavailable && (
                         <span
-                          className="inline-flex items-center gap-1 text-[10px] font-medium text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200"
+                          className="inline-flex items-center gap-1 text-[10px] font-medium text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200"
                           title="Recorrido vial aún no disponible para este tramo"
                         >
-                          <AlertCircle className="w-3 h-3 text-amber-500" />
+                          <AlertCircle className="w-3 h-3 text-amber-600" />
                           <span>Ruta vial no disponible</span>
                         </span>
                       )}
@@ -483,7 +460,7 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({
                     onClick={() =>
                       setManualFormDay(manualFormDay === day.dayNumber ? null : day.dayNumber)
                     }
-                    className="flex items-center gap-1 px-2.5 py-1 text-xs text-[#17243A] bg-white border border-[#E2E8F0] hover:bg-[#F1F5F9] rounded-lg transition-colors cursor-pointer font-medium"
+                    className="flex items-center gap-1 px-2.5 py-1 text-xs text-[#263B35] bg-white border border-[#E9E7E1] hover:bg-[#F7F2E8] rounded-md transition-colors cursor-pointer font-medium"
                     title="Añadir nota o actividad manual"
                   >
                     <Plus className="w-3.5 h-3.5 text-[#E85B49]" />
@@ -493,10 +470,10 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({
                   <button
                     type="button"
                     onClick={onNavigateToExplore}
-                    className="flex items-center gap-1 px-2.5 py-1 text-xs text-[#17243A] bg-white border border-[#E2E8F0] hover:bg-[#F1F5F9] rounded-lg transition-colors cursor-pointer font-medium"
+                    className="flex items-center gap-1 px-2.5 py-1 text-xs text-white bg-[#E85B49] hover:bg-[#D94C3A] rounded-md transition-colors cursor-pointer font-medium"
                     title="Explorar lugares para este día"
                   >
-                    <Compass className="w-3.5 h-3.5 text-[#2563EB]" />
+                    <Compass className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">Explorar</span>
                   </button>
                 </div>
@@ -621,43 +598,43 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({
                         onDragOver={(e) => handleDragOverCard(e, act, day.dayNumber)}
                         onDrop={(e) => handleDropOnCard(e, act, day.dayNumber)}
                         onDragEnd={handleDragEnd}
-                        className={`relative rounded-xl border transition-all ${
+                        className={`relative rounded-md border transition-all ${
                           isDraggingThis
                             ? 'opacity-40 scale-[0.98] border-dashed border-[#E85B49] bg-rose-50/40'
                             : isSelected
-                            ? 'bg-rose-50/30 border-[#E85B49] shadow-xs ring-1 ring-[#E85B49]/40'
-                            : 'bg-white border-[#E9EEF4] hover:border-slate-300 shadow-2xs hover:shadow-xs'
+                            ? 'bg-[#F7F2E8] border-[#E85B49] shadow-2xs ring-1 ring-[#E85B49]'
+                            : 'bg-white border-[#E9E7E1] hover:border-[#263B35]'
                         }`}
                       >
                         {/* Indicador visual de inserción Drop Target */}
                         {isDropTargetBefore && (
-                          <div className="absolute -top-1.5 left-2 right-2 h-1 bg-[#E85B49] rounded-full z-20 pointer-events-none shadow-xs" />
+                          <div className="absolute -top-1 left-2 right-2 h-0.5 bg-[#E85B49] rounded-full z-20 pointer-events-none" />
                         )}
                         {isDropTargetAfter && (
-                          <div className="absolute -bottom-1.5 left-2 right-2 h-1 bg-[#E85B49] rounded-full z-20 pointer-events-none shadow-xs" />
+                          <div className="absolute -bottom-1 left-2 right-2 h-0.5 bg-[#E85B49] rounded-full z-20 pointer-events-none" />
                         )}
 
-                        <div className="p-3 sm:p-3.5 flex items-start gap-3">
+                        <div className="p-3 flex items-start gap-3">
                           {/* Columna Izquierda: Handle de Drag & Drop + Número de Orden */}
                           <div className="flex flex-col items-center justify-center shrink-0 pt-0.5">
                             <span
-                              className="w-6 h-6 rounded-full text-white text-[11px] font-bold font-mono flex items-center justify-center shadow-xs"
+                              className="w-5 h-5 rounded-full text-white text-[10px] font-medium flex items-center justify-center"
                               style={{ backgroundColor: dayColor.bg }}
                               title={`Orden de visita: #${act.order}`}
                             >
                               {act.order}
                             </span>
                             <div
-                              className="mt-1.5 text-slate-300 hover:text-slate-600 cursor-grab active:cursor-grabbing p-1 rounded touch-none"
+                              className="mt-1 text-slate-300 hover:text-[#263B35] cursor-grab active:cursor-grabbing p-0.5 rounded touch-none"
                               title="Arrastrar para ordenar o mover de día"
                             >
-                              <GripVertical className="w-4 h-4" />
+                              <GripVertical className="w-3.5 h-3.5" />
                             </div>
                           </div>
 
                           {/* Fotografía de la actividad (PlaceImage) */}
                           <div
-                            className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden shrink-0 bg-slate-100 border border-slate-100 cursor-pointer"
+                            className="w-14 h-14 sm:w-16 sm:h-16 rounded-md overflow-hidden shrink-0 bg-slate-100 border border-[#E9E7E1] cursor-pointer"
                             onClick={() => {
                               if (place) onSelectPlace(place);
                             }}
@@ -670,87 +647,73 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({
                             />
                           </div>
 
-                          {/* Información detallada de la actividad */}
+                          {/* Información directa de la actividad */}
                           <div className="flex-1 min-w-0 flex flex-col justify-between">
                             <div>
-                              {/* Nombre y Badges */}
+                              {/* Nombre */}
                               <div className="flex items-start justify-between gap-2">
                                 <button
                                   type="button"
                                   onClick={() => {
                                     if (place) onSelectPlace(place);
                                   }}
-                                  className="text-xs sm:text-sm font-bold text-[#17243A] hover:text-[#E85B49] text-left leading-snug line-clamp-1 cursor-pointer"
+                                  className="text-xs sm:text-sm font-semibold text-[#263B35] hover:text-[#E85B49] text-left leading-snug line-clamp-1 cursor-pointer"
                                 >
                                   {act.customTitle || place?.name || 'Actividad'}
                                 </button>
 
-                                <span
-                                  className="text-[10px] font-semibold px-2 py-0.5 rounded-md shrink-0 uppercase tracking-wider font-mono border"
-                                  style={{
-                                    backgroundColor: `${dayColor.bg}15`,
-                                    color: dayColor.bg,
-                                    borderColor: `${dayColor.bg}30`,
-                                  }}
-                                >
+                                <span className="text-[10px] font-medium px-1.5 py-0.5 rounded shrink-0 bg-[#F7F2E8] text-[#263B35] border border-[#E9E7E1]">
                                   Día {act.dayNumber}
                                 </span>
                               </div>
 
                               {/* Metadatos: Categoría, Calificación y Horario */}
-                              <div className="flex items-center gap-1.5 text-[11px] text-[#64748B] mt-1 flex-wrap">
+                              <div className="flex items-center gap-1.5 text-[11px] text-[#64748B] mt-0.5 flex-wrap">
                                 {place?.category && (
-                                  <span className="capitalize font-medium text-[#17243A]">
+                                  <span className="capitalize text-[#263B35]">
                                     {place.subcategory || place.category}
                                   </span>
                                 )}
                                 {place?.rating && (
                                   <>
                                     <span>·</span>
-                                    <span className="flex items-center gap-0.5 text-amber-600 font-semibold">
-                                      <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
+                                    <span className="flex items-center gap-0.5 text-[#263B35] font-medium">
+                                      <Star className="w-3 h-3 fill-[#D9B66F] text-[#D9B66F]" />
                                       <span>{place.rating}</span>
                                     </span>
                                   </>
                                 )}
                                 <span>·</span>
-                                <span className="flex items-center gap-1 font-mono text-[#475569]">
-                                  <Clock className="w-3 h-3 text-slate-400" />
+                                <span className="flex items-center gap-1 text-[#64748B]">
+                                  <Clock className="w-3 h-3 text-[#64748B]" />
                                   <span>{act.timeSlot || 'Horario flexible'}</span>
                                 </span>
                               </div>
 
-                              {/* Dirección si existe */}
+                              {/* Dirección concisa si existe */}
                               {place?.address && (
-                                <div className="flex items-center gap-1 text-[11px] text-[#64748B] mt-1 truncate">
+                                <div className="flex items-center gap-1 text-[11px] text-[#64748B] mt-0.5 truncate">
                                   <MapPin className="w-3 h-3 text-[#E85B49] shrink-0" />
-                                  <span className="truncate">{place.address}</span>
+                                  <span className="truncate">{place.address.split(',')[0]}</span>
                                 </div>
-                              )}
-
-                              {/* Descripción breve del catálogo */}
-                              {place?.shortDescription && (
-                                <p className="text-[11px] text-[#475569] mt-1 line-clamp-2 leading-relaxed">
-                                  {place.shortDescription}
-                                </p>
                               )}
 
                               {/* Notas manuales añadidas */}
                               {act.notes && (
-                                <div className="mt-1.5 p-1.5 bg-[#FAF7F2] rounded-lg border border-amber-200/60 text-[11px] text-amber-900 italic">
+                                <div className="mt-1 p-1.5 bg-[#F7F2E8] rounded border border-[#E9E7E1] text-[11px] text-[#263B35] italic">
                                   «{act.notes}»
                                 </div>
                               )}
                             </div>
 
-                            {/* Barra inferior de acciones: Ver detalles, Cambiar día, Subir/Bajar, Quitar */}
-                            <div className="flex items-center justify-between pt-2.5 mt-2 border-t border-[#F1F5F9] text-xs flex-wrap gap-2 min-w-0">
+                            {/* Barra inferior de acciones compacta */}
+                            <div className="flex items-center justify-between pt-2 mt-1.5 border-t border-[#E9E7E1] text-xs flex-wrap gap-2 min-w-0">
                               <div className="flex items-center gap-2 flex-wrap min-w-0">
                                 {place && (
                                   <button
                                     type="button"
                                     onClick={() => onSelectPlace(place)}
-                                    className="text-[11px] font-semibold text-[#17243A] hover:text-[#E85B49] flex items-center gap-1 cursor-pointer"
+                                    className="text-[11px] font-medium text-[#263B35] hover:text-[#E85B49] flex items-center gap-1 cursor-pointer"
                                   >
                                     <MapPin className="w-3 h-3 text-[#E85B49]" />
                                     <span>Ver detalles</span>
@@ -766,7 +729,7 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({
                                       onMoveActivityToDay(act.id, Number(e.target.value))
                                     }
                                     aria-label="Mover a otro día"
-                                    className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg px-2 py-0.5 text-[11px] text-[#17243A] outline-none font-medium cursor-pointer"
+                                    className="bg-white border border-[#E9E7E1] rounded px-1.5 py-0.5 text-[11px] text-[#263B35] outline-none font-medium cursor-pointer"
                                   >
                                     {dayItems.map((d) => (
                                       <option key={d.dayNumber} value={d.dayNumber}>
@@ -778,12 +741,12 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({
                               </div>
 
                               {/* Controles de Orden (Subir/Bajar) y Eliminar */}
-                              <div className="flex items-center gap-1 shrink-0">
+                              <div className="flex items-center gap-0.5 shrink-0">
                                 <button
                                   type="button"
                                   disabled={idx === 0}
                                   onClick={() => onReorderActivity(act.id, 'up')}
-                                  className="p-1.5 text-[#64748B] hover:text-[#17243A] hover:bg-[#F8FAFC] disabled:opacity-25 rounded-md cursor-pointer transition-colors"
+                                  className="p-1 text-[#64748B] hover:text-[#263B35] hover:bg-[#F7F2E8] disabled:opacity-25 rounded cursor-pointer transition-colors"
                                   title="Subir orden de visita"
                                 >
                                   <ArrowUp className="w-3.5 h-3.5" />
@@ -792,7 +755,7 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({
                                   type="button"
                                   disabled={idx === dayActs.length - 1}
                                   onClick={() => onReorderActivity(act.id, 'down')}
-                                  className="p-1.5 text-[#64748B] hover:text-[#17243A] hover:bg-[#F8FAFC] disabled:opacity-25 rounded-md cursor-pointer transition-colors"
+                                  className="p-1 text-[#64748B] hover:text-[#263B35] hover:bg-[#F7F2E8] disabled:opacity-25 rounded cursor-pointer transition-colors"
                                   title="Bajar orden de visita"
                                 >
                                   <ArrowDown className="w-3.5 h-3.5" />
@@ -800,7 +763,7 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({
                                 <button
                                   type="button"
                                   onClick={() => onRemoveActivity(act.id)}
-                                  className="p-1.5 text-[#64748B] hover:text-rose-600 hover:bg-rose-50 rounded-md cursor-pointer transition-colors ml-1"
+                                  className="p-1 text-[#64748B] hover:text-[#E85B49] hover:bg-rose-50 rounded cursor-pointer transition-colors ml-0.5"
                                   title="Quitar actividad de este día"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />

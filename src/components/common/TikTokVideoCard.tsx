@@ -1,77 +1,145 @@
-
 import React from 'react';
+import { Play, MapPin, CheckCircle2 } from 'lucide-react';
 
-interface TikTokVideoCardProps {
+export interface TikTokVideoCardProps {
   videoUrl: string;
   title: string;
   creator: string;
+  creatorHandle?: string;
+  creatorAvatarUrl?: string;
   placeName?: string;
   thumbnailUrl?: string;
   category?: string;
+  platform?: string;
+  publishedDate?: string;
+  isApproved?: boolean;
 }
 
+/**
+ * TikTok Video Card — Clean, media-focused UI inspired by TikTok simplicity.
+ * Displays only:
+ * - Video thumbnail / preview
+ * - Title of the video
+ * - Creator handle & platform (e.g. @creador · TikTok)
+ * - Associated place
+ * - Original publication date (if available)
+ * - Approved content indicator
+ * - Direct action: "Ver en TikTok"
+ */
 export function TikTokVideoCard({
   videoUrl,
   title,
   creator,
+  creatorHandle,
+  creatorAvatarUrl,
   placeName,
   thumbnailUrl,
-  category = 'Video turístico',
+  platform = 'tiktok',
+  publishedDate,
+  isApproved = true,
 }: TikTokVideoCardProps) {
+  const platformLabel =
+    platform === 'youtube' ? 'YouTube' : platform === 'instagram' ? 'Instagram' : 'TikTok';
+
+  // Format creator and handle
+  const cleanCreator = creator.trim() || 'Creador de contenido';
+  const handleDisplay = creatorHandle
+    ? (creatorHandle.startsWith('@') ? creatorHandle : `@${creatorHandle}`)
+    : (cleanCreator.startsWith('@') ? cleanCreator : `@${cleanCreator.toLowerCase().replace(/\s+/g, '_')}`);
+  const creatorInitials = handleDisplay.replace(/^@/, '').slice(0, 2).toUpperCase() || 'CR';
+
   return (
-    <article className="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
-                  <div className="relative aspect-[16/9] overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700">
-     
+    <article className="group overflow-hidden rounded-lg border border-[#E9E7E1] bg-white transition-colors hover:border-slate-300 flex flex-col justify-between">
+      {/* Visual media preview container */}
+      <div className="relative aspect-[16/9] overflow-hidden bg-slate-900">
         {thumbnailUrl ? (
           <img
             src={thumbnailUrl}
             alt={title}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             loading="lazy"
           />
+        ) : creatorAvatarUrl ? (
+          <div className="relative flex h-full w-full flex-col items-center justify-center p-3 text-white overflow-hidden bg-slate-800">
+            <img
+              src={creatorAvatarUrl}
+              alt={cleanCreator}
+              className="w-12 h-12 rounded-full object-cover border border-white/40 shadow-sm"
+            />
+            <span className="text-xs font-medium text-white/90 mt-1 truncate max-w-[140px]">
+              {handleDisplay}
+            </span>
+          </div>
         ) : (
-          <div className="flex h-full flex-col items-center justify-center gap-2 text-white">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full border border-white/30 bg-white/10">
-              <svg viewBox="0 0 24 24" className="h-7 w-7" fill="currentColor">
-                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.4v13.67a2.9 2.9 0 0 1-2.9 2.9 2.9 2.9 0 1 1 2.9-2.9V12.2a6.3 6.3 0 1 0 3.4 5.6V10.8a8.2 8.2 0 0 0 4.8 1.55V8.96a4.85 4.85 0 0 1-1.03-.27Z" />
-              </svg>
+          <div className="relative flex h-full w-full flex-col items-center justify-center p-3 text-white bg-slate-800">
+            <div className="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-xs font-semibold text-white">
+              {creatorInitials}
             </div>
-            <span className="text-xs text-white/70">Video disponible en TikTok</span>
+            <span className="text-xs font-medium text-slate-300 mt-1 truncate max-w-[140px]">
+              {handleDisplay}
+            </span>
           </div>
         )}
 
-        <span className="absolute left-3 top-3 rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-white backdrop-blur">
-          {category}
-        </span>
+        {/* Play indicator */}
+        <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="w-9 h-9 rounded-full bg-white/90 text-[#263B35] flex items-center justify-center shadow-sm">
+            <Play className="w-4 h-4 fill-current ml-0.5" />
+          </div>
+        </div>
 
-        <span className="absolute bottom-3 right-3 rounded-full bg-black/70 px-3 py-1 text-xs font-medium text-white">
-          TikTok
+        {/* Platform badge */}
+        <span className="absolute bottom-2 right-2 rounded bg-black/70 px-1.5 py-0.5 text-[10px] font-medium text-white">
+          {platformLabel}
         </span>
       </div>
 
-      <div className="space-y-3 p-4">
-        <div>
-          <h3 className="line-clamp-2 text-sm font-semibold text-gray-900">
+      {/* Video Content Information */}
+      <div className="p-3 flex-1 flex flex-col justify-between space-y-2">
+        <div className="space-y-1">
+          {/* Title */}
+          <h3 className="line-clamp-2 text-xs font-semibold text-[#263B35] leading-snug">
             {title}
           </h3>
-          <p className="mt-1 text-xs text-gray-500">{creator}</p>
+
+          {/* @creator · Platform */}
+          <p className="text-[11px] text-[#64748B] truncate">
+            <span className="font-medium text-[#263B35]">{handleDisplay}</span>
+            <span> · {platformLabel}</span>
+          </p>
+
+          {/* Associated place */}
+          {placeName && (
+            <p className="text-[11px] text-[#64748B] flex items-center gap-1 truncate">
+              <MapPin className="w-3 h-3 text-[#E85B49] shrink-0" />
+              <span>{placeName}</span>
+            </p>
+          )}
+
+          {/* Original publication date when available */}
+          {publishedDate && (
+            <p className="text-[10px] text-slate-500">
+              Publicado: {publishedDate}
+            </p>
+          )}
+
+          {/* Content Approved */}
+          {isApproved && (
+            <p className="text-[11px] text-emerald-700 font-medium flex items-center gap-1 pt-0.5">
+              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+              <span>Contenido aprobado</span>
+            </p>
+          )}
         </div>
 
-        {placeName && (
-          <p className="flex items-center gap-1.5 text-xs text-gray-500">
-            <span aria-hidden="true">📍</span>
-            {placeName}
-          </p>
-        )}
-
+        {/* Action: Open original content */}
         <a
           href={videoUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-700"
+          className="w-full text-center py-1.5 px-3 rounded-md bg-[#263B35] text-white hover:bg-[#E85B49] text-xs font-medium transition-colors block cursor-pointer"
         >
-          Ver video en TikTok
-          <span aria-hidden="true">↗</span>
+          Ver en {platformLabel}
         </a>
       </div>
     </article>

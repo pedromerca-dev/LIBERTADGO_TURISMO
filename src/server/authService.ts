@@ -211,27 +211,50 @@ export function clearRevokedTokensForTesting(): void {
 
 // --- MIDDLEWARES ---
 
-export async function authMiddleware(req: Request, _res: Response, next: NextFunction): Promise<void> {
+export async function authMiddleware(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): Promise<void> {
   const authHeader = req.headers.authorization;
+
   let token: string | null = null;
 
-  if (authHeader && authHeader.startsWith('Bearer ')) {
-    token = authHeader.substring(7).trim();
-  } else if (req.headers.cookie) {
-    // Check for cookie token if present
-    const match = req.headers.cookie.match(/libertadgo_token=([^;]+)/);
-    if (match) token = match[1];
+  // 1. Intentar obtener un Bearer válido
+  if (authHeader?.startsWith('Bearer ')) {
+    const bearerToken = authHeader.substring(7).trim();
+
+    if (
+      bearerToken &&
+      bearerToken !== 'null' &&
+      bearerToken !== 'undefined'
+    ) {
+      const payload = verifyToken(bearerToken);
+
+      if (payload && !(await isTokenRevoked(bearerToken))) {
+        req.user = payload;
+        next();
+        return;
+      }
+    }
   }
 
-  if (token) {
-    const payload = verifyToken(token);
-    if (payload) {
-      const revoked = await isTokenRevoked(token);
-      if (!revoked) {
+  // 2. Si el Bearer no es válido, intentar con la cookie
+  const cookieHeader = req.headers.cookie;
+
+  if (cookieHeader) {
+    const match = cookieHeader.match(/(?:^|;\s*)libertadgo_token=([^;]+)/);
+
+    if (match) {
+      const cookieToken = decodeURIComponent(match[1]);
+      const payload = verifyToken(cookieToken);
+
+      if (payload && !(await isTokenRevoked(cookieToken))) {
         req.user = payload;
       }
     }
   }
+
   next();
 }
 
