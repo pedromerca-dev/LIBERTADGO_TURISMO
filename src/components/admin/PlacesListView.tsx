@@ -20,20 +20,20 @@ import {
 import { AdminPlaceRecord, PlaceStatus } from '../../types/adminCatalog.ts';
 import { PlaceCategory } from '../../types/catalog.ts';
 import { LA_LIBERTAD_LOCALITIES } from '../../types/geo.ts';
-import { useAuth } from '../../context/AuthContext.tsx';
 
 interface PlacesListViewProps {
   onEditPlace: (place: AdminPlaceRecord) => void;
   onCreatePlace: () => void;
   onViewPlaceHistory: (placeId: string, placeName: string) => void;
+  refreshKey: number;
 }
 
 export const PlacesListView: React.FC<PlacesListViewProps> = ({
   onEditPlace,
   onCreatePlace,
   onViewPlaceHistory,
+  refreshKey,
 }) => {
-  const { token } = useAuth();
   const [places, setPlaces] = useState<AdminPlaceRecord[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -61,10 +61,8 @@ export const PlacesListView: React.FC<PlacesListViewProps> = ({
       params.set('page', String(page));
       params.set('limit', '20');
 
-      const res = await fetch(`/api/admin/places?${params.toString()}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const res = await fetch(`/api/admin/places?${params.toString()}`, {      
+          credentials: 'include',
       });
 
       if (!res.ok) {
@@ -86,7 +84,7 @@ export const PlacesListView: React.FC<PlacesListViewProps> = ({
 
   useEffect(() => {
     fetchPlaces();
-  }, [page, status, category, localityId, isVerified, token]);
+  }, [page, status, category, localityId, isVerified, refreshKey]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,27 +92,43 @@ export const PlacesListView: React.FC<PlacesListViewProps> = ({
     fetchPlaces();
   };
 
-  const handleQuickStatusChange = async (placeId: string, newStatus: PlaceStatus) => {
+  const handleQuickStatusChange = async (
+    placeId: string,
+    newStatus: PlaceStatus
+  ) => {
     try {
       const res = await fetch(`/api/admin/places/${placeId}/status`, {
         method: 'PATCH',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           status: newStatus,
           reason: `Cambio rápido desde la tabla administrativa a ${newStatus}`,
         }),
       });
-
-      if (res.ok) {
-        setPlaces((prev) =>
-          prev.map((p) => (p.id === placeId ? { ...p, status: newStatus } : p))
-        );
+  
+      if (!res.ok) {
+        throw new Error('No se pudo actualizar el estado del lugar.');
       }
-    } catch {
-      // ignore
+  
+      setPlaces((prev) =>
+        prev.map((place) =>
+          place.id === placeId
+            ? { ...place, status: newStatus }
+            : place
+        )
+      );
+  
+    } catch (err) {
+      console.error('Error al cambiar el estado del lugar:', err);
+  
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'No se pudo actualizar el estado del lugar.'
+      );
     }
   };
 
