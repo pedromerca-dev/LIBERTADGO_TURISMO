@@ -1,1 +1,1 @@
-import './src/server/adminPlacesRoutes.ts';
+import './adminPlacesRoutes.ts';

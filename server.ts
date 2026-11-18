@@ -6,6 +6,7 @@ import { createServer as createViteServer } from 'vite';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import type { Server } from 'http';
+import './src/server/bootstrapAdminPlaces.ts';
 import { apiRouter } from './src/server/routes.ts';
 import { bootstrapAdminFromEnv, validateSecurityConfig, csrfProtectionMiddleware } from './src/server/authService.ts';
 import {
